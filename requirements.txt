@@ -1,0 +1,9 @@
+motor
+pytz
+pyrogram
+tgcrypto
+aiofiles
+python-dateutil
+schedule
+requests
+Pyromod==1.5
