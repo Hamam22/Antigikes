@@ -10,14 +10,14 @@ API_HASH = os.environ.get("API_HASH", "0330ec89ddab0d2bfdf8e263a68ec510")
 
 LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", "-1002109470361"))
 
-MONGO_DB_URI = os.environ.get("MONGO_DB_URI", "mongodb+srv://nprotect:nprotect@nprotect.zjnqv8t.mongodb.net/?retryWrites=true&w=majority")
-DB_NAME = os.environ.get("DB_NAME", "NPROTECT")
+MONGO_DB_URI = os.environ.get("MONGO_DB_URI", "mongodb+srv://KalengRobot:1234@cluster0.jjdvosf.mongodb.net/?retryWrites=true&w=majority")
+DB_NAME = os.environ.get("DB_NAME", "KalengRobot")
 BROADCAST_AS_COPY = True
 
 PLUG = dict(root="antigcast/plugins")
 
-OWNER_ID = [int(x) for x in (os.environ.get("OWNER_ID", "5027198970").split())]
-OWNER_NAME = os.environ.get("OWNER_NAME", "RedflixHD")
+OWNER_ID = [int(x) for x in (os.environ.get("OWNER_ID", "6364920674").split())]
+OWNER_NAME = os.environ.get("OWNER_NAME", "Kalengsarden1")
 
 
 LOG_FILE_NAME = "antigcast_logs.txt"
@@ -36,11 +36,9 @@ def LOGGER(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 CREATOR = [
-    5027198970, # Zelda
+    6364920674, # Kaleng
     1977120689, # Naka
-    1736494994, # Naka
 ]
 
-OWNER_ID.append(5027198970) # Zelda
+OWNER_ID.append(6364920674) # Kaleng
 OWNER_ID.append(1977120689) # Naka
-OWNER_ID.append(1736494994) # Naka
