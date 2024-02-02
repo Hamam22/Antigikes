@@ -2,13 +2,13 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "6852141063:AAHYHmI_XlhvLntnPkpJtAyC-zC9RWTK4YU")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "6722954472:AAHmB2oRYgGqGkuD6Jbg07bunIkmO73TqXs")
 BOT_WORKERS = int(os.environ.get("BOT_WORKERS", "4"))
 
-APP_ID = int(os.environ.get("APP_ID", "19593289"))
-API_HASH = os.environ.get("API_HASH", "4fb53b0fbe7f33f8062fb934d0e4a4bb")
+APP_ID = int(os.environ.get("APP_ID", "28633257"))
+API_HASH = os.environ.get("API_HASH", "0330ec89ddab0d2bfdf8e263a68ec510")
 
-LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", "-1002024799257"))
+LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", "-1002109470361"))
 
 MONGO_DB_URI = os.environ.get("MONGO_DB_URI", "mongodb+srv://nprotect:nprotect@nprotect.zjnqv8t.mongodb.net/?retryWrites=true&w=majority")
 DB_NAME = os.environ.get("DB_NAME", "NPROTECT")
