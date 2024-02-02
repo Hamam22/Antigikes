@@ -57,7 +57,7 @@ async def deldblmessag(app : Bot, message : Message):
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
 async def deletermessag(app : Bot, message : Message):
-    text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @ Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+    text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Kalengsarden1 Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
     chats = await get_actived_chats()
     if chat not in chats:
