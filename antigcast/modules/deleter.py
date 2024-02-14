@@ -12,7 +12,7 @@ from antigcast.helpers.message import *
 from antigcast.helpers.database import *
 
 
-@Bot.on_message(filters.command("addbl") & ~filters.private & Admin)
+@Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def addblmessag(app : Bot, message : Message):
     trigger = get_arg(message)
     if message.reply_to_message:
