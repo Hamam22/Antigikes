@@ -15,8 +15,8 @@ CTYPE = enums.ChatType
 inlinegc = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton(text="ᴄʀᴇᴀᴛᴏʀ", url="https://t.me/Kalengsarden1"),
-            InlineKeyboardButton(text="ᴄʜᴀɴɴᴇʟ", url="https://t.me/Chkaleng")
+            InlineKeyboardButton(text="ᴄʀᴇᴀᴛᴏʀ", url="https://t.me/Kaleng1"),
+            InlineKeyboardButton(text="ᴄʜᴀɴɴᴇʟ", url="https://t.me/KalengCh")
         ]
     ]
 )
@@ -28,7 +28,7 @@ inline = InlineKeyboardMarkup(
         ],
         [
                     InlineKeyboardButton(text="Creator", url=f"http://t.me/{OWNER_NAME}"),
-                    InlineKeyboardButton(text="Channel", url="https://t.me/Chkaleng")
+                    InlineKeyboardButton(text="Channel", url="https://t.me/KalengCh")
         ]
     ]
 )
