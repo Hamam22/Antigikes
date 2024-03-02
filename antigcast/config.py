@@ -2,7 +2,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "6858482597:AAGXiRVjATRjRkkjGJfLnYdId2tAv2XNuqQ")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "6377112689:AAH1Mv_tsUAPsWbzUjjk4S5H24KsgN_VDzU")
 BOT_WORKERS = int(os.environ.get("BOT_WORKERS", "4"))
 
 APP_ID = int(os.environ.get("APP_ID", "25639252"))
