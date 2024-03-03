@@ -9,7 +9,7 @@ from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
 
-@Bot.on_message(filters.command("gdel") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
 async def mute_handler(app : Bot, message : Message):
     if not message.reply_to_message:
         if len(message.command) != 2:
@@ -19,9 +19,9 @@ async def mute_handler(app : Bot, message : Message):
     user_id = user.id
 
     if user_id == message.from_user.id:
-        return await message.reply_text("Kamu tidak bisa melakukan Global Delete pada diri sendiri")
+        return await message.reply_text("Kamu tidak bisa melakukan kata terlarang pada diri sendiri")
     elif user_id == app.me.id:
-        return await message.reply_text("Kamu tidak bisa melakukan Global Delete pada Bot")
+        return await message.reply_text("Kamu tidak bisa melakukan kata terlarang pada Bot")
     elif user_id in OWNER_ID:
         return await message.reply_text("Kamu tidak bisa melakukan Global Delete pada Developer Bot")
 
@@ -30,7 +30,7 @@ async def mute_handler(app : Bot, message : Message):
 
     muted = await get_muted_users()
     if user_id in muted:
-        await xxnx.edit("**Maaf, Pengguna ini udah ada di daftar Global Mute**")
+        await xxnx.edit("**Maaf, Pengguna ini udah ada di daftar kata terlarang*")
         await asyncio.sleep(10)
         await xxnx.delete()
         await message.delete
