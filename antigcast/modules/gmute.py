@@ -26,7 +26,7 @@ async def mute_handler(app : Bot, message : Message):
         return await message.reply_text("Kamu tidak bisa melakukan Global Delete pada Developer Bot")
 
 
-    xxnx = await message.reply(f"`Memberikan Global Mute pada User...`")
+    xxnx = await message.reply(f"`Berhasil memasukan kata terlarang...`")
 
     muted = await get_muted_users()
     if user_id in muted:
@@ -43,12 +43,12 @@ async def mute_handler(app : Bot, message : Message):
 
         await mute_user(kon_id)
 
-        await xxnx.edit(f"**Global Mute Berhasil**\n- Name : {kon_name}\n- User ID : `{kon_id}`")
+        await xxnx.edit(f"**Berhasil Masukan kata terlarang**\n- Name : {kon_name}\n- User ID : `{kon_id}`")
         await asyncio.sleep(10)
         await xxnx.delete()
         await message.delete()
     except BaseException as e:
-        return xxnx.edit(f"**Global Mute Gagal :** `{e}`")
+        return xxnx.edit(f"**Kata terlarang sudah ada di list :** `{e}`")
 
 @Bot.on_message(filters.command("ungdel") & filters.user(OWNER_ID))
 async def unmute_hndlr(app : Bot, message : Message):
