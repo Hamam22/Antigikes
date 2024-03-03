@@ -13,7 +13,7 @@ from antigcast.helpers.database import *
 async def mute_handler(app : Bot, message : Message):
     if not message.reply_to_message:
         if len(message.command) != 2:
-            return await message.reply_text("Berikan saya id/username atau reply ke pesan")
+            return await message.reply_text("Berikan saya kata terlarang yang ingin di hapus")
         
     user = await extract(message)
     user_id = user.id
