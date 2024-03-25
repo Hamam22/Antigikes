@@ -1,0 +1,32 @@
+{
+    "env": {
+        "BOT_TOKEN": {
+            "description": "",
+            "required": true
+        },
+        "API_ID": {
+            "description": "",
+            "required": true
+        },
+       "API_HASH": {
+            "description": "",
+            "required": true
+        },
+        "LOG_CHANNEL_ID": {
+            "description": "",
+            "required": true
+        },
+        "OWNER_ID": {
+            "description": "",
+            "required": false,
+            "value": "6367490039"
+        },
+        "MONGO_DB_URI": {
+            "description": "",
+            "required": true
+        },
+        
+    "buildpacks": [
+        {"url": "heroku/python"}
+    ]
+}
