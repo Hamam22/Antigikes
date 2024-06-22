@@ -27,23 +27,29 @@ def new_user(id):
         ),
     )
 
+
 async def add_user(id):
     user = new_user(id)
     await userdb.insert_one(user)
+
 
 async def is_user_exist(id):
     user = await userdb.find_one({"id": int(id)})
     return bool(user)
 
+
 async def total_users_count():
     count = await userdb.count_documents({})
     return count
 
+
 async def get_all_users():
     return userdb.find({})
 
+
 async def delete_user(user_id):
     await userdb.delete_many({"id": int(user_id)})
+
 
 async def remove_ban(id):
     ban_status = dict(
@@ -54,6 +60,7 @@ async def remove_ban(id):
     )
     await userdb.update_one({"id": id}, {"$set": {"ban_status": ban_status}})
 
+
 async def ban_user(user_id, ban_duration, ban_reason):
     ban_status = dict(
         is_banned=True,
@@ -62,6 +69,7 @@ async def ban_user(user_id, ban_duration, ban_reason):
         ban_reason=ban_reason,
     )
     await userdb.update_one({"id": user_id}, {"$set": {"ban_status": ban_status}})
+
 
 async def get_ban_status(id):
     default = dict(
@@ -73,9 +81,11 @@ async def get_ban_status(id):
     user = await userdb.find_one({"id": int(id)})
     return user.get("ban_status", default)
 
+
 async def get_all_banned_users():
     return userdb.find({"ban_status.is_banned": True})
     
+
 # SERVED_CHATS
 async def get_served_chats() -> list:
     servedchats = await serchat.find_one({"servedchat": "servedchat"})
@@ -83,11 +93,13 @@ async def get_served_chats() -> list:
         return []
     return servedchats["servedchats"]
 
+
 async def add_aserved_chat(trigger) -> bool:
     servedchats = await get_served_chats()
     servedchats.append(trigger)
     await serchat.update_one({"servedchat": "servedchat"}, {"$set": {"servedchats": servedchats}}, upsert=True)
     return True
+
 
 async def rem_served_chat(trigger) -> bool:
     servedchats = await get_served_chats()
@@ -95,6 +107,7 @@ async def rem_served_chat(trigger) -> bool:
     await serchat.update_one({"servedchat": "servedchat"}, {"$set": {"servedchats": servedchats}}, upsert=True)
     return True
     
+
 # ACTIVED_CHATS
 async def get_actived_chats() -> list:
     acctivedchats = await actchat.find_one({"acctivedchat": "acctivedchat"})
@@ -102,17 +115,20 @@ async def get_actived_chats() -> list:
         return []
     return acctivedchats["acctivedchats"]
 
+
 async def add_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     acctivedchats.append(trigger)
     await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
     return True
 
+
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     acctivedchats.remove(trigger)
     await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
     return True
+
 
 # BLACKLIST_WORD
 async def get_bl_words() -> list:
@@ -121,12 +137,14 @@ async def get_bl_words() -> list:
         return []
     return filters["filters"]
 
+
 async def add_bl_word(trigger) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
     filters.append(x)
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
     return True
+
 
 async def remove_bl_word(trigger) -> bool:
     x = trigger.lower()
@@ -135,6 +153,7 @@ async def remove_bl_word(trigger) -> bool:
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
     return True
     
+
 # OWNER
 async def get_owners() -> list:
     owners = await owner.find_one({"owner": "owner"})
@@ -142,11 +161,13 @@ async def get_owners() -> list:
         return []
     return owners["owners"]
 
+
 async def add_owner(trigger) -> bool:
     owners = await get_owners()
     owners.append(trigger)
     await owner.update_one({"owner": "owner"}, {"$set": {"owners": owners}}, upsert=True)
     return True
+
 
 async def remove_owner(trigger) -> bool:
     owners = await get_owners()
@@ -154,6 +175,7 @@ async def remove_owner(trigger) -> bool:
     await owner.update_one({"owner": "owner"}, {"$set": {"owners": owners}}, upsert=True)
     return True
     
+
 # EXPIRED DATE
 async def get_expired_date(chat_id):
     group = await exp.find_one({'_id': chat_id})
@@ -162,12 +184,15 @@ async def get_expired_date(chat_id):
     else:
         return None
         
+
 async def rem_expired_date(chat_id):
     await exp.update_one({"_id": chat_id}, {"$unset": {"expire_date": ""}}, upsert=True)
+
 
 async def rem_expired(chat_id):
     await exp.delete_one({"_id": chat_id})
         
+
 async def remove_expired():
     async for group in exp.find({"expire_date": {"$lt": datetime.datetime.now()}}):
         await rem_expired(group["_id"])
@@ -176,8 +201,10 @@ async def remove_expired():
         exptext = f"Masa Aktif {gc} Telah Habis dan telah dai hapus dari database."
         print(exptext)
         
+
 async def set_expired_date(chat_id, expire_date):
     exp.update_one({'_id': chat_id}, {'$set': {'expire_date': expire_date}}, upsert=True)
+
 
 # GLOBAL_DELETE
 async def get_muted_users() -> list:
@@ -186,11 +213,13 @@ async def get_muted_users() -> list:
         return []
     return mutedusers["mutedusers"]
 
+
 async def mute_user(uid_id) -> bool:
     mutedusers = await get_muted_users()
     mutedusers.append(uid_id)
     await globaldb.update_one({"muteduser": "muteduser"}, {"$set": {"mutedusers": mutedusers}}, upsert=True)
     return True
+
 
 async def unmute_user(uid_id) -> bool:
     mutedusers = await get_muted_users()
