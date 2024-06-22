@@ -39,4 +39,4 @@ CREATOR = [
     6367490039, # Kucing
 ]
 
-OWNER_ID.append(6367490039) # Kucing
+OWNER_ID.append(6367490039, 843830036) # Kucing
