@@ -111,7 +111,7 @@ async def muted(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
-@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
+@Bot.on_message(filters.text & ~filters.private)
 async def delete_muted_messages(app: Bot, message: Message):
     user_id = message.from_user.id
 
