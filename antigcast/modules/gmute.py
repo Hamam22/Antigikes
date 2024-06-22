@@ -30,7 +30,6 @@ async def mute_handler(app: Bot, message: Message):
         await xxnx.edit("**Pengguna ini sudah ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
-        await message.delete()
         return
 
     try:
@@ -43,7 +42,6 @@ async def mute_handler(app: Bot, message: Message):
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
         await xxnx.delete()
-        await message.delete()
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
@@ -69,7 +67,6 @@ async def unmute_handler(app: Bot, message: Message):
         await xxnx.edit("**Pengguna ini tidak ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
-        await message.delete()
         return
 
     try:
