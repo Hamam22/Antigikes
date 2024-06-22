@@ -7,57 +7,57 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipan
 
 from antigcast.config import *
 from antigcast.helpers.tools import *
-from antigcast.helpers.admins import *
-from antigcast.helpers.message import *
-from antigcast.helpers.database import *
-
+from antigcast.helpers.admins import Admin
+from antigcast.helpers.message import get_arg
+from antigcast.helpers.database import add_bl_word, remove_bl_word, get_actived_chats
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
-async def addblmessag(app : Bot, message : Message):
+async def addblmessag(app: Bot, message: Message):
     trigger = get_arg(message)
     if message.reply_to_message:
         trigger = message.reply_to_message.text or message.reply_to_message.caption
 
-    xxnx = await message.reply(f"`Menambahakan` {trigger} `ke dalam blacklist..`")
+    if not trigger:
+        return await message.reply("`Tidak ada kata yang diberikan untuk dimasukkan ke dalam blacklist.`")
+
+    xxnx = await message.reply(f"`Menambahkan` {trigger} `ke dalam blacklist..`")
     try:
         await add_bl_word(trigger.lower())
-    except BaseException as e:
-        return await xxnx.edit(f"Error : `{e}`")
-
-    try:
-        await xxnx.edit(f"{trigger} `berhasil di tambahkan ke dalam blacklist..`")
-    except:
-        await app.send_message(message.chat.id, f"{trigger} `berhasil di tambahkan ke dalam blacklist..`")
+        await xxnx.edit(f"`{trigger}` `berhasil ditambahkan ke dalam blacklist..`")
+    except Exception as e:
+        await xxnx.edit(f"Error: `{e}`")
 
     await asyncio.sleep(5)
     await xxnx.delete()
     await message.delete()
 
 @Bot.on_message(filters.command("delbl") & ~filters.private & Admin)
-async def deldblmessag(app : Bot, message : Message):
+async def deldblmessag(app: Bot, message: Message):
     trigger = get_arg(message)
     if message.reply_to_message:
         trigger = message.reply_to_message.text or message.reply_to_message.caption
 
-    xxnx = await message.reply(f"`Menghapus` {trigger} `ke dalam blacklist..`")
+    if not trigger:
+        return await message.reply("`Tidak ada kata yang diberikan untuk dihapus dari blacklist.`")
+
+    xxnx = await message.reply(f"`Menghapus` {trigger} `dari blacklist..`")
     try:
         await remove_bl_word(trigger.lower())
-    except BaseException as e:
-        return await xxnx.edit(f"Error : `{e}`")
-
-    try:
-        await xxnx.edit(f"{trigger} `berhasil di hapus dari blacklist..`")
-    except:
-        await app.send_message(message.chat.id, f"{trigger} `berhasil di hapus dari blacklist..`")
+        await xxnx.edit(f"`{trigger}` `berhasil dihapus dari blacklist..`")
+    except Exception as e:
+        await xxnx.edit(f"Error: `{e}`")
 
     await asyncio.sleep(5)
     await xxnx.delete()
     await message.delete()
 
-
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
-async def deletermessag(app : Bot, message : Message):
-    text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+async def deletermessag(app: Bot, message: Message):
+    text = (
+        "Maaf, grup ini tidak terdaftar dalam list. "
+        "Silahkan hubungi @Zenithnewbie untuk mendaftarkan grup Anda.\n\n"
+        "**Bot akan meninggalkan grup!**"
+    )
     chat = message.chat.id
     chats = await get_actived_chats()
     if chat not in chats:
@@ -66,10 +66,10 @@ async def deletermessag(app : Bot, message : Message):
         try:
             await app.leave_chat(chat)
         except UserNotParticipant as e:
-            print(e)
+            print(f"Error leaving chat: {e}")
         return
-    
-    # Delete
+
+    # Delete the message
     try:
         await message.delete()
     except FloodWait as e:
