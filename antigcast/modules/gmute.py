@@ -3,13 +3,10 @@ import asyncio
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
-from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
 from antigcast.config import *
 from antigcast.helpers.tools import *
-from antigcast.helpers.admins import Admin
-from antigcast.helpers.message import get_arg, extract
-from antigcast.helpers.database import add_bl_word, remove_bl_word, get_actived_chats, get_muted_users, mute_user, unmute_user
+from antigcast.helpers.database import *
 
 @Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
 async def mute_handler(app: Bot, message: Message):
