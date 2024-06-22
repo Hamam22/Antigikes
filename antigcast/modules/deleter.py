@@ -7,9 +7,9 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipan
 
 from antigcast.config import *
 from antigcast.helpers.tools import *
-from antigcast.helpers.admins import Admin
-from antigcast.helpers.message import get_arg
-from antigcast.helpers.database import add_bl_word, remove_bl_word, get_actived_chats
+from antigcast.helpers.admins import *
+from antigcast.helpers.message import *
+from antigcast.helpers.database import *
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def addblmessag(app: Bot, message: Message):
