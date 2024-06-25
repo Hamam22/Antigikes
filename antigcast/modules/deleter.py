@@ -51,7 +51,7 @@ async def deldblmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
+@Bot.on_message(filters.text & ~filters.private & Gcast)
 async def deletermessag(app: Bot, message: Message):
     text = (
         "Maaf, grup ini tidak terdaftar dalam list. "
