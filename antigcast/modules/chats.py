@@ -44,18 +44,26 @@ async def addgcmessag(app : Bot, message : Message):
     await message.delete()
 
 @Bot.on_message(filters.command("add") & filters.user(OWNER_ID))
-async def addgroupmessag(app : Bot, message : Message):
+async def addgroupmessag(app: Bot, message: Message):
     xxnx = await message.reply(f"`Menambahakan izin dalam grup ini..`")
-    if len(message.command) > 3:
+    
+    if len(message.command) < 3:
         return await xxnx.edit(f"**Gunakan Format** : `/add group_id hari`")
-    command, group, hari = message.command[:3]
-    chat_id = int(group)
+    
+    try:
+        command, group, hari = message.command[:3]
+        chat_id = int(group)
+        days = int(hari)
+    except ValueError:
+        return await xxnx.edit("Group ID dan hari harus berupa angka.")
+    
     now = datetime.datetime.now(timezone("Asia/Jakarta"))
-    expired = now + relativedelta(days=int(hari))
+    expired = now + relativedelta(days=days)
     expired_date = expired.strftime("%d-%m-%Y")
+    
     chats = await get_actived_chats()
     if chat_id in chats:
-        msg = await message.reply("Maaf, Group ini sudah di izinkan untuk menggunakan Bot.")
+        msg = await message.reply("Maaf, Group ini sudah diizinkan untuk menggunakan Bot.")
         await asyncio.sleep(10)
         await msg.delete()
         return
@@ -64,9 +72,9 @@ async def addgroupmessag(app : Bot, message : Message):
         added = await add_actived_chat(chat_id)
         if added:
             await set_expired_date(chat_id, expired)
-    except BaseException as e:
+    except Exception as e:
         print(e)
-
+    
     await xxnx.edit(f"**BOT AKTIF**\nGroup ID: `{group}`\nExp : `{expired_date}` | `{hari} Hari..`")
     await asyncio.sleep(10)
     await xxnx.delete()
