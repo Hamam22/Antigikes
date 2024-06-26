@@ -41,7 +41,7 @@ async def handle_restart(app : Bot, message : Message):
     os.execl(sys.executable, sys.executable, "-m", "antigcast")
 
 @Client.on_message(filters.command("clean") & filters.user(CREATOR))
-async def handle_clean(client, message):
+async def handle_clean(app : Bot, message : Message):
     count = 0
     for file_name in os.popen("ls").read().split():
         try:
