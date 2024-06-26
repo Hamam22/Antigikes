@@ -60,7 +60,6 @@ async def deletermessag(app: Bot, message: Message):
     text = "Maaf, Grup ini tidak terdaftar di dalam list..."
     chat = message.chat.id
     chats = await get_actived_chats()
-    logging.info(f"Checking chat ID: {chat}")
 
     if chat not in chats:
         await message.reply(text=text)
@@ -71,11 +70,9 @@ async def deletermessag(app: Bot, message: Message):
             logging.error(e)
         return
 
-    # Check if message should be deleted
-    if Gcast:  # This should be a proper condition check
+    if Gcast:
         try:
             await message.delete()
-            logging.info(f"Deleted message from chat {chat}")
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.delete()
