@@ -71,11 +71,13 @@ async def deletermessag(app: Bot, message: Message):
             logging.error(e)
         return
 
-    try:
-        await message.delete()
-        logging.info(f"Deleted message from chat {chat}")
-    except FloodWait as e:
-        await asyncio.sleep(e.value)
-        await message.delete()
-    except MessageDeleteForbidden:
-        pass
+    # Check if message should be deleted
+    if Gcast:  # This should be a proper condition check
+        try:
+            await message.delete()
+            logging.info(f"Deleted message from chat {chat}")
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+            await message.delete()
+        except MessageDeleteForbidden:
+            pass
