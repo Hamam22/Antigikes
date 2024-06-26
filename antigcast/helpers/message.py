@@ -1,5 +1,8 @@
+import logging
 from pyrogram import filters
 from antigcast.helpers.database import *
+
+logging.basicConfig(level=logging.INFO)
 
 
 async def isGcast(filter, client, update):
@@ -7,25 +10,30 @@ async def isGcast(filter, client, update):
     awoos = update.text
     x = awoos.lower()
     xx = await get_bl_words()
-        
+    logging.info(f"Message content: {x}")
+
     with open('bl.txt', 'r') as file:
         blc = [w.lower().strip() for w in file.readlines()]
-        for chara in bl:
-            blc.append(chara)
+        blc.extend(bl)
+
+    logging.info(f"Blacklist characters: {blc}")
 
     for chara in blc:
         if chara in x:
+            logging.info(f"Found blacklisted char/word: {chara} in {x}")
             return True
-        
+
     if x in xx:
+        logging.info(f"Found blacklisted word: {x} in {xx}")
         return True
-    
+
     kont = update.from_user.id
     meki = await get_muted_users()
 
     if kont in meki:
+        logging.info(f"User {kont} is muted")
         return True
-        
+
     return False
 
 Gcast = filters.create(isGcast)
