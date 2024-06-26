@@ -10,19 +10,23 @@ async def isGcast(filter, client, update):
     awoos = update.text
     x = awoos.lower()
     xx = await get_bl_words()
+    
     logging.info(f"Message content: {x}")
 
+    # Read from bl.txt and add to blacklist characters
     with open('bl.txt', 'r') as file:
-        blc = [w.lower().strip() for w in file.readlines()]
+        blc = [w.lower().strip() for w in file.readlines() if w.strip()]
         blc.extend(bl)
-
+    
     logging.info(f"Blacklist characters: {blc}")
 
+    # Check if any blacklisted character or word is in the message
     for chara in blc:
-        if chara in x:
+        if chara and chara in x:
             logging.info(f"Found blacklisted char/word: {chara} in {x}")
             return True
 
+    # Check if the whole message matches any blacklisted word
     if x in xx:
         logging.info(f"Found blacklisted word: {x} in {xx}")
         return True
