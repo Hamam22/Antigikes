@@ -12,7 +12,7 @@ from antigcast.helpers.message import *
 from antigcast.helpers.database import *
 
 
-@Boy.on_message(filters.command("bl") & ~filters.private & Admin)
+@Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def tambah_ke_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
     if not trigger and message.reply_to_message:
@@ -57,7 +57,7 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.text & ~filters.private & Gcast)
+@Bot.on_message(filters.text & ~filters.private)
 async def deletermessag(app: Bot, message: Message):
     text = "Maaf, Grup ini tidak terdaftar di dalam list..."
     chat = message.chat.id
