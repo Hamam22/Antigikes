@@ -1,5 +1,3 @@
-import os
-import sys
 import asyncio
 import datetime
 
@@ -10,8 +8,6 @@ from pyrogram.enums import MessageEntityType
 
 from antigcast.helpers.database import *
 
-def restart():
-    os.execvp(sys.executable, [sys.executable, "-m antigcast"])
 
 def get_arg(message: Message):
     msg = message.text
