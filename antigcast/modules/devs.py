@@ -1,3 +1,4 @@
+import os
 import sys
 import asyncio
 import subprocess
@@ -23,22 +24,33 @@ async def send_msg(chat_id, message: Message):
         return send_msg(chat_id, message)
 
 @Bot.on_message(filters.command("update") & filters.user(CREATOR))
-async def updatemessag(app : Bot, message : Message):
-    xx = await message.reply(f"**Processing Update...**")
-    await asyncio.sleep(3)
-    try:
-        out = subprocess.check_output(["git", "pull"]).decode("UTF-8")
-        if "Already up to date." in str(out):
-            xnxx =  await xx.edit("**Bot sudah versi Terbaru")
-            await asyncio.sleep(3)
-            await xnxx.delete()
-            return await message.delete()
-        await xx.edit(f"```{out}```")
-    except Exception as e:
-        return await xx.edit(str(e))
-    await xx.delete()
-    await message.delete()
-    await restart()
+async def handle_update(app : Bot, message : Message):
+    out = subprocess.check_output(["git", "pull"]).decode("UTF-8")
+    if "Already up to date." in str(out):
+        return await message.reply(out, quote=True)
+    elif int(len(str(out))) > 4096:
+        await send_large_output(message, out)
+    else:
+        await message.reply(f"```{out}```", quote=True)
+    os.execl(sys.executable, sys.executable, "-m", "antigcast")
+
+
+@Bot.on_message(filters.command("restart") & filters.user(CREATOR))
+async def handle_restart(app : Bot, message : Message):
+    await message.reply("✅ System berhasil direstart", quote=True)
+    os.execl(sys.executable, sys.executable, "-m", "antigcast")
+
+@Bot.on_message(filters.command("clean") & filters.user(CREATOR))
+async def handle_clean(app : Bot, message : Message):
+    count = 0
+    for file_name in os.popen("ls").read().split():
+        try:
+            os.remove(file_name)
+            count += 1
+        except:
+            pass
+    await bash("rm -rf downloads")
+    await message.reply(f"✅ {count} sampah berhasil di bersihkan")
 
 @Bot.on_message(filters.command("gcast") & filters.user(CREATOR))
 async def gcast_hndl(app : Bot, message : Message):
