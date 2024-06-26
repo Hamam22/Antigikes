@@ -8,7 +8,7 @@ async def isGcast(filter, client, update):
     x = awoos.lower()
     xx = await get_bl_words()
         
-    with open('bl.txt', 'r') as file:
+    with open('bll.txt', 'r') as file:
         blc = [w.lower().strip() for w in file.readlines()]
         for chara in bl:
             blc.append(chara)
