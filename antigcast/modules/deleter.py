@@ -12,46 +12,48 @@ from antigcast.helpers.message import *
 from antigcast.helpers.database import *
 
 
-@Bot.on_message(filters.command("bl") & ~filters.private & Admin)
-async def addblmessag(app : Bot, message : Message):
+@Boy.on_message(filters.command("bl") & ~filters.private & Admin)
+async def tambah_ke_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
-    if message.reply_to_message:
+    if not trigger and message.reply_to_message:
         trigger = message.reply_to_message.text or message.reply_to_message.caption
 
-    xxnx = await message.reply(f"`Menambahakan` {trigger} `ke dalam blacklist..`")
+    if not trigger:
+        await message.reply("Error: Tidak ada kata yang diberikan untuk blacklist.")
+        return
+
+    response = await message.reply(f"`Menambahkan` {trigger} `ke dalam blacklist...`")
     try:
         await add_bl_word(trigger.lower())
-    except BaseException as e:
-        return await xxnx.edit(f"Error : `{e}`")
-
-    try:
-        await xxnx.edit(f"{trigger} `berhasil di tambahkan ke dalam blacklist..`")
-    except:
-        await app.send_message(message.chat.id, f"{trigger} `berhasil di tambahkan ke dalam blacklist..`")
+        await response.edit(f"`{trigger}` berhasil ditambahkan ke dalam blacklist.")
+    except Exception as e:
+        await response.edit(f"Error: `{e}`")
 
     await asyncio.sleep(5)
-    await xxnx.delete()
+    await response.delete()
     await message.delete()
 
 @Bot.on_message(filters.command("delbl") & ~filters.private & Admin)
-async def deldblmessag(app : Bot, message : Message):
+async def hapus_dari_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
-    if message.reply_to_message:
+    if not trigger and message.reply_to_message:
         trigger = message.reply_to_message.text or message.reply_to_message.caption
 
-    xxnx = await message.reply(f"`Menghapus` {trigger} `ke dalam blacklist..`")
+    if not trigger:
+        await message.reply("Error: Tidak ada kata yang diberikan untuk dihapus dari blacklist.")
+        return
+
+    response = await message.reply(f"`Menghapus` {trigger} `dari blacklist...`")
     try:
         await remove_bl_word(trigger.lower())
-    except BaseException as e:
-        return await xxnx.edit(f"Error : `{e}`")
-
-    try:
-        await xxnx.edit(f"{trigger} `berhasil di hapus dari blacklist..`")
-    except:
-        await app.send_message(message.chat.id, f"{trigger} `berhasil di hapus dari blacklist..`")
+        await response.edit(f"`{trigger}` berhasil dihapus dari blacklist.")
+    except ValueError as e:
+        await response.edit(f"Error: `{e}`")  # Penanganan error khusus jika tidak ditemukan
+    except Exception as e:
+        await response.edit(f"Error: `{e}`")
 
     await asyncio.sleep(5)
-    await xxnx.delete()
+    await response.delete()
     await message.delete()
 
 
