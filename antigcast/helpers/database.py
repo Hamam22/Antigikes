@@ -12,6 +12,7 @@ blackword = db['BLACKWORDS']
 owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
+mute_collection = db['GROUPMUTE']
 
 
 #USERS
@@ -226,3 +227,27 @@ async def unmute_user(uid_id) -> bool:
     mutedusers.remove(uid_id)
     await globaldb.update_one({"muteduser": "muteduser"}, {"$set": {"mutedusers": mutedusers}}, upsert=True)
     return True
+
+# GROUP_MUTE
+async def mute_user_in_group(group_id, user_id):
+    await mute_collection.update_one(
+        {'group_id': group_id},
+        {'$addToSet': {'user_ids': user_id}},
+        upsert=True
+    )
+
+async def unmute_user_in_group(group_id, user_id):
+    await mute_collection.update_one(
+        {'group_id': group_id},
+        {'$pull': {'user_ids': user_id}}
+    )
+
+async def get_muted_users_in_group(group_id):
+    doc = await mute_collection.find_one({'group_id': group_id})
+    if doc:
+        return doc.get('user_ids', [])
+    return []
+
+async def clear_muted_users_in_group(group_id):
+    await mute_collection.delete_one({'group_id': group_id})
+    
