@@ -126,9 +126,12 @@ async def add_actived_chat(trigger) -> bool:
 
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
-    acctivedchats.remove(trigger)
-    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
-    return True
+    if trigger in acctivedchats:
+        acctivedchats.remove(trigger)
+        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+        return True
+    else:
+        return False
 
 
 # BLACKLIST_WORD
