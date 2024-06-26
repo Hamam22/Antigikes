@@ -56,22 +56,24 @@ async def deldblmessag(app : Bot, message : Message):
 
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
-async def deletermessag(app : Bot, message : Message):
-    text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+async def deletermessag(app: Bot, message: Message):
+    text = "Maaf, Grup ini tidak terdaftar di dalam list..."
     chat = message.chat.id
     chats = await get_actived_chats()
+    logging.info(f"Checking chat ID: {chat}")
+
     if chat not in chats:
         await message.reply(text=text)
         await asyncio.sleep(5)
         try:
             await app.leave_chat(chat)
         except UserNotParticipant as e:
-            print(e)
+            logging.error(e)
         return
-    
-    # Delete
+
     try:
         await message.delete()
+        logging.info(f"Deleted message from chat {chat}")
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await message.delete()
