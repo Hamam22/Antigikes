@@ -5,6 +5,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 from antigcast import Bot
 
+from antigcast.helpers.admins import *
 from antigcast.config import *
 
 
