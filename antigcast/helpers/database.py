@@ -310,10 +310,10 @@ async def add_seller(seller_id, user_id, username, first_name, last_name):
         await sellers_collection.update_one(
             {'_id': seller_id},
             {'$set': {
-                'seller_name': seller_name,
+                'seller_name': seller_name if seller_name else "Unknown",
                 'added_by': {
                     'user_id': user_id,
-                    'username': username
+                    'username': username if username else "Unknown"
                 },
                 'added_at': datetime.datetime.now(timezone("Asia/Jakarta"))
             }},
