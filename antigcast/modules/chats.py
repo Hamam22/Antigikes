@@ -13,6 +13,9 @@ from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
 
+#SUPPORT BY PYROGRAM !!!!!!
+
+
 
 async def is_seller(user_id):
     sellers = await list_sellers()
