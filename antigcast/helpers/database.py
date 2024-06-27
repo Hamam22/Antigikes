@@ -309,11 +309,12 @@ async def add_seller(seller_id, user_id, username):
         await sellers_collection.update_one(
             {'_id': seller_id},
             {'$set': {
+                'seller_name': seller_name,
                 'added_by': {
-                    'user_id': message.from_user.id,
-                    'username': message.from_user.username
+                    'user_id': user_id,
+                    'username': username
                 },
-                'added_at': datetime.datetime.now(timezone("Asia/Jakarta"))
+                'added_at': datetime.datetime.now(timezone("UTC"))
             }},
             upsert=True
         )
