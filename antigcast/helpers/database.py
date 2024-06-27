@@ -304,7 +304,8 @@ async def clear_muted_users_in_group(group_id):
 
 
 #SELLER
-async def add_seller(seller_id, user_id, username):
+async def add_seller(seller_id, user_id, first_name, last_name):
+    seller_name = f"{first_name} {last_name}".strip()
     try:
         await sellers_collection.update_one(
             {'_id': seller_id},
@@ -312,7 +313,7 @@ async def add_seller(seller_id, user_id, username):
                 'seller_name': seller_name,
                 'added_by': {
                     'user_id': user_id,
-                    'username': username
+                    'username': message.from_user.username
                 },
                 'added_at': datetime.datetime.now(timezone("UTC"))
             }},
@@ -322,7 +323,6 @@ async def add_seller(seller_id, user_id, username):
     except Exception as e:
         print(f"Error adding seller: {e}")
         return False
-
 
 async def rem_seller(seller_id):
     try:
