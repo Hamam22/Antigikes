@@ -310,8 +310,8 @@ async def add_seller(seller_id, user_id, username):
             {'_id': seller_id},
             {'$set': {
                 'added_by': {
-                    'user_id': user_id,
-                    'username': username
+                    'user_id': message.from_user.id,
+                    'username': message.from_user.username
                 },
                 'added_at': datetime.datetime.now(timezone("Asia/Jakarta"))
             }},
