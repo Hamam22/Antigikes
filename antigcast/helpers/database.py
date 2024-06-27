@@ -15,7 +15,7 @@ owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mute_collection = db['GROUPMUTE']
-SELLER = db['ADDSELLER']
+seller = db['ADDSELLER']
 
 #USERS
 def new_user(id):
@@ -118,7 +118,6 @@ async def get_actived_chats() -> list:
         return []
     return acctivedchats["acctivedchats"]
 
-# Fungsi untuk menambahkan chat aktif
 async def add_actived_chat(trigger, user_id, username) -> bool:
     acctivedchats = await get_actived_chats()
     if trigger not in acctivedchats:
@@ -132,7 +131,6 @@ async def add_actived_chat(trigger, user_id, username) -> bool:
         return True
     return False
 
-# Fungsi untuk menghapus chat aktif
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     if trigger in acctivedchats:
@@ -145,7 +143,6 @@ async def rem_actived_chat(trigger) -> bool:
         return True
     return False
 
-# Fungsi untuk menetapkan informasi pengguna yang menambahkan grup
 async def set_chat_added_by(chat_id, user_id, username):
     await actchat.update_one(
         {'_id': chat_id},
@@ -158,7 +155,6 @@ async def set_chat_added_by(chat_id, user_id, username):
         upsert=True
     )
 
-# Fungsi untuk mendapatkan informasi pengguna yang menambahkan grup
 async def get_added_by(chat_id):
     chat = await actchat.find_one({'_id': chat_id})
     if chat:
@@ -219,15 +215,12 @@ async def get_expired_date(chat_id):
         return group.get('expire_date')
     return None
 
-# Fungsi untuk menghapus tanggal kedaluwarsa
 async def rem_expired_date(chat_id):
     await exp.update_one({"_id": chat_id}, {"$unset": {"expire_date": ""}}, upsert=True)
 
-# Fungsi untuk menghapus entri grup yang sudah kedaluwarsa
 async def rem_expired(chat_id):
     await exp.delete_one({"_id": chat_id})
 
-# Fungsi untuk menghapus grup yang sudah kedaluwarsa
 async def remove_expired():
     now = datetime.datetime.now(timezone("Asia/Jakarta"))
     async for group in exp.find({"expire_date": {"$lt": now}}):
@@ -237,7 +230,6 @@ async def remove_expired():
         exptext = f"Masa Aktif {gc} Telah Habis dan telah dihapus dari database."
         print(exptext)
 
-# Fungsi untuk menetapkan tanggal kedaluwarsa
 async def set_expired_date(chat_id, expire_date, user_id, username):
     await exp.update_one(
         {'_id': chat_id},
@@ -250,6 +242,7 @@ async def set_expired_date(chat_id, expire_date, user_id, username):
         }},
         upsert=True
     )
+
 
 # GLOBAL_DELETE
 async def get_muted_users() -> list:
@@ -271,6 +264,7 @@ async def unmute_user(uid_id) -> bool:
     mutedusers.remove(uid_id)
     await globaldb.update_one({"muteduser": "muteduser"}, {"$set": {"mutedusers": mutedusers}}, upsert=True)
     return True
+
 
 # GROUP_MUTE
 async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
@@ -308,6 +302,7 @@ async def clear_muted_users_in_group(group_id):
         {'$unset': {'user_data': ""}}  # Remove the entire user_data field
     )
 
+
 #SELLER
 async def add_seller(seller_id, seller_name, user_id, username):
     try:
@@ -328,7 +323,7 @@ async def add_seller(seller_id, seller_name, user_id, username):
         print(f"Error adding seller: {e}")
         return False
 
-# Fungsi untuk menghapus seller berdasarkan seller_id
+
 async def rem_seller(seller_id):
     try:
         await sellers_collection.delete_one({'_id': seller_id})
@@ -337,7 +332,7 @@ async def rem_seller(seller_id):
         print(f"Error removing seller: {e}")
         return False
 
-# Fungsi untuk mendapatkan daftar semua seller
+
 async def list_sellers():
     try:
         sellers = []
@@ -348,7 +343,7 @@ async def list_sellers():
         print(f"Error listing sellers: {e}")
         return []
 
-# Fungsi untuk mendapatkan seller berdasarkan seller_id
+
 async def get_seller(seller_id):
     try:
         seller = await sellers_collection.find_one({'_id': seller_id})
