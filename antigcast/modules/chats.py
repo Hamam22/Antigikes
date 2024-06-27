@@ -13,8 +13,18 @@ from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
 
-@Bot.on_message(filters.command("addgc") & filters.user(OWNER_ID))
+# Fungsi untuk mengecek apakah pengguna adalah penjual yang diizinkan
+async def is_seller(user_id):
+    sellers = await list_sellers()
+    return any(seller['_id'] == user_id for seller in sellers)
+
+
+@Bot.on_message(filters.command("addgc"))
 async def addgcmessag(app: Bot, message: Message):
+    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    if not await is_seller(message.from_user.id):
+        return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
+
     chat_id = message.chat.id
     chat_name = message.chat.title
     user_id = message.from_user.id
@@ -22,13 +32,13 @@ async def addgcmessag(app: Bot, message: Message):
     hari = get_arg(message)
     if not hari:
         hari = "30"
-    xxnx = await message.reply(f"`Menambahakan izin dalam grup ini..`")
+    xxnx = await message.reply(f"`Menambahkan izin dalam grup ini..`")
     now = datetime.datetime.now(timezone("Asia/Jakarta"))
     expired = now + relativedelta(days=int(hari))
     expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
     chats = await get_actived_chats()
     if chat_id in chats:
-        msg = await message.reply("Maaf, Group ini sudah di izinkan untuk menggunakan Bot.")
+        msg = await message.reply("Maaf, Group ini sudah diizinkan untuk menggunakan Bot.")
         await asyncio.sleep(10)
         await msg.delete()
         return
@@ -46,47 +56,12 @@ async def addgcmessag(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.command("add") & filters.user(OWNER_ID))
-async def addgroupmessag(app: Bot, message: Message):
-    xxnx = await message.reply(f"`Menambahakan izin dalam grup ini..`")
-    
-    if len(message.command) < 3:
-        return await xxnx.edit(f"**Gunakan Format** : `/add group_id hari`")
-    
-    try:
-        command, group, hari = message.command[:3]
-        chat_id = int(group)
-        days = int(hari)
-        user_id = message.from_user.id
-        username = message.from_user.username or message.from_user.first_name
-    except ValueError:
-        return await xxnx.edit("Group ID dan hari harus berupa angka.")
-    
-    now = datetime.datetime.now(timezone("Asia/Jakarta"))
-    expired = now + relativedelta(days=days)
-    expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
-    
-    chats = await get_actived_chats()
-    if chat_id in chats:
-        msg = await message.reply("Maaf, Group ini sudah diizinkan untuk menggunakan Bot.")
-        await asyncio.sleep(10)
-        await msg.delete()
-        return
-    
-    try:
-        added = await add_actived_chat(chat_id, user_id, username)
-        if added:
-            await set_expired_date(chat_id, expired, user_id, username)
-    except Exception as e:
-        print(e)
-    
-    await xxnx.edit(f"**BOT AKTIF**\nGroup ID: `{group}`\nExp: `{expired_datetime}` | `{hari} Hari..`")
-    await asyncio.sleep(10)
-    await xxnx.delete()
-    await message.delete()
+@Bot.on_message(filters.command("rmgc"))
+async def remgcmessag(app: Bot, message: Message):
+    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    if not await is_seller(message.from_user.id):
+        return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
-@Bot.on_message(filters.command("rmgc") & filters.user(OWNER_ID))
-async def remgcmessag(app : Bot, message : Message):
     chat_id = int(get_arg(message))
 
     if not chat_id:
@@ -99,13 +74,18 @@ async def remgcmessag(app : Bot, message : Message):
     except BaseException as e:
         print(e)
 
-    await xxnx.edit(f"Removed `{chat_id}` | Group ini tidak di izinkan untuk mengunakan Bot..`")
+    await xxnx.edit(f"Removed `{chat_id}` | Group ini tidak diizinkan untuk menggunakan Bot..`")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
 
-@Bot.on_message(filters.command("groups") & filters.user(OWNER_ID))
+
+@Bot.on_message(filters.command("groups"))
 async def get_groupsmessag(app: Bot, message: Message):
+    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    if not await is_seller(message.from_user.id):
+        return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
+
     group = []
     chats = await get_actived_chats()
     for chat in chats:
@@ -144,31 +124,48 @@ async def get_groupsmessag(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
+@Bot.on_message(filters.command("add"))
+async def addgroupmessag(app: Bot, message: Message):
+    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    if not await is_seller(message.from_user.id):
+        return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
-@Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
-async def addsellermessag(app: Bot, message: Message):
-    xxnx = await message.reply(f"`Menambahkan penjual baru..`")
+    xxnx = await message.reply(f"`Menambahkan izin dalam grup ini..`")
     
-    if len(message.command) != 2:
-        return await xxnx.edit(f"**Gunakan Format** : `/addseller seller_id`")
+    if len(message.command) < 3:
+        return await xxnx.edit(f"**Gunakan Format** : `/add group_id hari`")
     
     try:
-        seller_id = int(message.command[1])
+        command, group, hari = message.command[:3]
+        chat_id = int(group)
+        days = int(hari)
+        user_id = message.from_user.id
+        username = message.from_user.username or message.from_user.first_name
     except ValueError:
-        return await xxnx.edit("Seller ID harus berupa angka.")
+        return await xxnx.edit("Group ID dan hari harus berupa angka.")
+    
+    now = datetime.datetime.now(timezone("Asia/Jakarta"))
+    expired = now + relativedelta(days=days)
+    expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
+    
+    chats = await get_actived_chats()
+    if chat_id in chats:
+        msg = await message.reply("Maaf, Group ini sudah diizinkan untuk menggunakan Bot.")
+        await asyncio.sleep(10)
+        await msg.delete()
+        return
     
     try:
-        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
+        added = await add_actived_chat(chat_id, user_id, username)
         if added:
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
+            await set_expired_date(chat_id, expired, user_id, username)
     except Exception as e:
-        print(f"Error adding seller: {e}")
-        await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
+        print(e)
     
+    await xxnx.edit(f"**BOT AKTIF**\nGroup ID: `{group}`\nExp: `{expired_datetime}` | `{hari} Hari..`")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
-
 
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
