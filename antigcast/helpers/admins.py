@@ -17,7 +17,7 @@ async def is_member(filter, client, update):
     except Exception:
         return False
 
-    return member.status not in [STATUS.CREATOR, STATUS.ADMINISTRATOR]
+    return member.status not in [STATUS.OWNER, STATUS.ADMINISTRATOR]
 
 async def is_admin(filter, client, update):
     try:
@@ -30,7 +30,7 @@ async def is_admin(filter, client, update):
     except Exception:
         return False
 
-    return member.status in [STATUS.CREATOR, STATUS.ADMINISTRATOR]
+    return member.status in [STATUS.OWNER, STATUS.ADMINISTRATOR]
 
 MemberFilter = filters.create(is_member)
 AdminFilter = filters.create(is_admin)
