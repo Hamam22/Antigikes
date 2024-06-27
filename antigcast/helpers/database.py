@@ -304,12 +304,11 @@ async def clear_muted_users_in_group(group_id):
 
 
 #SELLER
-async def add_seller(seller_id, seller_name, user_id, username):
+async def add_seller(seller_id, user_id, username):
     try:
         await sellers_collection.update_one(
             {'_id': seller_id},
             {'$set': {
-                'seller_name': seller_name,
                 'added_by': {
                     'user_id': user_id,
                     'username': username
@@ -326,8 +325,8 @@ async def add_seller(seller_id, seller_name, user_id, username):
 
 async def rem_seller(seller_id):
     try:
-        await sellers_collection.delete_one({'_id': seller_id})
-        return True
+        result = await sellers_collection.delete_one({'_id': seller_id})
+        return result.deleted_count > 0
     except Exception as e:
         print(f"Error removing seller: {e}")
         return False
@@ -342,12 +341,3 @@ async def list_sellers():
     except Exception as e:
         print(f"Error listing sellers: {e}")
         return []
-
-
-async def get_seller(seller_id):
-    try:
-        seller = await sellers_collection.find_one({'_id': seller_id})
-        return seller
-    except Exception as e:
-        print(f"Error getting seller: {e}")
-        return None
