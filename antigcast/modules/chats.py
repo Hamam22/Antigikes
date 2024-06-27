@@ -197,8 +197,8 @@ async def addsellermessag(app: Bot, message: Message):
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
     
     await asyncio.sleep(10)
-    await xxnx.delete()
-    await message.delete()
+    await app.delete_messages(chat_id=xxnx.chat.id, message_ids=xxnx.message_id)  # Hapus pesan balasan
+    await app.delete_messages(chat_id=message.chat.id, message_ids=message.message_id)  # Hapus pesan asli yang memicu perintah
     
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
