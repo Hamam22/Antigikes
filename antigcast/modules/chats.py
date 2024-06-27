@@ -170,22 +170,26 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
+
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan penjual baru...`")
     
     if len(message.command) != 2:
-        return await xxnx.edit("**Gunakan Format**: `/addseller seller_id`")
+        return await xxnx.edit("**Gunakan Format** : `/addseller seller_id`")
     
     try:
         seller_id = int(message.command[1])
+        first_name = message.from_user.first_name or ""
+        last_name = message.from_user.last_name or ""
     except ValueError:
         return await xxnx.edit("Seller ID harus berupa angka.")
     
     try:
-        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
+        added = await add_seller(seller_id, message.from_user.id, first_name, last_name)
         if added:
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
+            seller_name = f"{first_name} {last_name}".strip()
+            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
     except Exception as e:
         print(f"Error adding seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
@@ -193,7 +197,7 @@ async def addsellermessag(app: Bot, message: Message):
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
-
+    
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
@@ -232,11 +236,11 @@ async def listsellersmessage(app: Bot, message: Message):
         username = added_by.get('username', 'Unknown')
 
         # Menggunakan markdown untuk tautan ke pengguna
-        user_link = f"[{username}](tg://user?id={user_id})"
+        user_link = f"[{username}](tg://user?id={user_id})" if user_id else "Unknown"
 
         seller_id = seller.get('_id')
         seller_name = seller.get('seller_name', 'Unknown')
-        added_at = seller.get('added_at', None)
+        added_at = seller.get('added_at')
         
         # Konversi waktu ke Asia/Jakarta
         if added_at:
