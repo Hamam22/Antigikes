@@ -14,16 +14,18 @@ from antigcast.helpers.database import *
 
 
 @Bot.on_message(filters.command("addgc") & filters.user(OWNER_ID))
-async def addgcmessag(app : Bot, message : Message):
+async def addgcmessag(app: Bot, message: Message):
     chat_id = message.chat.id
     chat_name = message.chat.title
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name
     hari = get_arg(message)
     if not hari:
         hari = "30"
     xxnx = await message.reply(f"`Menambahakan izin dalam grup ini..`")
     now = datetime.datetime.now(timezone("Asia/Jakarta"))
     expired = now + relativedelta(days=int(hari))
-    expired_date = expired.strftime("%d-%m-%Y")
+    expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
     chats = await get_actived_chats()
     if chat_id in chats:
         msg = await message.reply("Maaf, Group ini sudah di izinkan untuk menggunakan Bot.")
@@ -32,16 +34,17 @@ async def addgcmessag(app : Bot, message : Message):
         return
     
     try:
-        added = await add_actived_chat(chat_id)
+        added = await add_actived_chat(chat_id, user_id, username)
         if added:
-            await set_expired_date(chat_id, expired)
+            await set_expired_date(chat_id, expired, user_id, username)
     except BaseException as e:
         print(e)
 
-    await xxnx.edit(f"**BOT AKTIF**\nGroup : `{chat_name}`\nExp : `{expired_date}` | `{hari} Hari..`")
+    await xxnx.edit(f"**BOT AKTIF**\nGroup: `{chat_name}`\nExp: `{expired_datetime}` | `{hari} Hari..`")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
+
 
 @Bot.on_message(filters.command("add") & filters.user(OWNER_ID))
 async def addgroupmessag(app: Bot, message: Message):
@@ -54,12 +57,14 @@ async def addgroupmessag(app: Bot, message: Message):
         command, group, hari = message.command[:3]
         chat_id = int(group)
         days = int(hari)
+        user_id = message.from_user.id
+        username = message.from_user.username or message.from_user.first_name
     except ValueError:
         return await xxnx.edit("Group ID dan hari harus berupa angka.")
     
     now = datetime.datetime.now(timezone("Asia/Jakarta"))
     expired = now + relativedelta(days=days)
-    expired_date = expired.strftime("%d-%m-%Y")
+    expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
     
     chats = await get_actived_chats()
     if chat_id in chats:
@@ -69,13 +74,13 @@ async def addgroupmessag(app: Bot, message: Message):
         return
     
     try:
-        added = await add_actived_chat(chat_id)
+        added = await add_actived_chat(chat_id, user_id, username)
         if added:
-            await set_expired_date(chat_id, expired)
+            await set_expired_date(chat_id, expired, user_id, username)
     except Exception as e:
         print(e)
     
-    await xxnx.edit(f"**BOT AKTIF**\nGroup ID: `{group}`\nExp : `{expired_date}` | `{hari} Hari..`")
+    await xxnx.edit(f"**BOT AKTIF**\nGroup ID: `{group}`\nExp: `{expired_datetime}` | `{hari} Hari..`")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
@@ -100,31 +105,41 @@ async def remgcmessag(app : Bot, message : Message):
     await message.delete()
 
 @Bot.on_message(filters.command("groups") & filters.user(OWNER_ID))
-async def get_groupsmessag(app : Bot, message : Message):
+async def get_groupsmessag(app: Bot, message: Message):
     group = []
     chats = await get_actived_chats()
     for chat in chats:
         group.append(chat)
     if not group:
         return await message.reply("**Belum Ada Group yang Terdaftar.**")
-    # group.sort()
-    resp = await message.reply("**Memuat database...")
+    resp = await message.reply("**Memuat database...**")
     msg = f"**Daftar Group Aktif**\n\n"
     num = 0
     for gc in group:
         expired = await get_expired_date(int(gc))
+        added_by = await get_added_by(int(gc))
         if not expired:
-            expired_date = "None"
+            expired_datetime = "None"
         else:
-            expired_date = expired.strftime("%d-%m-%Y")
+            expired_datetime = expired.strftime("%d-%m-%Y %H:%M:%S")
+        if not added_by:
+            added_by_info = "Unknown"
+        else:
+            added_by_info = f"[{added_by['username']}](tg://user?id={added_by['user_id']})"
         try:
             get = await app.get_chat(int(gc))
             gname = get.title
             glink = get.invite_link
             gid = get.id
             num += 1
-            msg += f"**{num}. {gname}**\n├ Group ID : `{gid}`\n├ Link : [Tap Here]({glink})\n└ Expired : `{expired_date}`\n\n"
+            msg += (f"**{num}. {gname}**\n"
+                    f"├ Group ID: `{gid}`\n"
+                    f"├ Link: [Tap Here]({glink})\n"
+                    f"├ Expired: `{expired_datetime}`\n"
+                    f"└ Added by: {added_by_info}\n\n")
         except:
-            msg += f"**{num}. {gc}**\n└ Expired : `{expired_date}`\n\n"
+            msg += (f"**{num}. {gc}**\n"
+                    f"├ Expired: `{expired_datetime}`\n"
+                    f"└ Added by: {added_by_info}\n\n")
 
     await resp.edit(msg, disable_web_page_preview=True)
