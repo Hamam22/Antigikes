@@ -229,7 +229,7 @@ async def listsellersmessage(app: Bot, message: Message):
 
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        user_id = added_by.get('message.from_user.id', 0)
+        user_id = added_by.get('message.from_user.id')
         user_first_name = added_by.get('message.from_user.first_name', 'Unknown')
         user_last_name = added_by.get('message.from_user.last_name', '')
 
