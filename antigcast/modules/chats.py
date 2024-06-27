@@ -146,7 +146,7 @@ async def get_groupsmessag(app: Bot, message: Message):
 
 
 @bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
-async def addsellermessag(client: Client, message: Message):
+async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply(f"`Menambahkan penjual baru..`")
     
     if len(message.command) != 2:
@@ -171,7 +171,7 @@ async def addsellermessag(client: Client, message: Message):
 
 
 @bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
-async def remsellermessag(client: Client, message: Message):
+async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
     if not seller_id:
@@ -194,7 +194,7 @@ async def remsellermessag(client: Client, message: Message):
 
 
 @bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
-async def listsellersmessag(client: Client, message: Message):
+async def listsellersmessag(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
