@@ -6,7 +6,7 @@ from pyrogram.types import ChatMember
 
 STATUS = ChatMember.STATUS
 
-async def is_member(filter, client, update):
+async def is_member(_, client: Client, update):
     try:
         member = await client.get_chat_member(chat_id=update.chat.id, user_id=update.from_user.id)
     except FloodWait as wait_err:
@@ -19,7 +19,7 @@ async def is_member(filter, client, update):
 
     return member.status not in [STATUS.CREATOR, STATUS.ADMINISTRATOR]
 
-async def is_admin(filter, client, update):
+async def is_admin(_, client: Client, update):
     try:
         member = await client.get_chat_member(chat_id=update.chat.id, user_id=update.from_user.id)
     except FloodWait as wait_err:
