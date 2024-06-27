@@ -145,7 +145,7 @@ async def get_groupsmessag(app: Bot, message: Message):
     await resp.edit(msg, disable_web_page_preview=True)
 
 
-@bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply(f"`Menambahkan penjual baru..`")
     
@@ -170,7 +170,7 @@ async def addsellermessag(app: Bot, message: Message):
     await message.delete()
 
 
-@bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
@@ -193,7 +193,7 @@ async def remsellermessag(app: Bot, message: Message):
     await message.delete()
 
 
-@bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
 async def listsellersmessag(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
