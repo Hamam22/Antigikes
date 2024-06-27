@@ -182,11 +182,13 @@ async def addsellermessag(app: Bot, message: Message):
         seller_id = int(message.command[1])
         first_name = message.from_user.first_name or ""
         last_name = message.from_user.last_name or ""
+        username = message.from_user.username or ""
+        user_id = message.from_user.id
     except ValueError:
         return await xxnx.edit("Seller ID harus berupa angka.")
     
     try:
-        added = await add_seller(seller_id, message.from_user.id, first_name, last_name)
+        added = await add_seller(seller_id, user_id, username, first_name, last_name)
         if added:
             seller_name = f"{first_name} {last_name}".strip()
             await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
@@ -244,8 +246,7 @@ async def listsellersmessage(app: Bot, message: Message):
         
         # Konversi waktu ke Asia/Jakarta
         if added_at:
-            added_at = added_at.replace(tzinfo=timezone('UTC')).astimezone(timezone('Asia/Jakarta'))
-            added_at = added_at.strftime("%Y-%m-%d %H:%M:%S")
+            added_at = added_at.replace(tzinfo=timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
         else:
             added_at = "Unknown"
 
