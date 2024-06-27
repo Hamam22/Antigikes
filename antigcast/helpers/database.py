@@ -313,7 +313,7 @@ async def add_seller(seller_id, user_id, username):
                     'user_id': user_id,
                     'username': username
                 },
-                'added_at': datetime.datetime.now()
+                'added_at': datetime.datetime.now(timezone("Asia/Jakarta"))
             }},
             upsert=True
         )
