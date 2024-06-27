@@ -1,10 +1,10 @@
 from antigcast import Bot
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import Message, ChatPermissions
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
-from antigcast.helpers.admins import *
+from antigcast.helpers.admins import Admin
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import (
     get_muted_users_in_group,
@@ -13,6 +13,23 @@ from antigcast.helpers.database import (
     clear_muted_users_in_group
 )
 
+# Fungsi untuk membatasi pengguna
+async def restrict_user(app: Bot, chat_id: int, user_id: int):
+    await app.restrict_chat_member(
+        chat_id=chat_id,
+        user_id=user_id,
+        permissions=ChatPermissions(can_send_messages=False)
+    )
+
+# Fungsi untuk menghapus batasan pengguna
+async def unrestrict_user(app: Bot, chat_id: int, user_id: int):
+    await app.restrict_chat_member(
+        chat_id=chat_id,
+        user_id=user_id,
+        permissions=ChatPermissions(can_send_messages=True)
+    )
+
+# Handler untuk perintah mute
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -44,6 +61,7 @@ async def mute_handler(app: Bot, message: Message):
         kon_name = kon.first_name
 
         await mute_user_in_group(group_id, user_id, kon_name, issuer_id, issuer_name)
+        await restrict_user(app, group_id, user_id)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}")
         await asyncio.sleep(10)
@@ -51,6 +69,7 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
+# Handler untuk perintah unmute
 @Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -78,6 +97,7 @@ async def unmute_handler(app: Bot, message: Message):
 
     try:
         await unmute_user_in_group(group_id, user_id)
+        await unrestrict_user(app, group_id, user_id)
 
         await xxnx.edit(f"**Pengguna berhasil di unmute**\n- Nama: {muted[str(user_id)]['name']}\n- User ID: `{user_id}`")
         await asyncio.sleep(10)
@@ -86,6 +106,7 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
+# Handler untuk menampilkan daftar pengguna yang di mute
 @Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
@@ -107,14 +128,32 @@ async def muted(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
+# Handler untuk menghapus semua pengguna dari daftar mute
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
     group_id = message.chat.id
     await clear_muted_users_in_group(group_id)
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
 
+# Handler untuk menghapus pesan pengguna yang di mute
 @Bot.on_message(filters.text & ~filters.private)
 async def delete_muted_messages(app: Bot, message: Message):
+    user_id = message.from_user.id
+    group_id = message.chat.id
+
+    muted_users = await get_muted_users_in_group(group_id)
+    if str(user_id) in muted_users:
+        try:
+            await message.delete()
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+            await message.delete()
+        except MessageDeleteForbidden:
+            pass
+
+# Handler tambahan untuk menghapus media dari pengguna yang di mute
+@Bot.on_message(filters.media & ~filters.private)
+async def delete_muted_media(app: Bot, message: Message):
     user_id = message.from_user.id
     group_id = message.chat.id
 
