@@ -27,7 +27,7 @@ async def is_admin_or_owner(_, client, message):
 
 
 AdminFilter = filters.create(is_admin_or_owner)
-
+STATUS = enums.ChatMemberStatus
 
 @Bot.on_message(filters.command("pl") & filters.user(OWNER_ID) | AdminFilter)
 async def mute_handler(app: Bot, message: Message):
