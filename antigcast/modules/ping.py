@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 from time import time
-from pyrogram import filters
+from pyrogram import Client, filters
 from pyrogram.types import Message
 from antigcast import Bot
 
@@ -33,9 +33,10 @@ async def _human_time_duration(seconds):
             parts.append(f'{amount} {unit}{"" if amount == 1 else "s"}')
     return ", ".join(parts)
 
+Admin = filters.create(isAdmin)
 
-@Bot.on_message(filters.command("pung") & ~filters.private & Admin & Member)
-async def ping_pong(app: Bot, message: Message):
+@Bot.on_message(filters.command("pung") & filters.group & Admin)
+async def ping_pong(client: Client, message: Message):
     start = time()
     current_time = datetime.utcnow()
     uptime_sec = (current_time - START_TIME_UTC).total_seconds()
@@ -49,8 +50,8 @@ async def ping_pong(app: Bot, message: Message):
     )
 
 
-@Bot.on_message(filters.command("time") & ~filters.private & Admin & Member)
-async def get_uptime(app: Bot, message: Message):
+@Bot.on_message(filters.command("time") & filters.group & Admin)
+async def get_uptime(client: Client, message: Message):
     current_time_utc = datetime.utcnow()
     current_time_wib = current_time_utc + timedelta(hours=7)
     uptime_sec = (current_time_utc - START_TIME_UTC).total_seconds()
