@@ -15,7 +15,7 @@ owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mute_collection = db['GROUPMUTE']
-seller_collection = db['ADDSELLER']
+sellers_collection = db['ADDSELLER']
 
 #USERS
 def new_user(id):
