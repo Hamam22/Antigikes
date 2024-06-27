@@ -237,7 +237,7 @@ async def listsellersmessage(app: Bot, message: Message):
         user_link = f"<a href='tg://user?id={user_id}'>{message.from_user.first_name} {message.from_user.last_name}</a>"
 
         seller_id = seller.get('_id')
-        seller_name = f"<a href='tg://user?id={user_id}'>{message.from_user.first_name} {message.from_user.last_name}</a>"
+        seller_name = seller.get(f"<a href='tg://user?id={user_id}'>{message.from_user.first_name} {message.from_user.last_name}</a>")
         added_at = seller.get('added_at')
         num += 1
         msg += (f"**{num}. Penjual ID: `{seller_id}`**\n"
