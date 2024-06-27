@@ -34,7 +34,7 @@ async def _human_time_duration(seconds):
 
 
 @Bot.on_message(filters.command("pung") & ~filters.private)
-async def ping_pong(client: Client, message: Message):
+async def ping_pong(app: Bot, message: Message):
     start = time()
     current_time = datetime.utcnow()
     uptime_sec = (current_time - START_TIME_UTC).total_seconds()
@@ -49,7 +49,7 @@ async def ping_pong(client: Client, message: Message):
 
 
 @Bot.on_message(filters.command("time") & ~filters.private)
-async def get_uptime(client: Client, message: Message):
+async def get_uptime(app: Bot, message: Message):
     current_time_utc = datetime.utcnow()
     current_time_wib = current_time_utc + timedelta(hours=7)
     uptime_sec = (current_time_utc - START_TIME_UTC).total_seconds()
