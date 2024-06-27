@@ -145,34 +145,34 @@ async def get_groupsmessag(app: Bot, message: Message):
     await resp.edit(msg, disable_web_page_preview=True)
 
 
-@Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
-async def addsellermessag(app: Bot, message: Message):
+@bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
+async def addsellermessag(client: Client, message: Message):
     xxnx = await message.reply(f"`Menambahkan penjual baru..`")
     
-    if len(message.command) < 3:
-        return await xxnx.edit(f"**Gunakan Format** : `/addseller seller_id seller_name`")
+    if len(message.command) != 2:
+        return await xxnx.edit(f"**Gunakan Format** : `/addseller seller_id`")
     
     try:
-        command, seller_id, seller_name = message.command[:3]
-        seller_id = int(seller_id)
+        seller_id = int(message.command[1])
     except ValueError:
         return await xxnx.edit("Seller ID harus berupa angka.")
     
     try:
-        added = await add_seller(seller_id, seller_name, message.from_user.id, message.from_user.username)
+        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
         if added:
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nSeller Name: `{seller_name}`")
+            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
     except Exception as e:
-        print(e)
+        print(f"Error adding seller: {e}")
+        await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
     
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
 
 
-@Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
-async def remsellermessag(app: Bot, message: Message):
-    seller_id = int(get_arg(message))
+@bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
+async def remsellermessag(client: Client, message: Message):
+    seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
     if not seller_id:
         return await message.reply("`Silakan berikan Seller ID untuk menghapus penjual.`")
@@ -182,16 +182,19 @@ async def remsellermessag(app: Bot, message: Message):
         removed = await rem_seller(seller_id)
         if removed:
             await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` telah dihapus.**")
+        else:
+            await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` tidak ditemukan.**")
     except Exception as e:
-        print(e)
-
+        print(f"Error removing seller: {e}")
+        await xxnx.edit("Terjadi kesalahan saat menghapus penjual.")
+    
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
 
 
-@Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
-async def listsellersmessag(app: Bot, message: Message):
+@bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
+async def listsellersmessag(client: Client, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
@@ -201,9 +204,9 @@ async def listsellersmessag(app: Bot, message: Message):
     num = 0
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        added_by_info = f"[{added_by['username']}](tg://user?id={added_by['user_id']})"
+        added_by_info = f"[{added_by.get('username', 'Unknown')}](tg://user?id={added_by.get('user_id', 0)})"
         seller_id = seller.get('_id')
-        seller_name = seller.get('seller_name')
+        seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at', 'Unknown')
         num += 1
         msg += (f"**{num}. Penjual ID: `{seller_id}`**\n"
@@ -212,3 +215,4 @@ async def listsellersmessag(app: Bot, message: Message):
                 f"└ Ditambahkan pada: `{added_at}`\n\n")
 
     await resp.edit(msg, disable_web_page_preview=True)
+
