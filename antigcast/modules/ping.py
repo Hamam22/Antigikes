@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 from time import time
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.types import Message
 from antigcast import Bot
 
