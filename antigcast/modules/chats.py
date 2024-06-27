@@ -227,33 +227,22 @@ async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
-
-    resp = await message.reply("**Memuat database...**")
-    msg = f"**Daftar Penjual**\n\n"
+    
+    msg = "**Daftar Penjual**\n\n"
     num = 0
-
+    
     for seller in sellers:
-        added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id', 'Unknown')
-        username = added_by.get('username', 'Unknown')
-
-        user_link = f"[{username}](tg://user?id={user_id})" if user_id != 'Unknown' else "Unknown"
-
-        seller_id = seller.get('_id')
-        seller_name = seller.get('seller_name', 'Unknown')
-        added_at = seller.get('added_at')
-
-        if added_at:
-            added_at = added_at.astimezone(timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            added_at = "Unknown"
-
         num += 1
-        msg += (
-            f"**{num}. Penjual ID: `{seller_id}`**\n"
-            f"├ Nama Penjual: `{seller_name}`\n"
-            f"├ Ditambahkan oleh: {user_link}\n"
-            f"└ Ditambahkan pada: `{added_at}`\n\n"
-        )
-
-    await resp.edit(msg, disable_web_page_preview=True)
+        seller_id = seller['_id']
+        seller_name = seller.get('seller_name', 'Unknown')
+        added_by_info = seller.get('added_by', {'user_id': 'Unknown', 'username': 'Unknown'})
+        added_by_user_id = added_by_info.get('user_id', 'Unknown')
+        added_by_username = added_by_info.get('username', 'Unknown')
+        added_at = seller.get('added_at', 'Unknown')
+        
+        msg += (f"{num}. Penjual ID: `{seller_id}`\n"
+                f"├ Nama Penjual: {seller_name}\n"
+                f"├ Ditambahkan oleh: [{added_by_username}](tg://user?id={added_by_user_id})\n"
+                f"└ Ditambahkan pada: {added_at}\n\n")
+    
+    await message.reply(msg, disable_web_page_preview=True)
