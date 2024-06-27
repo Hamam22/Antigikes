@@ -2,11 +2,11 @@ import asyncio
 from pyrogram import filters, Client
 from pyrogram.errors.exceptions.flood_420 import FloodWait
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-from pyrogram.types import ChatMember
 
-STATUS = ChatMember.STATUS
 
-async def is_member(_, client: Client, update):
+STATUS = enums.ChatMemberStatus
+
+async def is_member(filter, client, update):
     try:
         member = await client.get_chat_member(chat_id=update.chat.id, user_id=update.from_user.id)
     except FloodWait as wait_err:
@@ -19,7 +19,7 @@ async def is_member(_, client: Client, update):
 
     return member.status not in [STATUS.CREATOR, STATUS.ADMINISTRATOR]
 
-async def is_admin(_, client: Client, update):
+async def is_admin(filter, client, update):
     try:
         member = await client.get_chat_member(chat_id=update.chat.id, user_id=update.from_user.id)
     except FloodWait as wait_err:
