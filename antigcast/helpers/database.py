@@ -304,7 +304,7 @@ async def clear_muted_users_in_group(group_id):
 
 
 #SELLER
-async def add_seller(seller_id, user_id, first_name, last_name):
+async def add_seller(seller_id, user_id, username, first_name, last_name):
     seller_name = f"{first_name} {last_name}".strip()
     try:
         await sellers_collection.update_one(
@@ -313,9 +313,9 @@ async def add_seller(seller_id, user_id, first_name, last_name):
                 'seller_name': seller_name,
                 'added_by': {
                     'user_id': user_id,
-                    'username': message.from_user.username
+                    'username': username
                 },
-                'added_at': datetime.datetime.now(timezone("UTC"))
+                'added_at': datetime.datetime.now(timezone("Asia/Jakarta"))
             }},
             upsert=True
         )
