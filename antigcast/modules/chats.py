@@ -227,22 +227,27 @@ async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
-    
+
     msg = "**Daftar Penjual**\n\n"
     num = 0
-    
+
     for seller in sellers:
         num += 1
         seller_id = seller['_id']
         seller_name = seller.get('seller_name', 'Unknown')
+        
         added_by_info = seller.get('added_by', {'user_id': 'Unknown', 'username': 'Unknown'})
         added_by_user_id = added_by_info.get('user_id', 'Unknown')
         added_by_username = added_by_info.get('username', 'Unknown')
+        added_by_user_link = f"[{added_by_username}](tg://user?id={added_by_user_id})" if added_by_user_id != 'Unknown' else "Unknown"
+        
         added_at = seller.get('added_at', 'Unknown')
+        if added_at != 'Unknown':
+            added_at = added_at.astimezone(timezone("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S")
         
         msg += (f"{num}. Penjual ID: `{seller_id}`\n"
                 f"├ Nama Penjual: {seller_name}\n"
-                f"├ Ditambahkan oleh: [{added_by_username}](tg://user?id={added_by_user_id})\n"
+                f"├ Ditambahkan oleh: {added_by_user_link}\n"
                 f"└ Ditambahkan pada: {added_at}\n\n")
-    
+
     await message.reply(msg, disable_web_page_preview=True)
