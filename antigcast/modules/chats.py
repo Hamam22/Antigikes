@@ -232,7 +232,7 @@ async def listsellersmessag(app: Bot, message: Message):
 
         # Format nama penjual sesuai dengan permintaan Anda
         user_id = added_by.get('user_id', 0)
-        first_name = added_by.get('first_name', 'Unknown')
+        first_name = added_by.get('message.from_user.frist_name', 'Unknown')
         last_name = added_by.get('last_name', '')
         user_link = f"[{added_by.get('username', 'Unknown')}](tg://user?id={added_by.get('user_id', 0)})"
 
