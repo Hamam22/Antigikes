@@ -35,7 +35,7 @@ async def _human_time_duration(seconds):
 
 Admin = filters.create(isAdmin)
 
-@Bot.on_message(filters.command("pung") & filters.group & Admin)
+@Bot.on_message(filters.command("pung") & filters.group & Admin, group=28)
 async def ping_pong(client: Client, message: Message):
     start = time()
     current_time = datetime.utcnow()
@@ -50,7 +50,7 @@ async def ping_pong(client: Client, message: Message):
     )
 
 
-@Bot.on_message(filters.command("time") & filters.group & Admin)
+@Bot.on_message(filters.command("time") & filters.group & Admin, group=27)
 async def get_uptime(client: Client, message: Message):
     current_time_utc = datetime.utcnow()
     current_time_wib = current_time_utc + timedelta(hours=7)
