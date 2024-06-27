@@ -13,7 +13,6 @@ from antigcast.helpers.database import (
     clear_muted_users_in_group
 )
 
-
 @Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -46,7 +45,7 @@ async def mute_handler(app: Bot, message: Message):
         kon = await app.get_users(user_id)
         kon_name = kon.first_name
 
-        await mute_user_in_group(group_id, user_id, kon_name, issuer_id, issuer_name) 
+        await mute_user_in_group(group_id, user_id, kon_name, issuer_id, issuer_name)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}")
         await asyncio.sleep(10)
@@ -102,7 +101,7 @@ async def muted(app: Bot, message: Message):
     msg = "**Daftar pengguna yang di mute**\n\n"
     num = 0
 
-    for user_id, data in kons.items(): 
+    for user_id, data in kons.items():
         num += 1
         user_name = data['name']
         muted_by_name = data['muted_by']['name']
