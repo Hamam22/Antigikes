@@ -13,23 +13,7 @@ from antigcast.helpers.database import (
     clear_muted_users_in_group
 )
 
-
-async def is_admin_or_owner(_, client, message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    
-    try:
-        member = await client.get_chat_member(chat_id=chat_id, user_id=user_id)
-        return member.status in ("creator", "administrator")
-    except Exception as e:
-        print(f"Error checking admin status: {e}")
-        return False
-
-
-AdminFilter = filters.create(is_admin_or_owner)
-STATUS = enums.ChatMemberStatus
-
-@Bot.on_message(filters.command("pl") & filters.user(OWNER_ID) | AdminFilter)
+@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
@@ -47,9 +31,6 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa mute bot")
     elif user_id in OWNER_ID:
         return await message.reply_text("Kamu tidak bisa mute developer bot")
-
-    if not await is_admin_or_owner(None, app, message):
-        return await message.reply_text("Perintah ini tidak untukmu!")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
@@ -72,8 +53,7 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-
-@Bot.on_message(filters.command("ungdel") & filters.user(OWNER_ID) | AdminFilter)
+@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
@@ -88,9 +68,6 @@ async def unmute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa unmute bot")
     elif user_id in OWNER_ID:
         return await message.reply_text("Kamu tidak bisa unmute developer bot")
-
-    if not await is_admin_or_owner(None, app, message):
-        return await message.reply_text("Perintah ini tidak untukmu!")
 
     xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
@@ -111,8 +88,7 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
-
-@Bot.on_message(filters.command("gmuted") & filters.user(OWNER_ID) | AdminFilter)
+@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
     kons = await get_muted_users_in_group(group_id)
@@ -133,16 +109,11 @@ async def muted(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
-
-@Bot.on_message(filters.command("clearmuted") & filters.user(OWNER_ID) | AdminFilter)
+@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
     group_id = message.chat.id
-    if not await is_admin_or_owner(None, app, message):
-        return await message.reply_text("Perintah ini tidak untukmu!")
-
     await clear_muted_users_in_group(group_id)
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
-
 
 @Bot.on_message(filters.text & ~filters.private)
 async def delete_muted_messages(app: Bot, message: Message):
