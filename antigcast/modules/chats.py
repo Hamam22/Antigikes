@@ -13,7 +13,7 @@ from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
 
-# Fungsi untuk mengecek apakah pengguna adalah penjual yang diizinkan
+
 async def is_seller(user_id):
     sellers = await list_sellers()
     return any(seller['_id'] == user_id for seller in sellers)
@@ -21,7 +21,7 @@ async def is_seller(user_id):
 
 @Bot.on_message(filters.command("addgc"))
 async def addgcmessag(app: Bot, message: Message):
-    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
@@ -58,7 +58,7 @@ async def addgcmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("rmgc"))
 async def remgcmessag(app: Bot, message: Message):
-    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
@@ -82,7 +82,7 @@ async def remgcmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("groups"))
 async def get_groupsmessag(app: Bot, message: Message):
-    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
@@ -126,7 +126,7 @@ async def get_groupsmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("add"))
 async def addgroupmessag(app: Bot, message: Message):
-    # Verifikasi apakah pengguna adalah penjual yang diizinkan
+    # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
 
