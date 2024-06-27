@@ -170,36 +170,30 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan penjual baru...`")
     
     if len(message.command) != 2:
-        return await xxnx.edit("**Gunakan Format** : `/addseller seller_id`")
+        return await xxnx.edit("**Gunakan Format**: `/addseller seller_id`")
     
     try:
         seller_id = int(message.command[1])
-        first_name = message.from_user.first_name or ""
-        last_name = message.from_user.last_name or ""
-        username = message.from_user.username or ""
-        user_id = message.from_user.id
     except ValueError:
         return await xxnx.edit("Seller ID harus berupa angka.")
     
     try:
-        added = await add_seller(seller_id, user_id, username, first_name, last_name)
+        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
         if added:
-            seller_name = f"{first_name} {last_name}".strip() or "Unknown"
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
+            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
     except Exception as e:
         print(f"Error adding seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
     
     await asyncio.sleep(10)
-    await app.delete_messages(chat_id=xxnx.chat.id, message_ids=xxnx.message_id)  # Hapus pesan balasan
-    await app.delete_messages(chat_id=message.chat.id, message_ids=message.message_id)  # Hapus pesan asli yang memicu perintah
-    
+    await xxnx.delete()
+    await message.delete()
+
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
@@ -234,17 +228,20 @@ async def listsellersmessage(app: Bot, message: Message):
 
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id', 'Unknown')
+        user_id = added_by.get('user_id')
         username = added_by.get('username', 'Unknown')
 
-        user_link = f"[{username}](tg://user?id={user_id})" if user_id != 'Unknown' else "Unknown"
+        # Menggunakan markdown untuk tautan ke pengguna
+        user_link = f"[{username}](tg://user?id={user_id})"
 
         seller_id = seller.get('_id')
         seller_name = seller.get('seller_name', 'Unknown')
-        added_at = seller.get('added_at')
-
+        added_at = seller.get('added_at', None)
+        
+        # Konversi waktu ke Asia/Jakarta
         if added_at:
-            added_at = added_at.astimezone(timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
+            added_at = added_at.replace(tzinfo=timezone('UTC')).astimezone(timezone('Asia/Jakarta'))
+            added_at = added_at.strftime("%Y-%m-%d %H:%M:%S")
         else:
             added_at = "Unknown"
 
