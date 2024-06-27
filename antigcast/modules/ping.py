@@ -7,11 +7,11 @@ from antigcast import Bot
 
 from antigcast.config import *
 
-# Waktu mulai bot
+
 START_TIME = datetime.utcnow()
 START_TIME_ISO = START_TIME.replace(microsecond=0).isoformat()
 
-# Definisi unit waktu untuk durasi uptime
+
 TIME_DURATION_UNITS = (
     ("week", 60 * 60 * 24 * 7),
     ("day", 60**2 * 24),
@@ -20,7 +20,6 @@ TIME_DURATION_UNITS = (
     ("sec", 1),
 )
 
-# Fungsi untuk mengubah detik menjadi format waktu manusia
 async def _human_time_duration(seconds):
     if seconds == 0:
         return "inf"
@@ -31,8 +30,8 @@ async def _human_time_duration(seconds):
             parts.append(f'{amount} {unit}{"" if amount == 1 else "s"}')
     return ", ".join(parts)
 
-# Perintah ping
-@bot.on_message(filters.command("ping"))
+
+@Bot.on_message(filters.command("ping"))
 async def ping_pong(app: Client, message: Message):
     start = time()
     current_time = datetime.utcnow()
@@ -46,8 +45,7 @@ async def ping_pong(app: Client, message: Message):
         f"**• Uptime -** `{uptime}`\n"
     )
 
-# Perintah uptime
-@bot.on_message(filters.command("uptime"))
+@Bot.on_message(filters.command("uptime"))
 async def get_uptime(app: Client, message: Message):
     current_time = datetime.utcnow()
     uptime_sec = (current_time - START_TIME).total_seconds()
