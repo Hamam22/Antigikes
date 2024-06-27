@@ -22,7 +22,7 @@ async def is_seller(user_id):
     return any(seller['_id'] == user_id for seller in sellers)
 
 
-@Bot.on_message(filters.command("addgc"))
+@Bot.on_message(filters.command("addgc") & filters.user(OWNER_ID))
 async def addgcmessag(app: Bot, message: Message):
     # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
@@ -59,7 +59,7 @@ async def addgcmessag(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.command("rmgc"))
+@Bot.on_message(filters.command("rmgc") & filters.user(OWNER_ID))
 async def remgcmessag(app: Bot, message: Message):
     # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
@@ -83,7 +83,7 @@ async def remgcmessag(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.command("groups"))
+@Bot.on_message(filters.command("groups") & filters.user(OWNER_ID))
 async def get_groupsmessag(app: Bot, message: Message):
     # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
@@ -127,7 +127,7 @@ async def get_groupsmessag(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
-@Bot.on_message(filters.command("add"))
+@Bot.on_message(filters.command("add") & filters.user(OWNER_ID))
 async def addgroupmessag(app: Bot, message: Message):
     # SOURCE PYROGRAM
     if not await is_seller(message.from_user.id):
