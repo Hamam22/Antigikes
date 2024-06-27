@@ -172,10 +172,10 @@ async def addgroupmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
-    xxnx = await message.reply(f"`Menambahkan penjual baru..`")
+    xxnx = await message.reply("`Menambahkan penjual baru...`")
     
     if len(message.command) != 2:
-        return await xxnx.edit(f"**Gunakan Format** : `/addseller seller_id`")
+        return await xxnx.edit("**Gunakan Format**: `/addseller seller_id`")
     
     try:
         seller_id = int(message.command[1])
@@ -201,7 +201,7 @@ async def remsellermessag(app: Bot, message: Message):
     if not seller_id:
         return await message.reply("`Silakan berikan Seller ID untuk menghapus penjual.`")
         
-    xxnx = await message.reply(f"`Menghapus penjual..`")
+    xxnx = await message.reply("`Menghapus penjual...`")
     try:
         removed = await rem_seller(seller_id)
         if removed:
@@ -216,7 +216,6 @@ async def remsellermessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
 async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
@@ -229,20 +228,29 @@ async def listsellersmessage(app: Bot, message: Message):
 
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        user_id = added_by.get('message.from_user.id')
-        user_first_name = added_by.get('message.from_user.first_name')
-        user_last_name = added_by.get('message.from_user.last_name')
+        user_id = added_by.get('user_id')
+        username = added_by.get('username', 'Unknown')
 
-        # Menggunakan HTML untuk membuat tautan dengan first name dan last name
-        user_link = f"<a href='tg://user?id={user_id}'>{message.from_user.first_name} {message.from_user.last_name}</a>"
+        # Menggunakan markdown untuk tautan ke pengguna
+        user_link = f"[{username}](tg://user?id={user_id})"
 
         seller_id = seller.get('_id')
-        seller_name = seller.get(f"<a href='tg://user?id={user_id}'>{message.from_user.first_name} {message.from_user.last_name}</a>")
-        added_at = seller.get('added_at')
+        seller_name = seller.get('seller_name', 'Unknown')
+        added_at = seller.get('added_at', None)
+        
+        # Konversi waktu ke Asia/Jakarta
+        if added_at:
+            added_at = added_at.replace(tzinfo=timezone('UTC')).astimezone(timezone('Asia/Jakarta'))
+            added_at = added_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            added_at = "Unknown"
+
         num += 1
-        msg += (f"**{num}. Penjual ID: `{seller_id}`**\n"
-                f"├ Nama Penjual: {seller_name}\n"
-                f"├ Ditambahkan oleh: {user_link}\n"
-                f"└ Ditambahkan pada: `{added_at}`\n\n")
+        msg += (
+            f"**{num}. Penjual ID: `{seller_id}`**\n"
+            f"├ Nama Penjual: `{seller_name}`\n"
+            f"├ Ditambahkan oleh: {user_link}\n"
+            f"└ Ditambahkan pada: `{added_at}`\n\n"
+        )
 
     await resp.edit(msg, disable_web_page_preview=True)
