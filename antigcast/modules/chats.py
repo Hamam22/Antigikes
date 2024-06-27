@@ -172,82 +172,66 @@ async def addgroupmessag(app: Bot, message: Message):
 
 
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
-async def addsellermessag(app: Bot, message: Message):
-    xxnx = await message.reply("`Menambahkan penjual baru...`")
-    
-    if len(message.command) != 2:
-        return await xxnx.edit("**Gunakan Format** : `/addseller seller_id`")
-    
+async def add_seller(app: Bot, message: Message):
+    if len(message.command) < 2:
+        return await message.reply("Gunakan format: `/addseller user_id`")
+
+    seller_id = message.command[1]
+
     try:
-        seller_id = int(message.command[1])
-        first_name = message.from_user.first_name or ""
-        last_name = message.from_user.last_name or ""
-        username = message.from_user.username or ""
+        seller_id = int(seller_id)
         user_id = message.from_user.id
-    except ValueError:
-        return await xxnx.edit("Seller ID harus berupa angka.")
-    
-    try:
-        added = await add_seller(seller_id, user_id, username, first_name, last_name)
-        if added:
-            seller_name = f"{first_name} {last_name}".strip() or "Unknown"
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
-    except Exception as e:
-        print(f"Error adding seller: {e}")
-        await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
-    
-    await asyncio.sleep(10)
-    await xxnx.delete()
-    await message.delete()
-    
-@Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
-async def remsellermessag(app: Bot, message: Message):
-    seller_id = int(message.command[1]) if len(message.command) > 1 else None
-
-    if not seller_id:
-        return await message.reply("`Silakan berikan Seller ID untuk menghapus penjual.`")
-        
-    xxnx = await message.reply("`Menghapus penjual...`")
-    try:
-        removed = await rem_seller(seller_id)
-        if removed:
-            await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` telah dihapus.**")
+        username = message.from_user.username or message.from_user.first_name
+        first_name = message.from_user.first_name
+        last_name = message.from_user.last_name or ""
+        success = await add_seller(seller_id, user_id, username, first_name, last_name)
+        if success:
+            await message.reply(f"User dengan ID `{seller_id}` telah ditambahkan sebagai seller.")
         else:
-            await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` tidak ditemukan.**")
+            await message.reply("Terjadi kesalahan saat menambahkan seller.")
+    except ValueError:
+        await message.reply("User ID harus berupa angka.")
     except Exception as e:
-        print(f"Error removing seller: {e}")
-        await xxnx.edit("Terjadi kesalahan saat menghapus penjual.")
-    
-    await asyncio.sleep(10)
-    await xxnx.delete()
-    await message.delete()
+        print(f"Error: {e}")
+        await message.reply("Terjadi kesalahan saat menambahkan seller.")
 
-@Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
-async def listsellersmessage(app: Bot, message: Message):
+@Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
+async def remove_seller(app: Bot, message: Message):
+    if len(message.command) < 2:
+        return await message.reply("Gunakan format: `/remseller user_id`")
+
+    seller_id = message.command[1]
+
+    try:
+        seller_id = int(seller_id)
+        success = await rem_seller(seller_id)
+        if success:
+            await message.reply(f"User dengan ID `{seller_id}` telah dihapus dari daftar seller.")
+        else:
+            await message.reply("Terjadi kesalahan saat menghapus seller.")
+    except ValueError:
+        await message.reply("User ID harus berupa angka.")
+    except Exception as e:
+        print(f"Error: {e}")
+        await message.reply("Terjadi kesalahan saat menghapus seller.")
+
+@Bot.on_message(filters.command("listseller") & filters.user(OWNER_ID))
+async def list_sellers(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
-        return await message.reply("**Belum ada penjual yang terdaftar.**")
+        return await message.reply("Tidak ada seller yang terdaftar.")
 
-    msg = "**Daftar Penjual**\n\n"
-    num = 0
-
-    for seller in sellers:
-        num += 1
-        seller_id = seller['_id']
+    msg = "**Daftar Seller**\n\n"
+    for idx, seller in enumerate(sellers, 1):
         seller_name = seller.get('seller_name', 'Unknown')
-        
-        added_by_info = seller.get('added_by', {'user_id': 'Unknown', 'username': 'Unknown'})
-        added_by_user_id = added_by_info.get('user_id', 'Unknown')
-        added_by_username = added_by_info.get('username', 'Unknown')
-        added_by_user_link = f"[{added_by_username}](tg://user?id={added_by_user_id})" if added_by_user_id != 'Unknown' else "Unknown"
-        
+        added_by = seller.get('added_by', {})
+        added_by_name = added_by.get('username', 'Unknown')
         added_at = seller.get('added_at', 'Unknown')
-        if added_at != 'Unknown':
-            added_at = added_at.astimezone(timezone("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S")
-        
-        msg += (f"{num}. Penjual ID: `{seller_id}`\n"
-                f"├ Nama Penjual: {seller_name}\n"
-                f"├ Ditambahkan oleh: {added_by_user_link}\n"
-                f"└ Ditambahkan pada: {added_at}\n\n")
 
-    await message.reply(msg, disable_web_page_preview=True)
+        # Mengubah waktu ke zona waktu Asia/Jakarta
+        if added_at != 'Unknown':
+            added_at = added_at.astimezone(timezone("Asia/Jakarta")).strftime("%d-%m-%Y %H:%M:%S")
+
+        msg += f"{idx}. {seller_name} (ID: `{seller['_id']}`)\n  Ditambahkan oleh: {added_by_name} pada {added_at}\n"
+
+    await message.reply(msg)
