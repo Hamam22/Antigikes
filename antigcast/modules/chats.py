@@ -229,9 +229,9 @@ async def listsellersmessage(app: Bot, message: Message):
 
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id', 0)
-        user_first_name = added_by.get('first_name', 'Unknown')
-        user_last_name = added_by.get('last_name', '')
+        user_id = added_by.get('message.from_user.id', 0)
+        user_first_name = added_by.get('message.from_user.first_name', 'Unknown')
+        user_last_name = added_by.get('message.from_user.last_name', '')
 
         # Menggunakan HTML untuk membuat tautan dengan first name dan last name
         user_link = f"<a href='tg://user?id={user_id}'>{user_first_name} {user_last_name}</a>"
