@@ -1,4 +1,6 @@
 import datetime
+from pytz import timezone
+from dateutil.relativedelta import relativedelta
 from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -116,22 +118,52 @@ async def get_actived_chats() -> list:
         return []
     return acctivedchats["acctivedchats"]
 
-
-async def add_actived_chat(trigger) -> bool:
+# Fungsi untuk menambahkan chat aktif
+async def add_actived_chat(trigger, user_id, username) -> bool:
     acctivedchats = await get_actived_chats()
-    acctivedchats.append(trigger)
-    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
-    return True
+    if trigger not in acctivedchats:
+        acctivedchats.append(trigger)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": acctivedchats}},
+            upsert=True
+        )
+        await set_chat_added_by(trigger, user_id, username)
+        return True
+    return False
 
-
+# Fungsi untuk menghapus chat aktif
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     if trigger in acctivedchats:
         acctivedchats.remove(trigger)
-        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": acctivedchats}},
+            upsert=True
+        )
         return True
-    else:
-        return False
+    return False
+
+# Fungsi untuk menetapkan informasi pengguna yang menambahkan grup
+async def set_chat_added_by(chat_id, user_id, username):
+    await actchat.update_one(
+        {'_id': chat_id},
+        {'$set': {
+            'added_by': {
+                'user_id': user_id,
+                'username': username
+            }
+        }},
+        upsert=True
+    )
+
+# Fungsi untuk mendapatkan informasi pengguna yang menambahkan grup
+async def get_added_by(chat_id):
+    chat = await actchat.find_one({'_id': chat_id})
+    if chat:
+        return chat.get('added_by')
+    return None
 
 
 # BLACKLIST_WORD
@@ -185,30 +217,39 @@ async def get_expired_date(chat_id):
     group = await exp.find_one({'_id': chat_id})
     if group:
         return group.get('expire_date')
-    else:
-        return None
-        
+    return None
 
+# Fungsi untuk menghapus tanggal kedaluwarsa
 async def rem_expired_date(chat_id):
     await exp.update_one({"_id": chat_id}, {"$unset": {"expire_date": ""}}, upsert=True)
 
-
+# Fungsi untuk menghapus entri grup yang sudah kedaluwarsa
 async def rem_expired(chat_id):
     await exp.delete_one({"_id": chat_id})
-        
 
+# Fungsi untuk menghapus grup yang sudah kedaluwarsa
 async def remove_expired():
-    async for group in exp.find({"expire_date": {"$lt": datetime.datetime.now()}}):
+    now = datetime.datetime.now(timezone("Asia/Jakarta"))
+    async for group in exp.find({"expire_date": {"$lt": now}}):
         await rem_expired(group["_id"])
         await rem_actived_chat(group["_id"])
         gc = group["_id"]
-        exptext = f"Masa Aktif {gc} Telah Habis dan telah dai hapus dari database."
+        exptext = f"Masa Aktif {gc} Telah Habis dan telah dihapus dari database."
         print(exptext)
-        
 
-async def set_expired_date(chat_id, expire_date):
-    exp.update_one({'_id': chat_id}, {'$set': {'expire_date': expire_date}}, upsert=True)
-
+# Fungsi untuk menetapkan tanggal kedaluwarsa
+async def set_expired_date(chat_id, expire_date, user_id, username):
+    await exp.update_one(
+        {'_id': chat_id},
+        {'$set': {
+            'expire_date': expire_date,
+            'added_by': {
+                'user_id': user_id,
+                'username': username
+            }
+        }},
+        upsert=True
+    )
 
 # GLOBAL_DELETE
 async def get_muted_users() -> list:
