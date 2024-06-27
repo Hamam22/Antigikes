@@ -149,7 +149,9 @@ async def set_chat_added_by(chat_id, user_id, username):
         {'$set': {
             'added_by': {
                 'user_id': user_id,
-                'username': username
+                'username': username,
+                'first_name': first_name,
+                'last_name': last_name
             }
         }},
         upsert=True
