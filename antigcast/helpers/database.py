@@ -304,15 +304,14 @@ async def clear_muted_users_in_group(group_id):
 
 
 #SELLER
-async def add_seller(seller_id, user_id, first_name, last_name):
+async def add_seller(seller_id, user_id, username):
     try:
         await sellers_collection.update_one(
             {'_id': seller_id},
             {'$set': {
                 'added_by': {
                     'user_id': user_id,
-                    'first_name': first_name,
-                    'last_name': last_name
+                    'username': username
                 },
                 'added_at': datetime.datetime.now()
             }},
