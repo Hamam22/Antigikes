@@ -170,6 +170,30 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
+@Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
+async def addsellermessag(app: Bot, message: Message):
+    xxnx = await message.reply(f"`Menambahkan penjual baru..`")
+    
+    if len(message.command) != 2:
+        return await xxnx.edit(f"**Gunakan Format** : `/addseller seller_id`")
+    
+    try:
+        seller_id = int(message.command[1])
+    except ValueError:
+        return await xxnx.edit("Seller ID harus berupa angka.")
+    
+    try:
+        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
+        if added:
+            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
+    except Exception as e:
+        print(f"Error adding seller: {e}")
+        await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
+    
+    await asyncio.sleep(10)
+    await xxnx.delete()
+    await message.delete()
+
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
