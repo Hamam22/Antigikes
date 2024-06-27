@@ -29,9 +29,7 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa mute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
-    elif user_id in OWNER_ID:
-        return await message.reply_text("Kamu tidak bisa mute developer bot")
-
+    
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
     muted = await get_muted_users_in_group(group_id)
