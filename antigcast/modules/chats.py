@@ -190,7 +190,7 @@ async def addsellermessag(app: Bot, message: Message):
     try:
         added = await add_seller(seller_id, user_id, username, first_name, last_name)
         if added:
-            seller_name = f"{first_name} {last_name}".strip()
+            seller_name = f"{first_name} {last_name}".strip() or "Unknown"
             await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
     except Exception as e:
         print(f"Error adding seller: {e}")
@@ -234,19 +234,17 @@ async def listsellersmessage(app: Bot, message: Message):
 
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id')
+        user_id = added_by.get('user_id', 'Unknown')
         username = added_by.get('username', 'Unknown')
 
-        # Menggunakan markdown untuk tautan ke pengguna
-        user_link = f"[{username}](tg://user?id={user_id})" if user_id else "Unknown"
+        user_link = f"[{username}](tg://user?id={user_id})" if user_id != 'Unknown' else "Unknown"
 
         seller_id = seller.get('_id')
         seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at')
-        
-        # Konversi waktu ke Asia/Jakarta
+
         if added_at:
-            added_at = added_at.replace(tzinfo=timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
+            added_at = added_at.astimezone(timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
         else:
             added_at = "Unknown"
 
