@@ -218,7 +218,7 @@ async def remsellermessag(app: Bot, message: Message):
 
 
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
-async def listsellersmessag(app: Bot, message: Message):
+async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
@@ -226,23 +226,23 @@ async def listsellersmessag(app: Bot, message: Message):
     resp = await message.reply("**Memuat database...**")
     msg = f"**Daftar Penjual**\n\n"
     num = 0
+
     for seller in sellers:
         added_by = seller.get('added_by', {})
-        added_by_info = f"[{added_by.get('username', 'Unknown')}](tg://user?id={added_by.get('user_id', 0)})"
-
-        # Format nama penjual sesuai dengan permintaan Anda
         user_id = added_by.get('user_id', 0)
-        first_name = added_by.get('message.from_user.frist_name', 'Unknown')
-        last_name = added_by.get('last_name', '')
-        user_link = f"[{added_by.get('username', 'Unknown')}](tg://user?id={added_by.get('message.from_user.frist_name')})"
+        user_first_name = added_by.get('first_name', 'Unknown')
+        user_last_name = added_by.get('last_name', '')
+
+        # Menggunakan HTML untuk membuat tautan dengan first name dan last name
+        user_link = f"<a href='tg://user?id={user_id}'>{user_first_name} {user_last_name}</a>"
 
         seller_id = seller.get('_id')
         seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at', 'Unknown')
         num += 1
         msg += (f"**{num}. Penjual ID: `{seller_id}`**\n"
-                f"├ Nama Penjual: {user_link}\n"  # Menggunakan format nama yang diinginkan
-                f"├ Ditambahkan oleh: {added_by_info}\n"
+                f"├ Nama Penjual: {seller_name}\n"
+                f"├ Ditambahkan oleh: {user_link}\n"
                 f"└ Ditambahkan pada: `{added_at}`\n\n")
 
     await resp.edit(msg, disable_web_page_preview=True)
