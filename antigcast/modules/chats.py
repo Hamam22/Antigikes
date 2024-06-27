@@ -8,7 +8,7 @@ from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 
-from antigcast.config import *
+from antigcast.config import OWNER_ID
 from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
