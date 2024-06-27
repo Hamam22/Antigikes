@@ -15,7 +15,7 @@ owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mute_collection = db['GROUPMUTE']
-
+SELLER = db['ADDSELLER']
 
 #USERS
 def new_user(id):
@@ -307,4 +307,52 @@ async def clear_muted_users_in_group(group_id):
         {'group_id': group_id},
         {'$unset': {'user_data': ""}}  # Remove the entire user_data field
     )
-    
+
+#SELLER
+async def add_seller(seller_id, seller_name, user_id, username):
+    try:
+        await sellers_collection.update_one(
+            {'_id': seller_id},
+            {'$set': {
+                'seller_name': seller_name,
+                'added_by': {
+                    'user_id': user_id,
+                    'username': username
+                },
+                'added_at': datetime.datetime.now()
+            }},
+            upsert=True
+        )
+        return True
+    except Exception as e:
+        print(f"Error adding seller: {e}")
+        return False
+
+# Fungsi untuk menghapus seller berdasarkan seller_id
+async def rem_seller(seller_id):
+    try:
+        await sellers_collection.delete_one({'_id': seller_id})
+        return True
+    except Exception as e:
+        print(f"Error removing seller: {e}")
+        return False
+
+# Fungsi untuk mendapatkan daftar semua seller
+async def list_sellers():
+    try:
+        sellers = []
+        async for seller in sellers_collection.find():
+            sellers.append(seller)
+        return sellers
+    except Exception as e:
+        print(f"Error listing sellers: {e}")
+        return []
+
+# Fungsi untuk mendapatkan seller berdasarkan seller_id
+async def get_seller(seller_id):
+    try:
+        seller = await sellers_collection.find_one({'_id': seller_id})
+        return seller
+    except Exception as e:
+        print(f"Error getting seller: {e}")
+        return None
