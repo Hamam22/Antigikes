@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime
 from pytz import timezone
-from dateutil.relativedelta import relativedelta
 from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
