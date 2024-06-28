@@ -270,7 +270,7 @@ async def add_seller(seller_id):
         print(f"Error adding seller to MongoDB: {e}")
         return False
 
-# Fungsi untuk menghapus penjual
+# Function to remove a seller
 async def rem_seller(seller_id):
     try:
         result = await sellers_collection.delete_one({"_id": seller_id})
@@ -279,7 +279,7 @@ async def rem_seller(seller_id):
         print(f"Error removing seller from MongoDB: {e}")
         return False
 
-# Fungsi untuk menampilkan daftar penjual
+# Function to list all sellers
 async def list_sellers():
     try:
         sellers = []
@@ -290,4 +290,3 @@ async def list_sellers():
         print(f"Error listing sellers from MongoDB: {e}")
         return []
         
-    
