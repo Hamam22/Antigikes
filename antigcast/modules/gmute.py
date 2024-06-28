@@ -109,12 +109,11 @@ async def muted(app: Bot, message: Message):
         num += 1
 
         try:
-            get = await app.get_users(int(x))
             gname = get.mention
             gid = get.id
             msg += f"**{num}. {gname}**\n└ User ID: `{gid}`\n\n"
         except Exception:
-            msg += f"**{num}. {xname}**\n└ User ID: `{x}`\n\n"
+            msg += f"**{num}. {gname}**\n└ User ID: `{gid}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
