@@ -233,13 +233,19 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, user_name=None):
+async def mute_user_in_group(group_id, user_id, user_name):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'user_ids': {'id': user_id, 'name': user_name}}},
+        {
+            '$set': {
+                f'user_data.{user_id}': {
+                    'name': user_name,
+                    }
+                }
+            }
+        },
         upsert=True
     )
-
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
