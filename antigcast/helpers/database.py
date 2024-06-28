@@ -255,4 +255,39 @@ async def get_muted_users_in_group(group_id):
 
 async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
+
+#SELLER
+async def add_seller(seller_id):
+    try:
+        added_at = datetime.now(timezone('Asia/Jakarta'))
+        seller_data = {
+            "_id": seller_id,
+            "added_at": added_at
+        }
+        result = await sellers_collection.insert_one(seller_data)
+        return True
+    except Exception as e:
+        print(f"Error adding seller to MongoDB: {e}")
+        return False
+
+# Fungsi untuk menghapus penjual
+async def rem_seller(seller_id):
+    try:
+        result = await sellers_collection.delete_one({"_id": seller_id})
+        return result.deleted_count > 0
+    except Exception as e:
+        print(f"Error removing seller from MongoDB: {e}")
+        return False
+
+# Fungsi untuk menampilkan daftar penjual
+async def list_sellers():
+    try:
+        sellers = []
+        async for seller in sellers_collection.find():
+            sellers.append(seller)
+        return sellers
+    except Exception as e:
+        print(f"Error listing sellers from MongoDB: {e}")
+        return []
+        
     
