@@ -170,7 +170,7 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-
+# Command handler to add a seller
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan penjual baru...`")
@@ -180,26 +180,21 @@ async def addsellermessag(app: Bot, message: Message):
     
     try:
         seller_id = int(message.command[1])
-        first_name = message.from_user.first_name or ""
-        last_name = message.from_user.last_name or ""
-        username = message.from_user.username or ""
-        user_id = message.from_user.id
-    except ValueError:
-        return await xxnx.edit("Seller ID harus berupa angka.")
-    
-    try:
-        added = await add_seller(seller_id, user_id, username, first_name, last_name)
+        added_at = datetime.datetime.now(timezone('Asia/Jakarta'))
+        
+        added = await add_seller(seller_id, added_at)
         if added:
-            seller_name = f"{first_name} {last_name}".strip() or "Unknown"
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nNama Penjual: `{seller_name}`")
+            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`\nAdded At: `{added_at}`")
+        else:
+            await xxnx.edit("Gagal menambahkan penjual.")
+    
+    except ValueError:
+        await xxnx.edit("Seller ID harus berupa angka.")
     except Exception as e:
         print(f"Error adding seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
-    
-    await asyncio.sleep(10)
-    await app.delete_messages(chat_id=xxnx.chat.id, message_ids=xxnx.message_id)  # Hapus pesan balasan
-    await app.delete_messages(chat_id=message.chat.id, message_ids=message.message_id)  # Hapus pesan asli yang memicu perintah
-    
+
+# Command handler to remove a seller
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
@@ -217,11 +212,8 @@ async def remsellermessag(app: Bot, message: Message):
     except Exception as e:
         print(f"Error removing seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menghapus penjual.")
-    
-    await asyncio.sleep(10)
-    await xxnx.delete()
-    await message.delete()
 
+# Command handler to list all sellers
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
 async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
@@ -233,14 +225,7 @@ async def listsellersmessage(app: Bot, message: Message):
     num = 0
 
     for seller in sellers:
-        added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id', 'Unknown')
-        username = added_by.get('username', 'Unknown')
-
-        user_link = f"[{username}](tg://user?id={user_id})" if user_id != 'Unknown' else "Unknown"
-
         seller_id = seller.get('_id')
-        seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at')
 
         if added_at:
@@ -251,8 +236,6 @@ async def listsellersmessage(app: Bot, message: Message):
         num += 1
         msg += (
             f"**{num}. Penjual ID: `{seller_id}`**\n"
-            f"├ Nama Penjual: `{seller_name}`\n"
-            f"├ Ditambahkan oleh: {user_link}\n"
             f"└ Ditambahkan pada: `{added_at}`\n\n"
         )
 
