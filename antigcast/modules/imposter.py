@@ -85,18 +85,18 @@ async def chk_usr(app: Bot, message: Message):
     if msg != "":
         await message.reply_photo("https://telegra.ph/file/58afe55fee5ae99d6901b.jpg", caption=msg)
 
-@app.on_message(filters.command("imposter") & ~filters.bot & ~filters.via_bot & filters.group, group=32)
+@app.on_message(filters.command("imposter") & ~filters.bot & ~filters.via_bot & filters.group & Admin, group=32)
 async def set_mataa(app: Bot, message: Message):
     if len(message.command) == 1:
         return await message.reply("**Penggunaan Deteksi Penyamar: penyamar on|off**")
-    if message.command[1] == "enable":
+    if message.command[1] == "on":
         cekset = await impo_on(message.chat.id)
         if cekset:
             await message.reply("**Mode penyamar sudah diaktifkan.**")
         else:
             await impo_on(message.chat.id)
             await message.reply(f"**Berhasil mengaktifkan mode penyamar untuk {message.chat.title}**")
-    elif message.command[1] == "disable":
+    elif message.command[1] == "off":
         cekset = await impo_off(message.chat.id)
         if not cekset:
             await message.reply("**Mode penyamar sudah dinonaktifkan.**")
