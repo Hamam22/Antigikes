@@ -240,28 +240,32 @@ async def mute_user_in_group(group_id, user_id, user_name):
             '$set': {
                 f'user_data.{user_id}': {
                     'name': user_name,
-                    }
                 }
             }
         },
         upsert=True
     )
+
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$pull': {'user_ids': {'id': user_id}}}
+        {'$unset': {f'user_data.{user_id}': 1}}
     )
 
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc:
-        muted_users = doc.get('user_ids', [])
-        return [(user.get('id'), user.get('name')) for user in muted_users]
+        user_data = doc.get('user_data', {})
+        muted_users = [(user_id, data.get('name')) for user_id, data in user_data.items()]
+        return muted_users
     return []
 
 async def clear_muted_users_in_group(group_id):
-    await mute_collection.delete_one({'group_id': group_id})
-
+    await mute_collection.update_one(
+        {'group_id': group_id},
+        {'$unset': {'user_data': 1}}
+)
+    
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
