@@ -4,7 +4,7 @@ from antigcast.helpers.database import impo_off, impo_on, check_pretender, add_u
 from antigcast import Bot
 
 @Bot.on_message(filters.group & ~filters.bot & ~filters.via_bot, group=69)
-async def chk_usr(app, Bot, message: Message):
+async def chk_usr(app: Bot, message: Message):
     if message.sender_chat or not await check_pretender(message.chat.id):
         return
     if not await usr_data(message.from_user.id):
@@ -86,7 +86,7 @@ async def chk_usr(app, Bot, message: Message):
         await message.reply_photo("https://telegra.ph/file/58afe55fee5ae99d6901b.jpg", caption=msg)
 
 @app.on_message(filters.group & filters.command("imposter") & ~filters.bot & ~filters.via_bot)
-async def set_mataa(app, Bot, message: Message):
+async def set_mataa(app: Bot, message: Message):
     if len(message.command) == 1:
         return await message.reply("**Penggunaan Deteksi Penyamar: penyamar on|off**")
     if message.command[1] == "enable":
