@@ -227,6 +227,13 @@ async def listsellersmessage(app: Bot, message: Message):
     num = 0
 
     for seller in sellers:
+        added_by = seller.get('added_by', {})
+        user_id = added_by.get('user_id')
+        username = added_by.get('username', 'Unknown')
+
+        # Menggunakan markdown untuk tautan ke pengguna
+        user_link = f"[{username}](tg://user?id={user_id})"
+
         seller_id = seller.get('_id')
         seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at', None)
@@ -242,6 +249,7 @@ async def listsellersmessage(app: Bot, message: Message):
         msg += (
             f"**{num}. Penjual ID: `{seller_id}`**\n"
             f"├ Nama Penjual: `{seller_name}`\n"
+            f"├ Ditambahkan oleh: {user_link}\n"
             f"└ Ditambahkan pada: `{added_at}`\n\n"
         )
 
