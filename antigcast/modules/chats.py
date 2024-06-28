@@ -170,78 +170,79 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-# Definisi fungsi bot menggunakan kode yang lengkap
+# Bot command to add a seller
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addseller_message(app: Bot, message: Message):
-    xxnx = await message.reply("`Menambahkan penjual baru...`")
+    xxnx = await message.reply("`Adding a new seller...`")
     
     if len(message.command) != 2:
-        return await xxnx.edit("**Gunakan Format**: `/addseller seller_id`")
+        return await xxnx.edit("**Usage**: `/addseller seller_id`")
     
     try:
         seller_id = int(message.command[1])
     except ValueError:
-        return await xxnx.edit("Seller ID harus berupa angka.")
+        return await xxnx.edit("Seller ID must be an integer.")
     
     try:
         added = await add_seller(seller_id)
         if added:
-            await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
+            await xxnx.edit(f"**Seller Added**\nSeller ID: `{seller_id}`")
     except Exception as e:
         print(f"Error adding seller: {e}")
-        await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
+        await xxnx.edit("An error occurred while adding the seller.")
     
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
 
+# Bot command to remove a seller
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
 async def remseller_message(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
     if not seller_id:
-        return await message.reply("`Silakan berikan Seller ID untuk menghapus penjual.`")
+        return await message.reply("`Please provide the Seller ID to remove.`")
         
-    xxnx = await message.reply("`Menghapus penjual...`")
+    xxnx = await message.reply("`Removing seller...`")
     try:
         removed = await rem_seller(seller_id)
         if removed:
-            await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` telah dihapus.**")
+            await xxnx.edit(f"**Seller with Seller ID `{seller_id}` has been removed.**")
         else:
-            await xxnx.edit(f"**Penjual dengan Seller ID `{seller_id}` tidak ditemukan.**")
+            await xxnx.edit(f"**Seller with Seller ID `{seller_id}` not found.**")
     except Exception as e:
         print(f"Error removing seller: {e}")
-        await xxnx.edit("Terjadi kesalahan saat menghapus penjual.")
+        await xxnx.edit("An error occurred while removing the seller.")
     
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
 
+# Bot command to list all sellers
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
 async def listsellers_message(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
-        return await message.reply("**Belum ada penjual yang terdaftar.**")
+        return await message.reply("**No sellers registered yet.**")
 
-    resp = await message.reply("**Memuat database...**")
-    msg = f"**Daftar Penjual**\n\n"
+    resp = await message.reply("**Loading database...**")
+    msg = f"**List of Sellers**\n\n"
     num = 0
 
     for seller in sellers:
         seller_id = seller.get('_id')
         added_at = seller.get('added_at', None)
         
-        # Konversi waktu ke Asia/Jakarta
+        # Convert time to Asia/Jakarta timezone
         if added_at:
-            added_at = added_at.replace(tzinfo=timezone('UTC')).astimezone(timezone('Asia/Jakarta'))
-            added_at = added_at.strftime("%Y-%m-%d %H:%M:%S")
+            added_at = added_at.astimezone(timezone('Asia/Jakarta')).strftime("%Y-%m-%d %H:%M:%S")
         else:
             added_at = "Unknown"
 
         num += 1
         msg += (
-            f"**{num}. Penjual ID: `{seller_id}`**\n"
-            f"└ Ditambahkan pada: `{added_at}`\n\n"
+            f"**{num}. Seller ID: `{seller_id}`**\n"
+            f"└ Added at: `{added_at}`\n\n"
         )
 
     await resp.edit(msg, disable_web_page_preview=True)
