@@ -118,50 +118,22 @@ async def get_actived_chats() -> list:
         return []
     return acctivedchats["acctivedchats"]
 
-async def add_actived_chat(trigger, user_id, username) -> bool:
+
+async def add_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
-    if trigger not in acctivedchats:
-        acctivedchats.append(trigger)
-        await actchat.update_one(
-            {"acctivedchat": "acctivedchat"},
-            {"$set": {"acctivedchats": acctivedchats}},
-            upsert=True
-        )
-        await set_chat_added_by(trigger, user_id, username)
-        return True
-    return False
+    acctivedchats.append(trigger)
+    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+    return True
+
 
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     if trigger in acctivedchats:
         acctivedchats.remove(trigger)
-        await actchat.update_one(
-            {"acctivedchat": "acctivedchat"},
-            {"$set": {"acctivedchats": acctivedchats}},
-            upsert=True
-        )
+        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
         return True
-    return False
-
-async def set_chat_added_by(chat_id, user_id, username):
-    await actchat.update_one(
-        {'_id': chat_id},
-        {'$set': {
-            'added_by': {
-                'user_id': user_id,
-                'username': username,
-                'first_name': first_name,
-                'last_name': last_name
-            }
-        }},
-        upsert=True
-    )
-
-async def get_added_by(chat_id):
-    chat = await actchat.find_one({'_id': chat_id})
-    if chat:
-        return chat.get('added_by')
-    return None
+    else:
+        return False
 
 
 # BLACKLIST_WORD
@@ -215,35 +187,29 @@ async def get_expired_date(chat_id):
     group = await exp.find_one({'_id': chat_id})
     if group:
         return group.get('expire_date')
-    return None
+    else:
+        return None
+        
 
 async def rem_expired_date(chat_id):
     await exp.update_one({"_id": chat_id}, {"$unset": {"expire_date": ""}}, upsert=True)
 
+
 async def rem_expired(chat_id):
     await exp.delete_one({"_id": chat_id})
+        
 
 async def remove_expired():
-    now = datetime.datetime.now(timezone("Asia/Jakarta"))
-    async for group in exp.find({"expire_date": {"$lt": now}}):
+    async for group in exp.find({"expire_date": {"$lt": datetime.datetime.now()}}):
         await rem_expired(group["_id"])
         await rem_actived_chat(group["_id"])
         gc = group["_id"]
-        exptext = f"Masa Aktif {gc} Telah Habis dan telah dihapus dari database."
+        exptext = f"Masa Aktif {gc} Telah Habis dan telah dai hapus dari database."
         print(exptext)
+        
 
-async def set_expired_date(chat_id, expire_date, user_id, username):
-    await exp.update_one(
-        {'_id': chat_id},
-        {'$set': {
-            'expire_date': expire_date,
-            'added_by': {
-                'user_id': user_id,
-                'username': username
-            }
-        }},
-        upsert=True
-    )
+async def set_expired_date(chat_id, expire_date):
+    exp.update_one({'_id': chat_id}, {'$set': {'expire_date': expire_date}}, upsert=True)
 
 
 # GLOBAL_DELETE
@@ -267,80 +233,26 @@ async def unmute_user(uid_id) -> bool:
     await globaldb.update_one({"muteduser": "muteduser"}, {"$set": {"mutedusers": mutedusers}}, upsert=True)
     return True
 
-
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
+async def mute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {
-            '$set': {
-                f'user_data.{user_id}': {
-                    'name': user_name,
-                    'muted_by': {
-                        'id': issuer_id,
-                        'name': issuer_name
-                    }
-                }
-            }
-        },
+        {'$addToSet': {'user_ids': user_id}},
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$unset': {f'user_data.{user_id}': ""}}  # Remove user from dictionary
+        {'$pull': {'user_ids': user_id}}
     )
 
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
-    if doc and 'user_data' in doc:
-        return doc['user_data']  # Return dictionary of user ID and associated data
-    return {}
+    if doc:
+        return doc.get('user_ids', [])
+    return []
 
 async def clear_muted_users_in_group(group_id):
-    await mute_collection.update_one(
-        {'group_id': group_id},
-        {'$unset': {'user_data': ""}}  # Remove the entire user_data field
-    )
-
-
-#SELLER
-async def add_seller(seller_id, user_id, first_name, last_name):
-    seller_name = f"{first_name} {last_name}".strip()
-    try:
-        await sellers_collection.update_one(
-            {'_id': seller_id},
-            {'$set': {
-                'seller_name': seller_name,
-                'added_by': {
-                    'user_id': user_id,
-                    'username': message.from_user.username
-                },
-                'added_at': datetime.datetime.now(timezone("UTC"))
-            }},
-            upsert=True
-        )
-        return True
-    except Exception as e:
-        print(f"Error adding seller: {e}")
-        return False
-
-async def rem_seller(seller_id):
-    try:
-        result = await sellers_collection.delete_one({'_id': seller_id})
-        return result.deleted_count > 0
-    except Exception as e:
-        print(f"Error removing seller: {e}")
-        return False
-
-
-async def list_sellers():
-    try:
-        sellers = []
-        async for seller in sellers_collection.find():
-            sellers.append(seller)
-        return sellers
-    except Exception as e:
-        print(f"Error listing sellers: {e}")
-        return []
+    await mute_collection.delete_one({'group_id': group_id})
+    
