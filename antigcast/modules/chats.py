@@ -32,7 +32,7 @@ async def addgcmessag(app: Bot, message: Message):
     if not hari:
         hari = "30"
     xxnx = await message.reply(f"`Menambahkan izin dalam grup ini...`")
-    now = datetime.now(timezone("Asia/Jakarta"))
+    now = datetime.datetime.now(timezone("Asia/Jakarta"))
     expired = now + relativedelta(days=int(hari))
     expired_date = expired.strftime("%d-%m-%Y")
     chats = await get_actived_chats()
