@@ -43,7 +43,7 @@ async def mute_handler(app: Bot, message: Message):
         kon_name = kon.first_name
         kon_id = kon.id
 
-        await mute_user_in_group(group_id, kon_id)
+        await mute_user_in_group(group_id, kon_id, kon_name)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
