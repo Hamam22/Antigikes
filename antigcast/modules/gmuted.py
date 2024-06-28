@@ -5,7 +5,7 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
 from antigcast.config import OWNER_ID
-from antigcast.helpers.admins import *
+from antigcast.helpers.admins import AdminFilter
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import (
     get_muted_users_in_group,
@@ -46,11 +46,7 @@ async def mute_handler(app: Bot, message: Message):
         kon_name = kon.first_name
         kon_id = kon.id
 
-        await mute_user_in_group(group_id, kon_id)
-
-        # Tambahkan pengguna yang memberikan perintah ke dalam daftar gmuted
-        await mute_user_in_group(group_id, message.from_user.id)
-        await add_user_data(group_id, message.from_user.id, message.from_user.first_name)
+        await mute_user_in_group(group_id, kon_id, message.from_user.id)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
@@ -59,7 +55,7 @@ async def mute_handler(app: Bot, message: Message):
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
 
-@Bot.on_message(filters.command("ungdel") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
@@ -128,7 +124,7 @@ async def muted(app: Bot, message: Message):
     for data in user_data:
         user_name = data.get('user_name')
         user_id = data.get('user_id')
-        msg += f" Nama{user_name} \n└ admin : `{user_id}`\n\n"
+        msg += f" Nama {user_name} \n└ admin : `{user_id}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
