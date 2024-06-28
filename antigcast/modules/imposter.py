@@ -86,7 +86,7 @@ async def chk_usr(app: Bot, message: Message):
             message.from_user.last_name,
         )
     if msg != "":
-        await message.reply_photo("https://telegra.ph/file/58afe55fee5ae99d6901b.jpg", caption=msg)
+        await message.reply_photo("https://telegra.ph/file/33dd722f223dec90d874d.jpg", caption=msg)
 
 @app.on_message(filters.command("imposter") & filters.group & Admin, group=32)
 async def set_mataa(app: Bot, message: Message):
