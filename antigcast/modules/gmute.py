@@ -114,7 +114,7 @@ async def muted(app: Bot, message: Message):
             gid = get.id
             msg += f"**{num}. {gname}**\n└ User ID: `{gid}`\n\n"
         except Exception:
-            msg += f"**{num}. {gname}**\n└ User ID: `{x}`\n\n"
+            msg += f"**{num}. {xname}**\n└ User ID: `{x}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
