@@ -15,6 +15,7 @@ exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mute_collection = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
+user_collection = db['IMPOSTER']
 
 #USERS
 def new_user(id):
@@ -286,4 +287,56 @@ async def list_sellers():
     except Exception as e:
         print(f"Error listing sellers from MongoDB: {e}")
         return []
+
+#IMPOSTER
+async def impo_on(chat_id: int):
+    # Mengaktifkan mode pretender untuk grup tertentu
+    result = await pretender_collection.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"pretender_mode": True}},
+        upsert=True
+    )
+    return result.modified_count > 0
+
+async def impo_off(chat_id: int):
+    # Menonaktifkan mode pretender untuk grup tertentu
+    result = await pretender_collection.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"pretender_mode": False}},
+        upsert=True
+    )
+    return result.modified_count > 0
+
+async def check_pretender(chat_id: int):
+    # Memeriksa apakah mode pretender diaktifkan untuk grup tertentu
+    result = await pretender_collection.find_one({"chat_id": chat_id})
+    if result:
+        return result.get("pretender_mode", False)
+    return False
+
+async def add_userdata(user_id: int, username: str, first_name: str, last_name: str):
+    # Menambahkan atau memperbarui data pengguna di database
+    await user_collection.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "username": username,
+                "first_name": first_name,
+                "last_name": last_name,
+            }
+        },
+        upsert=True
+    )
+
+async def get_userdata(user_id: int):
+    # Mengambil data pengguna dari database
+    result = await user_collection.find_one({"user_id": user_id})
+    if result:
+        return result.get("username"), result.get("first_name"), result.get("last_name")
+    return None, None, None
+
+async def usr_data(user_id: int):
+    # Memeriksa apakah data pengguna ada di database
+    result = await user_collection.find_one({"user_id": user_id})
+    return result is not None
         
