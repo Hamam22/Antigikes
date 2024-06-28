@@ -170,8 +170,9 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
+# Definisi fungsi bot menggunakan kode yang lengkap
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
-async def addsellermessag(app: Bot, message: Message):
+async def addseller_message(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan penjual baru...`")
     
     if len(message.command) != 2:
@@ -183,7 +184,7 @@ async def addsellermessag(app: Bot, message: Message):
         return await xxnx.edit("Seller ID harus berupa angka.")
     
     try:
-        added = await add_seller(seller_id, message.from_user.id, message.from_user.username)
+        added = await add_seller(seller_id)
         if added:
             await xxnx.edit(f"**Penjual Ditambahkan**\nSeller ID: `{seller_id}`")
     except Exception as e:
@@ -195,7 +196,7 @@ async def addsellermessag(app: Bot, message: Message):
     await message.delete()
 
 @Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
-async def remsellermessag(app: Bot, message: Message):
+async def remseller_message(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
     if not seller_id:
@@ -217,7 +218,7 @@ async def remsellermessag(app: Bot, message: Message):
     await message.delete()
 
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
-async def listsellersmessage(app: Bot, message: Message):
+async def listsellers_message(app: Bot, message: Message):
     sellers = await list_sellers()
     if not sellers:
         return await message.reply("**Belum ada penjual yang terdaftar.**")
@@ -227,15 +228,7 @@ async def listsellersmessage(app: Bot, message: Message):
     num = 0
 
     for seller in sellers:
-        added_by = seller.get('added_by', {})
-        user_id = added_by.get('user_id')
-        username = added_by.get('username', 'Unknown')
-
-        # Menggunakan markdown untuk tautan ke pengguna
-        user_link = f"[{username}](tg://user?id={user_id})"
-
         seller_id = seller.get('_id')
-        seller_name = seller.get('seller_name', 'Unknown')
         added_at = seller.get('added_at', None)
         
         # Konversi waktu ke Asia/Jakarta
@@ -248,8 +241,6 @@ async def listsellersmessage(app: Bot, message: Message):
         num += 1
         msg += (
             f"**{num}. Penjual ID: `{seller_id}`**\n"
-            f"├ Nama Penjual: `{seller_name}`\n"
-            f"├ Ditambahkan oleh: {user_link}\n"
             f"└ Ditambahkan pada: `{added_at}`\n\n"
         )
 
