@@ -289,34 +289,19 @@ async def list_sellers():
         return []
 
 #IMPOSTER
-async def impo_on(chat_id: int):
-    # Mengaktifkan mode pretender untuk grup tertentu
-    result = await pretender_collection.update_one(
-        {"chat_id": chat_id},
-        {"$set": {"pretender_mode": True}},
-        upsert=True
-    )
-    return result.modified_count > 0
 
-async def impo_off(chat_id: int):
-    # Menonaktifkan mode pretender untuk grup tertentu
-    result = await pretender_collection.update_one(
-        {"chat_id": chat_id},
-        {"$set": {"pretender_mode": False}},
-        upsert=True
-    )
-    return result.modified_count > 0
+async def usr_data(user_id: int) -> bool:
+    user = await impdb.find_one({"user_id": user_id})
+    return bool(user)
 
-async def check_pretender(chat_id: int):
-    # Memeriksa apakah mode pretender diaktifkan untuk grup tertentu
-    result = await pretender_collection.find_one({"chat_id": chat_id})
-    if result:
-        return result.get("pretender_mode", False)
-    return False
 
-async def add_userdata(user_id: int, username: str, first_name: str, last_name: str):
-    # Menambahkan atau memperbarui data pengguna di database
-    await user_collection.update_one(
+async def get_userdata(user_id: int) -> bool:
+    user = await impdb.find_one({"user_id": user_id})
+    return user["username"], user["first_name"], user["last_name"]
+
+
+async def add_userdata(user_id: int, username, first_name, last_name):
+    await impdb.update_one(
         {"user_id": user_id},
         {
             "$set": {
@@ -325,18 +310,17 @@ async def add_userdata(user_id: int, username: str, first_name: str, last_name: 
                 "last_name": last_name,
             }
         },
-        upsert=True
+        upsert=True,
     )
 
-async def get_userdata(user_id: int):
-    # Mengambil data pengguna dari database
-    result = await user_collection.find_one({"user_id": user_id})
-    if result:
-        return result.get("username"), result.get("first_name"), result.get("last_name")
-    return None, None, None
+async def check_pretender(chat_id: int) -> bool:
+    chat = await impdb.find_one({"chat_id_toggle": chat_id})
+    return bool(chat)
 
-async def usr_data(user_id: int):
-    # Memeriksa apakah data pengguna ada di database
-    result = await user_collection.find_one({"user_id": user_id})
-    return result is not None
-        
+
+async def impo_on(chat_id: int) -> bool:
+    await impdb.insert_one({"chat_id_toggle": chat_id})
+
+
+async def impo_off(chat_id: int):
+    await impdb.delete_one({"chat_id_toggle": chat_id})
