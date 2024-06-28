@@ -127,7 +127,7 @@ async def muted(app: Bot, message: Message):
     for data in user_data:
         user_name = data.get('user_name')
         user_id = data.get('user_id')
-        msg += f"  Nama \n└ admin : `{user_id}`\n\n"
+        msg += f" Nama{user_name} \n└ admin : `{user_id}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
