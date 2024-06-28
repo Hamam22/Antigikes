@@ -124,11 +124,10 @@ async def muted(app: Bot, message: Message):
 
     # Tambahkan pengguna yang memberikan perintah
     user_data = await get_user_data(group_id)
-    msg += "**Admin yang memberikan perintah pl**\n\n"
     for data in user_data:
         user_name = data.get('user_name')
         user_id = data.get('user_id')
-        msg += f"**{user_name}**\n└ User ID: `{user_id}`\n\n"
+        msg += f"  Nama \n└ admin : `{user_id}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
