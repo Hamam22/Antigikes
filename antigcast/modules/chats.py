@@ -57,7 +57,7 @@ async def addgcmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("add"))
 async def addgroupmessag(app: Bot, message: Message):
-    # Memeriksa izin penjual sebelum menjalankan perintah
+    
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
@@ -73,7 +73,7 @@ async def addgroupmessag(app: Bot, message: Message):
     except ValueError:
         return await xxnx.edit("Group ID dan hari harus berupa angka.")
     
-    now = datetime.now(timezone("Asia/Jakarta"))
+    now = datetime.datetime.now(timezone("Asia/Jakarta"))
     expired = now + relativedelta(days=days)
     expired_date = expired.strftime("%d-%m-%Y")
     
