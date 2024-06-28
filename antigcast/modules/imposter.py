@@ -107,4 +107,4 @@ async def set_mataa(app: Bot, message: Message):
             await impo_off(message.chat.id)
             await message.reply(f"**Berhasil menonaktifkan mode penyamar untuk {message.chat.title}**")
     else:
-        await message.reply("**Penggunaan Deteksi Penyamar: penyamar on|off**")
+        await message.reply("**Penggunaan Deteksi Penyamar: penyamar enable|disable**")
