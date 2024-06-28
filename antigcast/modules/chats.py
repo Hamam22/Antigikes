@@ -17,9 +17,13 @@ from antigcast.helpers.database import *
 
 
 async def is_seller(user_id):
-    sellers = await list_sellers()
-    return any(seller['_id'] == user_id for seller in sellers)
-
+    try:
+        seller = await sellers_collection.find_one({"_id": user_id})
+        return seller is not None
+    except Exception as e:
+        print(f"Error checking seller: {e}")
+        return False
+        
 # Handler perintah /addgc untuk menambah izin grup dengan durasi default 30 hari
 @Bot.on_message(filters.command("addgc") & filters.user(OWNER_ID))
 async def addgcmessag(app: Bot, message: Message):
