@@ -5,18 +5,15 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
 from antigcast.config import OWNER_ID
-from antigcast.helpers.admins import*
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import (
     get_muted_users_in_group,
     mute_user_in_group,
     unmute_user_in_group,
-    clear_muted_users_in_group,
-    get_user_data,
-    add_user_data
+    clear_muted_users_in_group
 )
 
-@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
+@Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
@@ -46,7 +43,7 @@ async def mute_handler(app: Bot, message: Message):
         kon_name = kon.first_name
         kon_id = kon.id
 
-        await mute_user_in_group(group_id, kon_id, message.from_user.id)
+        await mute_user_in_group(group_id, kon_id)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
@@ -55,7 +52,7 @@ async def mute_handler(app: Bot, message: Message):
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
+@Bot.on_message(filters.command("ungdel") & filters.user(OWNER_ID))
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
@@ -95,7 +92,7 @@ async def unmute_handler(app: Bot, message: Message):
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
 
-@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
+@Bot.on_message(filters.command("gmuted") & filters.user(OWNER_ID))
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
     kons = await get_muted_users_in_group(group_id)
@@ -119,17 +116,10 @@ async def muted(app: Bot, message: Message):
         except Exception:
             msg += f"**{num}. {x}**\n\n"
 
-    # Tambahkan pengguna yang memberikan perintah
-    user_data = await get_user_data(group_id)
-    for data in user_data:
-        user_name = data.get('user_name')
-        user_id = data.get('user_id')
-        msg += f" Nama {user_name} \n└ admin : `{user_id}`\n\n"
-
     await resp.edit(msg, disable_web_page_preview=True)
 
 
-@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
+@Bot.on_message(filters.command("clearmuted") & filters.user(OWNER_ID))
 async def clear_muted(app: Bot, message: Message):
     group_id = message.chat.id
     await clear_muted_users_in_group(group_id)
