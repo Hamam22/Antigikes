@@ -233,10 +233,10 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, first_name):
+async def mute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'users': {'id': user_id, 'first_name': first_name}}},
+        {'$addToSet': {'user_ids': user_id}},
         upsert=True
     )
 
@@ -249,12 +249,12 @@ async def unmute_user_in_group(group_id, user_id):
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc:
-        return doc.get('users', [])
+        return doc.get('user_ids', [])
     return []
 
 async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
-    
+
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
