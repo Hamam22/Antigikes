@@ -6,7 +6,7 @@ from antigcast import Bot, app
 
 
 
-@Bot.on_message(filters.text & ~filters.private)
+@Bot.on_message(filters.text & ~filters.private & filterd.group, group=34)
 async def chk_usr(app: Bot, message: Message):
     if message.sender_chat or not await check_pretender(message.chat.id):
         return
