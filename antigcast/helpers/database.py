@@ -235,54 +235,27 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id: int, user_id: int, admin_id: int):
+async def mute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
         {'$addToSet': {'user_ids': user_id}},
         upsert=True
     )
-    await add_user_data(group_id, admin_id, user_id)
 
-# Fungsi untuk menghapus user yang dimute dari database
-async def unmute_user_in_group(group_id: int, user_id: int):
+async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
         {'$pull': {'user_ids': user_id}}
     )
-    await clear_user_data(group_id, user_id)
 
-# Fungsi untuk mendapatkan daftar user yang dimute dari database
-async def get_muted_users_in_group(group_id: int) -> List[int]:
+async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc:
         return doc.get('user_ids', [])
     return []
 
-# Fungsi untuk membersihkan semua user yang dimute dari database
-async def clear_muted_users_in_group(group_id: int):
+async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
-
-# Fungsi untuk menambahkan data user yang dimute dan admin yang melakukan aksi
-async def add_user_data(group_id: int, admin_id: int, user_id: int):
-    await mute_collection.update_one(
-        {'group_id': group_id},
-        {'$addToSet': {'user_data': {'user_id': user_id, 'admin_id': admin_id}}},
-        upsert=True
-    )
-
-# Fungsi untuk menghapus data user dari database
-async def clear_user_data(group_id: int, user_id: int):
-    await mute_collection.update_one(
-        {'group_id': group_id},
-        {'$pull': {'user_data': {'user_id': user_id}}}
-    )
-
-# Fungsi untuk mendapatkan data user dan admin yang melakukan aksi mute dari database
-async def get_user_data(group_id: int) -> List[dict]:
-    doc = await mute_collection.find_one({'group_id': group_id})
-    if doc:
-        return doc.get('user_data', [])
-    return []
     
 #SELLER
 async def add_seller(seller_id, added_at):
