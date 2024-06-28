@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 from antigcast.helpers.database import impo_off, impo_on, check_pretender, add_userdata, get_userdata, usr_data
-from antigcast import Bot
+from antigcast import Bot, app
 
 @Bot.on_message(filters.group & ~filters.bot & ~filters.via_bot, group=69)
 async def chk_usr(app: Bot, message: Message):
