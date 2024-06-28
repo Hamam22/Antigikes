@@ -19,10 +19,10 @@ async def is_seller(user_id):
     sellers = await list_sellers()
     return any(seller['_id'] == user_id for seller in sellers)
 
-# Handler perintah /addgc untuk menambah izin grup dengan durasi default 30 hari
+
 @Bot.on_message(filters.command("addgc"))
 async def addgcmessag(app: Bot, message: Message):
-    # Memeriksa izin penjual sebelum menjalankan perintah
+    
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
@@ -54,7 +54,7 @@ async def addgcmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-# Handler perintah /add untuk menambah izin grup dengan durasi yang ditentukan
+
 @Bot.on_message(filters.command("add"))
 async def addgroupmessag(app: Bot, message: Message):
     # Memeriksa izin penjual sebelum menjalankan perintah
@@ -96,10 +96,10 @@ async def addgroupmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-# Handler perintah /rmgc untuk menghapus izin grup
+
 @Bot.on_message(filters.command("rmgc") & filters.user(OWNER_ID))
 async def remgcmessag(app: Bot, message: Message):
-    # Memeriksa izin penjual sebelum menjalankan perintah
+    
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
@@ -120,10 +120,10 @@ async def remgcmessag(app: Bot, message: Message):
     await xxnx.delete()
     await message.delete()
 
-# Handler perintah /groups untuk menampilkan daftar grup yang diizinkan
+
 @Bot.on_message(filters.command("groups"))
 async def get_groupsmessag(app: Bot, message: Message):
-    # Memeriksa izin penjual sebelum menjalankan perintah
+
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
@@ -155,7 +155,7 @@ async def get_groupsmessag(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
     
-# Command handler to add a seller
+
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan penjual baru...`")
@@ -179,8 +179,8 @@ async def addsellermessag(app: Bot, message: Message):
         print(f"Error adding seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
 
-# Command handler to remove a seller
-@Bot.on_message(filters.command("remseller") & filters.user(OWNER_ID))
+
+@Bot.on_message(filters.command("rmmseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
     seller_id = int(message.command[1]) if len(message.command) > 1 else None
 
@@ -198,7 +198,7 @@ async def remsellermessag(app: Bot, message: Message):
         print(f"Error removing seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menghapus penjual.")
 
-# Command handler to list all sellers
+
 @Bot.on_message(filters.command("listsellers") & filters.user(OWNER_ID))
 async def listsellersmessage(app: Bot, message: Message):
     sellers = await list_sellers()
