@@ -15,7 +15,7 @@ exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mute_collection = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
-pretender_collection = db['PRETENDER']
+impdb = db['PRETENDER']
 
 #USERS
 def new_user(id):
