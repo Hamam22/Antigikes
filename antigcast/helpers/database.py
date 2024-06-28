@@ -234,6 +234,7 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
+# Fungsi yang sudah ada
 async def mute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
@@ -256,6 +257,20 @@ async def get_muted_users_in_group(group_id):
 async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
 
+# Tambahkan fungsi ini untuk menyimpan data pengguna
+async def add_user_data(group_id, user_id, user_name):
+    await mute_collection.update_one(
+        {'group_id': group_id},
+        {'$addToSet': {'user_data': {'user_id': user_id, 'user_name': user_name}}},
+        upsert=True
+    )
+
+# Fungsi untuk mengambil data pengguna yang mute
+async def get_user_data(group_id):
+    doc = await mute_collection.find_one({'group_id': group_id})
+    if doc:
+        return doc.get('user_data', [])
+    return []
 
 #SELLER
 async def add_seller(seller_id, added_at):
