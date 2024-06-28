@@ -15,7 +15,7 @@ from antigcast.helpers.database import (
     add_user_data
 )
 
-@Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
@@ -98,7 +98,7 @@ async def unmute_handler(app: Bot, message: Message):
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
 
-@Bot.on_message(filters.command("gmuted") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
     kons = await get_muted_users_in_group(group_id)
@@ -132,7 +132,7 @@ async def muted(app: Bot, message: Message):
     await resp.edit(msg, disable_web_page_preview=True)
 
 
-@Bot.on_message(filters.command("clearmuted") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
     group_id = message.chat.id
     await clear_muted_users_in_group(group_id)
