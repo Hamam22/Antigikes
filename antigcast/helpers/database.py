@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from pytz import timezone
 from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
