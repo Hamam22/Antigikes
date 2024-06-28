@@ -91,15 +91,15 @@ async def chk_usr(app: Bot, message: Message):
 @app.on_message(filters.command("imposter") & ~filters.bot & ~filters.via_bot & filters.group & Admin, group=32)
 async def set_mataa(app: Bot, message: Message):
     if len(message.command) == 1:
-        return await message.reply("**Penggunaan Deteksi Penyamar: penyamar on|off**")
-    if message.command[1] == "on":
+        return await message.reply("**Penggunaan Deteksi Penyamar: penyamar enable|disable**")
+    if message.command[1] == "enable":
         cekset = await impo_on(message.chat.id)
         if cekset:
             await message.reply("**Mode penyamar sudah diaktifkan.**")
         else:
             await impo_on(message.chat.id)
             await message.reply(f"**Berhasil mengaktifkan mode penyamar untuk {message.chat.title}**")
-    elif message.command[1] == "off":
+    elif message.command[1] == "disable":
         cekset = await impo_off(message.chat.id)
         if not cekset:
             await message.reply("**Mode penyamar sudah dinonaktifkan.**")
