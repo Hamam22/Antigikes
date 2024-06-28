@@ -43,7 +43,7 @@ async def mute_handler(app: Bot, message: Message):
         kon_name = kon.first_name
         kon_id = kon.id
 
-        await mute_user_in_group(group_id, kon_id, kon_name)
+        await mute_user_in_group(group_id, kon_id)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
@@ -95,9 +95,9 @@ async def unmute_handler(app: Bot, message: Message):
 @Bot.on_message(filters.command("gmuted") & filters.user(OWNER_ID))
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
-    users = await get_muted_users_in_group(group_id)
+    kons = await get_muted_users_in_group(group_id)
 
-    if not users:
+    if not kons:
         return await message.reply("**Belum ada pengguna yang di mute.**")
 
     resp = await message.reply("**Memuat database...**")
@@ -105,20 +105,19 @@ async def muted(app: Bot, message: Message):
     msg = "**Daftar pengguna yang di mute**\n\n"
     num = 0
 
-    for user in users:
+    for x in kons:
         num += 1
-        user_id = user['id']
-        first_name = user.get('first_name', 'Unknown')
+
         try:
-            get = await app.get_users(int(user_id))
+            get = await app.get_users(int(x))
             gname = get.mention
             gid = get.id
             msg += f"**{num}. {gname}**\n└ User ID: `{gid}`\n\n"
         except Exception:
-            
-            msg += f"**{num}. {first_name}**\n└ User ID: `{user_id}`\n\n"
+            msg += f"**{num}. {x}**\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
+
 
 @Bot.on_message(filters.command("clearmuted") & filters.user(OWNER_ID))
 async def clear_muted(app: Bot, message: Message):
