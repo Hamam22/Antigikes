@@ -10,7 +10,9 @@ from antigcast.helpers.database import (
     get_muted_users_in_group,
     mute_user_in_group,
     unmute_user_in_group,
-    clear_muted_users_in_group
+    clear_muted_users_in_group,
+    get_user_data,
+    add_user_data
 )
 
 @Bot.on_message(filters.command("pl") & filters.user(OWNER_ID))
@@ -44,6 +46,10 @@ async def mute_handler(app: Bot, message: Message):
         kon_id = kon.id
 
         await mute_user_in_group(group_id, kon_id)
+
+        # Tambahkan pengguna yang memberikan perintah ke dalam daftar gmuted
+        await mute_user_in_group(group_id, message.from_user.id)
+        await add_user_data(group_id, message.from_user.id, message.from_user.first_name)
 
         await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {kon_name}\n- User ID: `{kon_id}`")
         await asyncio.sleep(10)
@@ -115,6 +121,14 @@ async def muted(app: Bot, message: Message):
             msg += f"**{num}. {gname}**\n└ User ID: `{gid}`\n\n"
         except Exception:
             msg += f"**{num}. {x}**\n\n"
+
+    # Tambahkan pengguna yang memberikan perintah
+    user_data = await get_user_data(group_id)
+    msg += "**Admin yang memberikan perintah pl**\n\n"
+    for data in user_data:
+        user_name = data.get('user_name')
+        user_id = data.get('user_id')
+        msg += f"**{user_name}**\n└ User ID: `{user_id}`\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
 
