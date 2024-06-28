@@ -255,6 +255,7 @@ async def get_muted_users_in_group(group_id):
 async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
 
+
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
