@@ -258,7 +258,7 @@ async def clear_muted_users_in_group(group_id):
 #SELLER
 async def add_seller(seller_id):
     try:
-        added_at = datetime.now(timezone('Asia/Jakarta'))
+        added_at = datetime.datetime.now(timezone('Asia/Jakarta'))
         seller_data = {
             "_id": seller_id,
             "added_at": added_at
