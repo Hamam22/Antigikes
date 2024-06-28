@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from antigcast.helpers.database import impo_off, impo_on, check_pretender, add_userdata, get_userdata, usr_data
 from antigcast import Bot, app
 
-@Bot.on_message(filters.group & ~filters.bot & ~filters.via_bot, group=69)
+@Bot.on_message(~filters.private & ~filters.bot & ~filters.via_bot)
 async def chk_usr(app: Bot, message: Message):
     if message.sender_chat or not await check_pretender(message.chat.id):
         return
@@ -85,7 +85,7 @@ async def chk_usr(app: Bot, message: Message):
     if msg != "":
         await message.reply_photo("https://telegra.ph/file/58afe55fee5ae99d6901b.jpg", caption=msg)
 
-@app.on_message(filters.group & filters.command("imposter") & ~filters.bot & ~filters.via_bot)
+@app.on_message(filters.command("imposter") & ~filters.bot & ~filters.via_bot & filters.group, group=32)
 async def set_mataa(app: Bot, message: Message):
     if len(message.command) == 1:
         return await message.reply("**Penggunaan Deteksi Penyamar: penyamar on|off**")
