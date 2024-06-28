@@ -256,9 +256,9 @@ async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
 
 #SELLER
-async def add_seller(seller_id):
+# Function to add a seller
+async def add_seller(seller_id, added_at):
     try:
-        added_at = datetime.datetime.now(timezone('Asia/Jakarta'))
         seller_data = {
             "_id": seller_id,
             "added_at": added_at
