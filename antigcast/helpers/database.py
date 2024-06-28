@@ -233,34 +233,29 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, username=None):
+async def mute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'user_ids': user_id, 'usernames': username}},
+        {'$addToSet': {'user_ids': user_id}},
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$pull': {'user_ids': user_id, 'usernames': None}}
+        {'$pull': {'user_ids': user_id}}
     )
 
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc:
-        user_ids = doc.get('user_ids', [])
-        usernames = doc.get('usernames', [])
-        muted_users = []
-        for user_id, username in zip(user_ids, usernames):
-            muted_users.append({'user_id': user_id, 'username': username})
-        return muted_users
+        return doc.get('user_ids', [])
     return []
 
 async def clear_muted_users_in_group(group_id):
     await mute_collection.delete_one({'group_id': group_id})
+
 #SELLER
-# Function to add a seller
 async def add_seller(seller_id, added_at):
     try:
         seller_data = {
@@ -273,7 +268,6 @@ async def add_seller(seller_id, added_at):
         print(f"Error adding seller to MongoDB: {e}")
         return False
 
-# Function to remove a seller
 async def rem_seller(seller_id):
     try:
         result = await sellers_collection.delete_one({"_id": seller_id})
@@ -282,7 +276,6 @@ async def rem_seller(seller_id):
         print(f"Error removing seller from MongoDB: {e}")
         return False
 
-# Function to list all sellers
 async def list_sellers():
     try:
         sellers = []
