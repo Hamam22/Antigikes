@@ -293,7 +293,7 @@ async def clear_muted_users_in_group(group_id):
     await mute_collection.update_one(
         {'group_id': group_id},
         {'$unset': {'user_data': ""}}
-    )
+)
     
 #SELLER
 async def add_seller(seller_id, added_at):
