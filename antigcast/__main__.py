@@ -9,7 +9,7 @@ from antigcast.helpers.tools import checkExpired
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
-msg = """
+msg = ""
 **🇲🇨Berhasil Di Aktifkan🇲🇨*
 **📩Anti Gcast Pelerr📩**
 **Python Version** `{}`
