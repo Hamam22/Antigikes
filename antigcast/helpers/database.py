@@ -236,6 +236,24 @@ async def unmute_user(uid_id) -> bool:
 # GROUP_MUTE
 async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
     await mute_collection.update_one(
+        {'grasync def get_muted_users_in_group(group_id):
+    doc = await mute_collection.find_one({'group_id': group_id})
+    if doc and 'user_data' in doc:
+        # Jika user_data adalah list, konversi ke dictionary
+        if isinstance(doc['user_data'], list):
+            user_data_dict = {str(item['user_id']): {'name': 'unknown', 'muted_by': {'id': item['admin_id'], 'name': 'unknown'}} for item in doc['user_data']}
+            # Perbarui database dengan format dictionary
+            await mute_collection.update_one(
+                {'group_id': group_id},
+                {'$set': {'user_data': user_data_dict}}
+            )
+            return user_data_dict
+        # Jika sudah dictionary, kembalikan data langsung
+        return doc['user_data']
+    return {}
+
+async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
+    await mute_collection.update_one(
         {'group_id': group_id},
         {
             '$set': {
@@ -257,19 +275,12 @@ async def unmute_user_in_group(group_id, user_id):
         {'$unset': {f'user_data.{user_id}': ""}}  # Remove user from dictionary
     )
 
-async def get_muted_users_in_group(group_id):
-    doc = await mute_collection.find_one({'group_id': group_id})
-    if doc and 'user_data' in doc:
-        print(f"Data yang ditemukan untuk grup {group_id}: {doc['user_data']}")  # Tambahkan log ini
-        return doc['user_data']  # Return dictionary of user ID and associated data
-    return {}
-
 async def clear_muted_users_in_group(group_id):
     await mute_collection.update_one(
         {'group_id': group_id},
         {'$unset': {'user_data': ""}}  # Remove the entire user_data field
     )
-    
+        
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
