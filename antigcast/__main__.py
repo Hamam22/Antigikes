@@ -27,5 +27,5 @@ async def main():
     await checkExpired()
     await idle()
 
-LOGGER.INFO("Starting Bot...")
+LOGGER("INFO").info("Starting Bot...")
 loop.run_until_complete(main())
