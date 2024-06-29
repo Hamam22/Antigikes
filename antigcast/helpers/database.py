@@ -294,13 +294,7 @@ async def clear_muted_users_in_group(group_id):
         {'group_id': group_id},
         {'$unset': {'user_data': ""}}
     )
-
-async def update_all_groups(app):
-    async for group in mute_collection.find({}):
-        group_id = group['group_id']
-        user_data = await get_muted_users_in_group(group_id, app)
-        print(f"Data yang diperbarui untuk grup {group_id}: {user_data}")
-        
+    
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
