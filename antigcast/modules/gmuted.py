@@ -114,7 +114,7 @@ async def clear_muted(app: Bot, message: Message):
     await clear_muted_users_in_group(group_id)
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
 
-@Bot.on_message(filters.text & ~filters.private)
+@Bot.on_message(filters.text & ~filters.private & filters.group, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
     user_id = message.from_user.id
     group_id = message.chat.id
