@@ -22,7 +22,7 @@ async def main():
         username = app.me.username
         namebot = app.me.first_name
         log = await app.send_message(LOG_CHANNEL_ID, msg.format(pyver.split()[0], pyrover))
-        LOGGER.info(f"{namebot} | [ @{username} ] | 🔥 BERHASIL DIAKTIFKAN! 🔥")
+        LOGGER("INFO").info(f"{namebot} | [ @{username} ] | 🔥 BERHASIL DIAKTIFKAN! 🔥")
     except Exception as e:
         print(e)
     LOGGER("INFO").info(f"[🔥 BOT AKTIF! 🔥]")
