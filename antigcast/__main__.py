@@ -21,12 +21,11 @@ async def main():
         # Pastikan pyver dan pyrover sudah didefinisikan
         log = await app.send_message(LOG_CHANNEL_ID, msg.format(pyver.split()[0], pyrover))
         LOGGER.info(f"{namebot} | [ @{username} ] | 🔥 BERHASIL DIAKTIFKAN! 🔥")
-        await log.delete()
     except Exception as e:
         print(e)
     LOGGER.info("[🔥 BOT AKTIF! 🔥]")
     await checkExpired()
     await idle()
 
-LOGGER.info("Starting Bot...")
+LOGGER.INFO("Starting Bot...")
 loop.run_until_complete(main())
