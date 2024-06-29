@@ -234,9 +234,7 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
-    await mute_collection.update_one(
-        {'grasync def get_muted_users_in_group(group_id):
+async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc and 'user_data' in doc:
         # Jika user_data adalah list, konversi ke dictionary
@@ -272,13 +270,13 @@ async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_nam
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$unset': {f'user_data.{user_id}': ""}}  # Remove user from dictionary
+        {'$unset': {f'user_data.{user_id}': ""}}  # Hapus user dari dictionary
     )
 
 async def clear_muted_users_in_group(group_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$unset': {'user_data': ""}}  # Remove the entire user_data field
+        {'$unset': {'user_data': ""}}  # Hapus seluruh field user_data
     )
         
 #SELLER
