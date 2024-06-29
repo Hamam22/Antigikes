@@ -260,6 +260,7 @@ async def unmute_user_in_group(group_id, user_id):
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
     if doc and 'user_data' in doc:
+        print(f"Data yang ditemukan untuk grup {group_id}: {doc['user_data']}")  # Tambahkan log ini
         return doc['user_data']  # Return dictionary of user ID and associated data
     return {}
 
