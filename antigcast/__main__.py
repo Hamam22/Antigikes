@@ -1,6 +1,7 @@
 import asyncio
 from antigcast import Bot, app
 from antigcast.config import LOGGER, LOG_CHANNEL_ID
+from pyrogram import __version__ as pyrover
 from pyrogram import idle
 from antigcast.helpers.tools import checkExpired
 
