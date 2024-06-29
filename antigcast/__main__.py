@@ -7,13 +7,19 @@ from antigcast.helpers.tools import checkExpired
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
 
+msg = """
+**Berhasil Di Aktifkan**
+**Python Version** `{}`
+**Pyrogram Version** `{}`
+"""
+
 async def main():
     try:
         await app.start()
         app.me = await app.get_me()
         username = app.me.username
         namebot = app.me.first_name
-        log = await app.send_message(LOG_CHANNEL_ID, "BOT AKTIF!")
+        log = await app.send_message(LOG_CHANNEL_ID, msg.format(pyver.split()[0], pyrover)))
         LOGGER("INFO").info(f"{namebot} | [ @{username} ] | 🔥 BERHASIL DIAKTIFKAN! 🔥")
         await log.delete()
     except Exception as a:
