@@ -18,12 +18,11 @@ async def main():
         app.me = await app.get_me()
         username = app.me.username
         namebot = app.me.first_name
-        # Pastikan pyver dan pyrover sudah didefinisikan
         log = await app.send_message(LOG_CHANNEL_ID, msg.format(pyver.split()[0], pyrover))
         LOGGER.info(f"{namebot} | [ @{username} ] | 🔥 BERHASIL DIAKTIFKAN! 🔥")
     except Exception as e:
         print(e)
-    LOGGER.info("[🔥 BOT AKTIF! 🔥]")
+    LOGGER("INFO").info(f"[🔥 BOT AKTIF! 🔥]")
     await checkExpired()
     await idle()
 
