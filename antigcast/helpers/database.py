@@ -235,27 +235,40 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id):
+async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'user_ids': user_id}},
+        {
+            '$set': {
+                f'user_data.{user_id}': {
+                    'name': user_name,
+                    'muted_by': {
+                        'id': issuer_id,
+                        'name': issuer_name
+                    }
+                }
+            }
+        },
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
     await mute_collection.update_one(
         {'group_id': group_id},
-        {'$pull': {'user_ids': user_id}}
+        {'$unset': {f'user_data.{user_id}': ""}}  # Remove user from dictionary
     )
 
 async def get_muted_users_in_group(group_id):
     doc = await mute_collection.find_one({'group_id': group_id})
-    if doc:
-        return doc.get('user_ids', [])
-    return []
+    if doc and 'user_data' in doc:
+        return doc['user_data']  # Return dictionary of user ID and associated data
+    return {}
 
 async def clear_muted_users_in_group(group_id):
-    await mute_collection.delete_one({'group_id': group_id})
+    await mute_collection.update_one(
+        {'group_id': group_id},
+        {'$unset': {'user_data': ""}}  # Remove the entire user_data field
+    )
     
 #SELLER
 async def add_seller(seller_id, added_at):
