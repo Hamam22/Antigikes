@@ -19,9 +19,6 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
 
     user = await extract(message)
-    if not user:
-        return await message.reply_text("Pengguna tidak ditemukan")
-
     user_id = user.id
     group_id = message.chat.id
 
@@ -32,10 +29,10 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa mute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
-    
+
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
-    muted = await get_muted_users_in_group(group_id)
+    muted = await get_muted_users_in_group(group_id, app)
     if str(user_id) in muted:
         await xxnx.edit("**Pengguna ini sudah ada di daftar mute**")
         await asyncio.sleep(10)
@@ -60,9 +57,6 @@ async def unmute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
 
     user = await extract(message)
-    if not user:
-        return await message.reply_text("Pengguna tidak ditemukan")
-
     user_id = user.id
     group_id = message.chat.id
 
@@ -75,7 +69,7 @@ async def unmute_handler(app: Bot, message: Message):
 
     xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
-    muted = await get_muted_users_in_group(group_id)
+    muted = await get_muted_users_in_group(group_id, app)
     if str(user_id) not in muted:
         await xxnx.edit("**Pengguna ini tidak ada di daftar mute**")
         await asyncio.sleep(10)
@@ -95,10 +89,7 @@ async def unmute_handler(app: Bot, message: Message):
 @Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
-    kons = await get_muted_users_in_group(group_id)
-
-    if not isinstance(kons, dict):
-        return await message.reply("**Terjadi kesalahan dalam memuat daftar mute.**")
+    kons = await get_muted_users_in_group(group_id, app)
 
     if not kons:
         return await message.reply("**Belum ada pengguna yang di mute.**")
@@ -127,7 +118,7 @@ async def delete_muted_messages(app: Bot, message: Message):
     user_id = message.from_user.id
     group_id = message.chat.id
 
-    muted_users = await get_muted_users_in_group(group_id)
+    muted_users = await get_muted_users_in_group(group_id, app)
     if str(user_id) in muted_users:
         try:
             await message.delete()
