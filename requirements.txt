@@ -1,6 +1,6 @@
 motor
 pytz
-pyrogram
+pyrofock
 tgcrypto
 aiofiles
 python-dateutil
