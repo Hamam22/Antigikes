@@ -4,7 +4,7 @@ from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
-from antigcast.helpers.admins from antigcast import Bot
+from antigcast.helpers.admin from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
