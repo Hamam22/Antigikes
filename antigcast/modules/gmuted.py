@@ -4,15 +4,16 @@ from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
+from antigcast.helpers.admins from antigcast import Bot
+from pyrogram import filters
+from pyrogram.types import Message
+from pyrogram.errors import FloodWait, MessageDeleteForbidden
+import asyncio
+
+
 from antigcast.helpers.admins import*
 from antigcast.helpers.tools import extract
-from antigcast.helpers.database import (
-    get_muted_users_in_group,
-    mute_user_in_group,
-    unmute_user_in_group,
-    clear_muted_users_in_group
-)
-
+from antigcast.helpers.database import *
 
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
@@ -65,8 +66,6 @@ async def unmute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa unmute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa unmute bot")
-    elif user_id in OWNER_ID:
-        return await message.reply_text("Kamu tidak bisa unmute developer bot")
 
     xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
