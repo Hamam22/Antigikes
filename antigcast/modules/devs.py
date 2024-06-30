@@ -40,18 +40,6 @@ async def handle_restart(app : Bot, message : Message):
     await message.reply("✅ System berhasil direstart", quote=True)
     os.execl(sys.executable, sys.executable, "-m", "antigcast")
 
-@Bot.on_message(filters.command("clean") & filters.user(CREATOR))
-async def handle_clean(app : Bot, message : Message):
-    count = 0
-    for file_name in os.popen("ls").read().split():
-        try:
-            os.remove(file_name)
-            count += 1
-        except:
-            pass
-    subprocess.run(["rm", "-rf", "downloads"], check=True)
-    await message.reply(f"✅ {count} sampah berhasil di bersihkan")
-    
 @Bot.on_message(filters.command("gcast") & filters.user(CREATOR))
 async def gcast_hndl(app : Bot, message : Message):
     groups = await get_actived_chats()
