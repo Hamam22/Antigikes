@@ -8,7 +8,7 @@ from antigcast.helpers.admins import*
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
+@Bot.on_message(filters.command("ya") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
@@ -46,7 +46,7 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
+@Bot.on_message(filters.command("unya") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
