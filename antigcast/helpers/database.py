@@ -244,7 +244,7 @@ async def mute_user_in_group(group_id, user_id, muted_by_id, muted_by_name):
 async def unmute_user_in_group(group_id, user_id):
     await mutedb.update_one(
         {'group_id': group_id},
-        {'$pull': {'muted_users': {'user_id': user_id}}},
+        {'$pull': {'muted_users': {'user_id': user_id}}}
     )
 
 async def get_muted_users_in_group(group_id):
