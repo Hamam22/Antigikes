@@ -234,6 +234,7 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
+async def mute_user_in_group(group_id, user_id, muted_by_id, muted_by_name):
     await mutedb.update_one(
         {'group_id': group_id},
         {'$addToSet': {'muted_users': {'user_id': user_id, 'muted_by': {'id': muted_by_id, 'name': muted_by_name}}}},
