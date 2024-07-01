@@ -6,7 +6,7 @@ import asyncio
 
 from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
-from angigcast.helpers.databade import *
+from antigcast.helpers.databade import *
 
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
