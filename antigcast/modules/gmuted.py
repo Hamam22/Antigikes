@@ -1,12 +1,12 @@
-from BocilAnti import Bot
+from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 
-from BocilAnti.helpers.admins import *
-from BocilAnti.helpers.tools import extract
-from BocilAnti.helpers.databade import *
+from antigcast.helpers.admins import *
+from antigcast.helpers.tools import extract
+from angigcast.helpers.databade import *
 
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
