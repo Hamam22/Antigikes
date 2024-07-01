@@ -281,6 +281,7 @@ async def unmute_user_in_group(group_id, user_id):
         {'$unset': {f'user_data.{user_id}': ""}}
     )
 
+
 async def clear_muted_users_in_group(group_id):
     await mutedb.mute.update_one(
         {'group_id': group_id},
