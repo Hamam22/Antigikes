@@ -234,59 +234,26 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def get_user_name(user_id, app):
-    try:
-        user = await app.get_users(user_id)
-        return user.first_name
-    except Exception:
-        return "unknown"
-
-async def get_muted_users_in_group(group_id, app):
-    doc = await mutedb.mute.find_one({'group_id': group_id})
-    if doc and 'user_data' in doc:
-        user_data_dict = {}
-        for user_id, data in doc['user_data'].items():
-            user_name = await get_user_name(int(user_id), app)
-            admin_name = await get_user_name(data['muted_by']['id'], app)
-            user_data_dict[user_id] = {
-                'name': user_name,
-                'muted_by': {
-                    'id': data['muted_by']['id'],
-                    'name': admin_name
-                }
-            }
-        return user_data_dict
-    return {}
-
-async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
-    await mutedb.mute.update_one(
+    await mutedb.update_one(
         {'group_id': group_id},
-        {
-            '$set': {
-                f'user_data.{user_id}': {
-                    'name': user_name,
-                    'muted_by': {
-                        'id': issuer_id,
-                        'name': issuer_name
-                    }
-                }
-            }
-        },
+        {'$addToSet': {'muted_users': {'user_id': user_id, 'muted_by': {'id': muted_by_id, 'name': muted_by_name}}}},
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
-    await mutedb.mute.update_one(
+    await mutedb.update_one(
         {'group_id': group_id},
-        {'$unset': {f'user_data.{user_id}': ""}}
+        {'$pull': {'muted_users': {'user_id': user_id}}},
     )
 
+async def get_muted_users_in_group(group_id):
+    doc = await mutedb.find_one({'group_id': group_id})
+    if doc:
+        return doc.get('muted_users', [])
+    return []
 
 async def clear_muted_users_in_group(group_id):
-    await mutedb.mute.update_one(
-        {'group_id': group_id},
-        {'$unset': {'user_data': ""}}
-    )
+    await mutedb.delete_one({'group_id': group_id})
     
 #SELLER
 async def add_seller(seller_id, added_at):
