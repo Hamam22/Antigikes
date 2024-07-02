@@ -234,27 +234,41 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, muted_by_id, muted_by_name):
     await mutedb.update_one(
         {'group_id': group_id},
         {'$addToSet': {'muted_users': {'user_id': user_id, 'muted_by': {'id': muted_by_id, 'name': muted_by_name}}}},
         upsert=True
     )
+    # Hapus cache setelah memperbarui database
+    await cache.delete(f"muted_users_{group_id}")
 
 async def unmute_user_in_group(group_id, user_id):
     await mutedb.update_one(
         {'group_id': group_id},
         {'$pull': {'muted_users': {'user_id': user_id}}}
     )
+    # Hapus cache setelah memperbarui database
+    await cache.delete(f"muted_users_{group_id}")
 
 async def get_muted_users_in_group(group_id):
+    # Coba ambil dari cache
+    cached_data = await cache.get(f"muted_users_{group_id}")
+    if cached_data:
+        return eval(cached_data)
+
+    # Jika tidak ada dalam cache, ambil dari database
     doc = await mutedb.find_one({'group_id': group_id})
     if doc:
-        return doc.get('muted_users', [])
+        muted_users = doc.get('muted_users', [])
+        # Simpan dalam cache
+        await cache.set(f"muted_users_{group_id}", str(muted_users))
+        return muted_users
     return []
 
 async def clear_muted_users_in_group(group_id):
     await mutedb.delete_one({'group_id': group_id})
+    # Hapus cache setelah menghapus dari database
+    await cache.delete(f"muted_users_{group_id}")
     
 #SELLER
 async def add_seller(seller_id, added_at):
