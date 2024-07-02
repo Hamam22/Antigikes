@@ -7,7 +7,8 @@ import aiomcache
 
 from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
-from antigcast.helpers.database import *
+from helpers.database import (mute_user_in_group, unmute_user_in_group, 
+                              get_muted_users_in_group, clear_muted_users_in_group)
 
 
 cache = aiomcache.Client("127.0.0.1", 11211)
