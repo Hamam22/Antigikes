@@ -1,4 +1,5 @@
 import datetime
+import aiomcache
 from pytz import timezone
 from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,6 +17,8 @@ globaldb = db['GLOBALMUTE']
 mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
 impdb = db['PRETENDER']
+
+cache = aiomcache.Client("127.0.0.1", 11211)
 
 #USERS
 def new_user(id):
@@ -234,6 +237,7 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
+async def mute_user_in_group(group_id, user_id, muted_by_id, muted_by_name):
     await mutedb.update_one(
         {'group_id': group_id},
         {'$addToSet': {'muted_users': {'user_id': user_id, 'muted_by': {'id': muted_by_id, 'name': muted_by_name}}}},
