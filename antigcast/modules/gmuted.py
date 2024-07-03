@@ -7,6 +7,7 @@ import logging
 
 from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
+from antigcast.helpers.database import *
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
