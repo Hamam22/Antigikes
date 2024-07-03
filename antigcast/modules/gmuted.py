@@ -9,11 +9,10 @@ from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-# Setup logging
+
 logging.basicConfig(level=logging.INFO)
 
 
-# Handlers
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -128,17 +127,18 @@ async def clear_muted(app: Bot, message: Message):
 async def delete_muted_messages(app: Bot, message: Message):
     user_id = message.from_user.id
     group_id = message.chat.id
+    group_name = message.chat.title 
 
     muted_users = await get_muted_users_in_group(group_id)
     if any(user['user_id'] == user_id for user in muted_users):
         try:
             await message.delete()
-            logging.info(f"Deleted message from muted user {user_id} in group {group_id}")
+            logging.info(f"Deleted message from muted user {user_id} in group {group_name} ({group_id})")
         except FloodWait as e:
             logging.warning(f"FloodWait error: {e}. Waiting for {e.value} seconds.")
             await asyncio.sleep(e.value)
             await message.delete()
         except MessageDeleteForbidden:
-            logging.error(f"Bot does not have permission to delete messages in group {group_id}")
+            logging.error(f"Bot does not have permission to delete messages in group {group_name} ({group_id})")
         except Exception as e:
             logging.error(f"Failed to delete message: {e}")
