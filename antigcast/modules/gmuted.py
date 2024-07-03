@@ -1,7 +1,7 @@
 from antigcast import Bot
-from pyrofock import filters
-from pyrofock.types import Message
-from pyrofock.errors import FloodWait, MessageDeleteForbidden
+from pyrofork import filters
+from pyrofork.types import Message
+from pyrofork.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 import logging
 
