@@ -125,9 +125,12 @@ async def clear_muted(app: Bot, message: Message):
 
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
+    if not message.from_user:
+        return  # Abaikan pesan yang bukan dari pengguna
+
     user_id = message.from_user.id
     group_id = message.chat.id
-    group_name = message.chat.title 
+    group_name = message.chat.title  # Mendapatkan nama grup
 
     muted_users = await get_muted_users_in_group(group_id)
     if any(user['user_id'] == user_id for user in muted_users):
