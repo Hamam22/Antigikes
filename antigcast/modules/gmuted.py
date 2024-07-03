@@ -3,12 +3,16 @@ from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
+import logging
 
-from antigcast.helpers.admins import *
+from antigcast.helpers.admins import Admin
 from antigcast.helpers.tools import extract
-from antigcast.helpers.database import *
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
 
 
+# Handlers
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -45,6 +49,7 @@ async def mute_handler(app: Bot, message: Message):
         await asyncio.sleep(10)
         await xxnx.delete()
     except Exception as e:
+        logging.error(f"Error muting user: {e}")
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
 
@@ -79,6 +84,7 @@ async def unmute_handler(app: Bot, message: Message):
         await xxnx.delete()
         await message.delete()
     except Exception as e:
+        logging.error(f"Error unmuting user: {e}")
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
 
@@ -103,7 +109,7 @@ async def muted(app: Bot, message: Message):
         msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
-    
+
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
@@ -126,8 +132,12 @@ async def delete_muted_messages(app: Bot, message: Message):
     if any(user['user_id'] == user_id for user in muted_users):
         try:
             await message.delete()
+            logging.info(f"Deleted message from muted user {user_id} in group {group_id}")
         except FloodWait as e:
+            logging.warning(f"FloodWait error: {e}. Waiting for {e.value} seconds.")
             await asyncio.sleep(e.value)
             await message.delete()
         except MessageDeleteForbidden:
-            pass
+            logging.error(f"Bot does not have permission to delete messages in group {group_id}")
+        except Exception as e:
+            logging.error(f"Failed to delete message: {e}")
