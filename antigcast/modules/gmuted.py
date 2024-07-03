@@ -5,7 +5,7 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
 import logging
 
-from antigcast.helpers.admins import Admin
+from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 
 # Setup logging
