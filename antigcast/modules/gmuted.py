@@ -19,6 +19,9 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
 
     user = await extract(message)
+    if user is None:
+        return await message.reply_text("Pengguna tidak ditemukan")
+    
     user_id = user.id
     group_id = message.chat.id
 
@@ -33,7 +36,7 @@ async def mute_handler(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
     muted = await get_muted_users_in_group(group_id)
-    if any(user['user_id'] == user_id for user in muted):
+    if any(u['user_id'] == user_id for u in muted):
         await xxnx.edit("**Pengguna ini sudah ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
@@ -49,7 +52,6 @@ async def mute_handler(app: Bot, message: Message):
         await asyncio.sleep(10)
         await xxnx.delete()
     except Exception as e:
-        logging.error(f"Error muting user: {e}")
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
 
@@ -59,6 +61,9 @@ async def unmute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
 
     user = await extract(message)
+    if user is None:
+        return await message.reply_text("Pengguna tidak ditemukan")
+    
     user_id = user.id
     group_id = message.chat.id
 
@@ -70,7 +75,7 @@ async def unmute_handler(app: Bot, message: Message):
     xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
     muted = await get_muted_users_in_group(group_id)
-    if not any(user['user_id'] == user_id for user in muted):
+    if not any(u['user_id'] == user_id for u in muted):
         await xxnx.edit("**Pengguna ini tidak ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
@@ -84,7 +89,6 @@ async def unmute_handler(app: Bot, message: Message):
         await xxnx.delete()
         await message.delete()
     except Exception as e:
-        logging.error(f"Error unmuting user: {e}")
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
 
@@ -104,7 +108,8 @@ async def muted(app: Bot, message: Message):
     for user in kons:
         num += 1
         user_id = user['user_id']
-        user_name = (await app.get_users(user_id)).first_name
+        user_data = await app.get_users(user_id)
+        user_name = user_data.first_name
         muted_by_name = user['muted_by']['name']
         msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
@@ -126,14 +131,14 @@ async def clear_muted(app: Bot, message: Message):
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
     if not message.from_user:
-        return  # Abaikan pesan yang bukan dari pengguna
+        return  
 
     user_id = message.from_user.id
     group_id = message.chat.id
-    group_name = message.chat.title  # Mendapatkan nama grup
+    group_name = message.chat.title 
 
     muted_users = await get_muted_users_in_group(group_id)
-    if any(user['user_id'] == user_id for user in muted_users):
+    if any(u['user_id'] == user_id for u in muted_users):
         try:
             await message.delete()
             logging.info(f"Deleted message from muted user {user_id} in group {group_name} ({group_id})")
