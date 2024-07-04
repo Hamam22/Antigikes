@@ -158,17 +158,17 @@ async def get_groupsmessag(app: Bot, message: Message):
 @Bot.on_message(filters.command("addseller") & filters.user(OWNER_ID))
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("Menambahkan penjual baru...")
-    
+
     if len(message.command) != 2:
         return await xxnx.edit("Gunakan Format : /addseller seller_id")
-    
+
     try:
         seller_id = int(message.command[1])
         added_at = datetime.datetime.now(timezone('Asia/Jakarta'))
-        
+
         added = await add_seller(seller_id, added_at)
         if added:
-            await xxnx.edit(f"Penjual Ditambahkan\nSeller ID: {seller_id}\nAdded At: {added_at}")
+            await xxnx.edit(f"Penjual Ditambahkan\nSeller ID: {seller_id}\nAdded At: {added_at.strftime('%Y-%m-%d %H:%M:%S')}")
         else:
             await xxnx.edit("Gagal menambahkan penjual.")
     
@@ -179,13 +179,16 @@ async def addsellermessag(app: Bot, message: Message):
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
 
 
-@Bot.on_message(filters.command("rmmseller") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("rmseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
-    seller_id = int(message.command[1]) if len(message.command) > 1 else None
+    if len(message.command) != 2:
+        return await message.reply("Gunakan Format : /rmseller seller_id")
 
-    if not seller_id:
-        return await message.reply("Silakan berikan Seller ID untuk menghapus penjual.")
-        
+    try:
+        seller_id = int(message.command[1])
+    except ValueError:
+        return await message.reply("Seller ID harus berupa angka.")
+
     xxnx = await message.reply("Menghapus penjual...")
     try:
         removed = await rem_seller(seller_id)
