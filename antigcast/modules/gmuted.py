@@ -3,14 +3,10 @@ from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden
 import asyncio
-import logging
 
 from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
-
-
-logging.basicConfig(level=logging.INFO)
 
 
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
@@ -19,9 +15,6 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di mute")
 
     user = await extract(message)
-    if user is None:
-        return await message.reply_text("Pengguna tidak ditemukan")
-    
     user_id = user.id
     group_id = message.chat.id
 
@@ -36,7 +29,7 @@ async def mute_handler(app: Bot, message: Message):
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
     muted = await get_muted_users_in_group(group_id)
-    if any(u['user_id'] == user_id for u in muted):
+    if any(user['user_id'] == user_id for user in muted):
         await xxnx.edit("**Pengguna ini sudah ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
@@ -61,9 +54,6 @@ async def unmute_handler(app: Bot, message: Message):
         return await message.reply_text("Berikan saya ID pengguna yang ingin di unmute")
 
     user = await extract(message)
-    if user is None:
-        return await message.reply_text("Pengguna tidak ditemukan")
-    
     user_id = user.id
     group_id = message.chat.id
 
@@ -75,7 +65,7 @@ async def unmute_handler(app: Bot, message: Message):
     xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
     muted = await get_muted_users_in_group(group_id)
-    if not any(u['user_id'] == user_id for u in muted):
+    if not any(user['user_id'] == user_id for user in muted):
         await xxnx.edit("**Pengguna ini tidak ada di daftar mute**")
         await asyncio.sleep(10)
         await xxnx.delete()
@@ -108,8 +98,7 @@ async def muted(app: Bot, message: Message):
     for user in kons:
         num += 1
         user_id = user['user_id']
-        user_data = await app.get_users(user_id)
-        user_name = user_data.first_name
+        user_name = (await app.get_users(user_id)).first_name
         muted_by_name = user['muted_by']['name']
         msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
@@ -130,23 +119,18 @@ async def clear_muted(app: Bot, message: Message):
 
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
-    if not message.from_user:
-        return  
-
     user_id = message.from_user.id
     group_id = message.chat.id
-    group_name = message.chat.title 
 
     muted_users = await get_muted_users_in_group(group_id)
-    if any(u['user_id'] == user_id for u in muted_users):
+    if any(user['user_id'] == user_id for user in muted_users):
+        print(f"Pesan dari pengguna yang di-mute: {user_id}")
         try:
             await message.delete()
-            logging.info(f"Deleted message from muted user {user_id} in group {group_name} ({group_id})")
+            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus")
         except FloodWait as e:
-            logging.warning(f"FloodWait error: {e}. Waiting for {e.value} seconds.")
             await asyncio.sleep(e.value)
             await message.delete()
+            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus setelah menunggu {e.value} detik")
         except MessageDeleteForbidden:
-            logging.error(f"Bot does not have permission to delete messages in group {group_name} ({group_id})")
-        except Exception as e:
-            logging.error(f"Failed to delete message: {e}")
+            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id}")
