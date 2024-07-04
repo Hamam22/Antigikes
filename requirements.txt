@@ -1,7 +1,7 @@
 motor[srv]
 pytz
-pyrofork
-TgCrypto-pyrofork
+pyrogram
+TgCrypto
 aiofiles
 python-dateutil
 schedule
