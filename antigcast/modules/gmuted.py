@@ -119,6 +119,9 @@ async def clear_muted(app: Bot, message: Message):
 
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
+    if not message.from_user:
+        return  # Jika pesan tidak memiliki pengirim yang valid, lewati
+
     user_id = message.from_user.id
     group_id = message.chat.id
     group_name = message.chat.title
