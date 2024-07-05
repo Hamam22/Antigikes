@@ -1,6 +1,6 @@
 import datetime
 from pytz import timezone
-from antigcast.config import MONGO_DB_URI, DB_NAME
+from BocilAnti.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
 mongo_client = AsyncIOMotorClient(MONGO_DB_URI)
@@ -13,9 +13,9 @@ blackword = db['BLACKWORDS']
 owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
-mutedb = db['GROUPMUTE']
+mute_collection = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
-impdb = db['PRETENDER']
+impdb = db['IMPOSTER']
 
 #USERS
 def new_user(id):
@@ -234,28 +234,29 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id, muted_by_id, muted_by_name):
-    await mutedb.update_one(
+async def mute_user_in_group(group_id, user_id):
+    await mute_collection.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'muted_users': {'user_id': user_id, 'muted_by': {'id': muted_by_id, 'name': muted_by_name}}}},
+        {'$addToSet': {'user_ids': user_id}},
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
-    await mutedb.update_one(
+    await mute_collection.update_one(
         {'group_id': group_id},
-        {'$pull': {'muted_users': {'user_id': user_id}}}
+        {'$pull': {'user_ids': user_id}}
     )
 
 async def get_muted_users_in_group(group_id):
-    doc = await mutedb.find_one({'group_id': group_id})
+    doc = await mute_collection.find_one({'group_id': group_id})
     if doc:
-        return doc.get('muted_users', [])
+        return doc.get('user_ids', [])
     return []
 
 async def clear_muted_users_in_group(group_id):
-    await mutedb.delete_one({'group_id': group_id})
-    
+    await mute_collection.delete_one({'group_id': group_id})
+
+
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
@@ -287,8 +288,7 @@ async def list_sellers():
         print(f"Error listing sellers from MongoDB: {e}")
         return []
 
-#IMPOSTER
-
+#IMPOSTORE
 async def usr_data(user_id: int) -> bool:
     user = await impdb.find_one({"user_id": user_id})
     return bool(user)
@@ -323,3 +323,4 @@ async def impo_on(chat_id: int) -> bool:
 
 async def impo_off(chat_id: int):
     await impdb.delete_one({"chat_id_toggle": chat_id})
+    
