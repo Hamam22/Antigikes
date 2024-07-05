@@ -13,9 +13,9 @@ blackword = db['BLACKWORDS']
 owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
-mute_collection = db['GROUPMUTE']
+mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
-impdb = db['IMPOSTER']
+impdb = db['PRETENDER']
 
 #USERS
 def new_user(id):
@@ -234,29 +234,59 @@ async def unmute_user(uid_id) -> bool:
     return True
 
 # GROUP_MUTE
-async def mute_user_in_group(group_id, user_id):
-    await mute_collection.update_one(
+async def get_user_name(user_id, app):
+    try:
+        user = await app.get_users(user_id)
+        return user.first_name
+    except Exception:
+        return "unknown"
+
+async def get_muted_users_in_group(group_id, app):
+    doc = await mutedb.mute.find_one({'group_id': group_id})
+    if doc and 'user_data' in doc:
+        user_data_dict = {}
+        for user_id, data in doc['user_data'].items():
+            user_name = await get_user_name(int(user_id), app)
+            admin_name = await get_user_name(data['muted_by']['id'], app)
+            user_data_dict[user_id] = {
+                'name': user_name,
+                'muted_by': {
+                    'id': data['muted_by']['id'],
+                    'name': admin_name
+                }
+            }
+        return user_data_dict
+    return {}
+
+async def mute_user_in_group(group_id, user_id, user_name, issuer_id, issuer_name):
+    await mutedb.mute.update_one(
         {'group_id': group_id},
-        {'$addToSet': {'user_ids': user_id}},
+        {
+            '$set': {
+                f'user_data.{user_id}': {
+                    'name': user_name,
+                    'muted_by': {
+                        'id': issuer_id,
+                        'name': issuer_name
+                    }
+                }
+            }
+        },
         upsert=True
     )
 
 async def unmute_user_in_group(group_id, user_id):
-    await mute_collection.update_one(
+    await mutedb.mute.update_one(
         {'group_id': group_id},
-        {'$pull': {'user_ids': user_id}}
-    )
-
-async def get_muted_users_in_group(group_id):
-    doc = await mute_collection.find_one({'group_id': group_id})
-    if doc:
-        return doc.get('user_ids', [])
-    return []
+        {'$unset': {f'user_data.{user_id}': ""}}
+)
 
 async def clear_muted_users_in_group(group_id):
-    await mute_collection.delete_one({'group_id': group_id})
-
-
+    await mutedb.mute.update_one(
+        {'group_id': group_id},
+        {'$unset': {'user_data': ""}}
+    )
+    
 #SELLER
 async def add_seller(seller_id, added_at):
     try:
@@ -288,7 +318,8 @@ async def list_sellers():
         print(f"Error listing sellers from MongoDB: {e}")
         return []
 
-#IMPOSTORE
+#IMPOSTER
+
 async def usr_data(user_id: int) -> bool:
     user = await impdb.find_one({"user_id": user_id})
     return bool(user)
@@ -323,4 +354,3 @@ async def impo_on(chat_id: int) -> bool:
 
 async def impo_off(chat_id: int):
     await impdb.delete_one({"chat_id_toggle": chat_id})
-    
