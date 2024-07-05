@@ -121,16 +121,17 @@ async def clear_muted(app: Bot, message: Message):
 async def delete_muted_messages(app: Bot, message: Message):
     user_id = message.from_user.id
     group_id = message.chat.id
+    group_name = message.chat.title
 
     muted_users = await get_muted_users_in_group(group_id)
     if any(user['user_id'] == user_id for user in muted_users):
-        print(f"Pesan dari pengguna yang di-mute: {user_id}")
+        print(f"Pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
         try:
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus")
+            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus")
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus setelah menunggu {e.value} detik")
+            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
         except MessageDeleteForbidden:
-            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id}")
+            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
