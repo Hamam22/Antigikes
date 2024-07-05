@@ -8,7 +8,6 @@ from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) != 2:
@@ -120,7 +119,7 @@ async def clear_muted(app: Bot, message: Message):
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
     if not message.from_user:
-        return  # Jika pesan tidak memiliki pengirim yang valid, lewati
+        return 
 
     user_id = message.from_user.id
     group_id = message.chat.id
@@ -138,3 +137,5 @@ async def delete_muted_messages(app: Bot, message: Message):
             print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
         except MessageDeleteForbidden:
             print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
+    else:
+        print(f"Pengguna {user_id} tidak ditemukan dalam daftar mute")
