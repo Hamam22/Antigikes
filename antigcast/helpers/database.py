@@ -1,6 +1,6 @@
 import datetime
 from pytz import timezone
-from BocilAnti.config import MONGO_DB_URI, DB_NAME
+from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
 mongo_client = AsyncIOMotorClient(MONGO_DB_URI)
