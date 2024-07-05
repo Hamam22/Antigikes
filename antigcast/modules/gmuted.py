@@ -103,7 +103,7 @@ async def muted(app: Bot, message: Message):
         msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
-    
+
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
@@ -124,10 +124,13 @@ async def delete_muted_messages(app: Bot, message: Message):
 
     muted_users = await get_muted_users_in_group(group_id)
     if any(user['user_id'] == user_id for user in muted_users):
+        print(f"Pesan dari pengguna yang di-mute: {user_id}")
         try:
             await message.delete()
+            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus")
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.delete()
+            print(f"Pesan dari pengguna yang di-mute {user_id} berhasil dihapus setelah menunggu {e.value} detik")
         except MessageDeleteForbidden:
-            pass
+            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id}")
