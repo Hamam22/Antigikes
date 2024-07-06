@@ -22,12 +22,16 @@ async def is_seller(user_id):
 
 @Bot.on_message(filters.command("addgc"))
 async def addgcmessag(app: Bot, message: Message):
-    
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
     chat_id = message.chat.id
     chat_name = message.chat.title
+    seller_id = message.from_user.id
+    username = message.from_user.username
+    name = message.from_user.first_name + (
+        " " + message.from_user.last_name if message.from_user.last_name else ""
+    )
     hari = get_arg(message)
     if not hari:
         hari = "30"
@@ -46,10 +50,11 @@ async def addgcmessag(app: Bot, message: Message):
         added = await add_actived_chat(chat_id)
         if added:
             await set_expired_date(chat_id, expired)
+            await save_seller_info(chat_id, seller_id, username, name)  # Simpan info penjual di database
     except Exception as e:
         print(e)
 
-    await xxnx.edit(f"BOT AKTIF\nGrup : {chat_name}\nExp : {expired_date} | {hari} Hari..")
+    await xxnx.edit(f"BOT AKTIF\nGrup : {chat_name}\nExp : {expired_date} | {hari} Hari..\nDitambahkan oleh: {name} (@{username})")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
@@ -57,10 +62,14 @@ async def addgcmessag(app: Bot, message: Message):
 
 @Bot.on_message(filters.command("add"))
 async def addgroupmessag(app: Bot, message: Message):
-    
     if not await is_seller(message.from_user.id):
         return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
     
+    seller_id = message.from_user.id
+    username = message.from_user.username
+    name = message.from_user.first_name + (
+        " " + message.from_user.last_name if message.from_user.last_name else ""
+    )
     xxnx = await message.reply(f"Menambahkan izin dalam grup ini...")
     
     if len(message.command) < 3:
@@ -88,13 +97,15 @@ async def addgroupmessag(app: Bot, message: Message):
         added = await add_actived_chat(chat_id)
         if added:
             await set_expired_date(chat_id, expired)
+            await save_seller_info(chat_id, seller_id, username, name)  # Simpan info penjual di database
     except Exception as e:
         print(e)
-    
-    await xxnx.edit(f"BOT AKTIF\nGroup ID: {group}\nExp : {expired_date} | {hari} Hari..")
+
+    await xxnx.edit(f"BOT AKTIF\nGroup ID: {group}\nExp : {expired_date} | {hari} Hari..\nDitambahkan oleh: {name} (@{username})")
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
+    
 
 
 @Bot.on_message(filters.command("rmgc") & filters.user(OWNER_ID))
@@ -138,19 +149,26 @@ async def get_groupsmessag(app: Bot, message: Message):
     num = 0
     for gc in group:
         expired = await get_expired_date(int(gc))
+        seller_info = await get_seller_info(int(gc))  # Ambil info penjual dari database
         if not expired:
             expired_date = "None"
         else:
             expired_date = expired.strftime("%d-%m-%Y")
+        if not seller_info:
+            seller_name = "Unknown"
+            seller_username = "Unknown"
+        else:
+            seller_name = seller_info.get("name", "Unknown")
+            seller_username = seller_info.get("username", "Unknown")
         try:
             get = await app.get_chat(int(gc))
             gname = get.title
             glink = get.invite_link
             gid = get.id
             num += 1
-            msg += f"{num}. {gname}\n├ Group ID : {gid}\n├ Link : [Tap Here]({glink})\n└ Expired : {expired_date}\n\n"
+            msg += f"{num}. {gname}\n├ Group ID : {gid}\n├ Link : [Tap Here]({glink})\n├ Expired : {expired_date}\n└ Ditambahkan oleh: {seller_name} (@{seller_username})\n\n"
         except:
-            msg += f"{num}. {gc}\n└ Expired : {expired_date}\n\n"
+            msg += f"{num}. {gc}\n├ Expired : {expired_date}\n└ Ditambahkan oleh: {seller_name} (@{seller_username})\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
     
