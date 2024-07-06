@@ -159,35 +159,39 @@ async def get_groupsmessag(app: Bot, message: Message):
 async def addsellermessag(app: Bot, message: Message):
     xxnx = await message.reply("Menambahkan penjual baru...")
 
-    if len(message.command) != 2:
-        return await xxnx.edit("Gunakan Format : /addseller seller_id")
+    if message.reply_to_message:
+        seller_id = message.reply_to_message.from_user.id
+    elif len(message.command) == 2:
+        try:
+            seller_id = int(message.command[1])
+        except ValueError:
+            return await xxnx.edit("Seller ID harus berupa angka.")
+    else:
+        return await xxnx.edit("Gunakan Format : /addseller seller_id atau reply ke pesan user.")
 
     try:
-        seller_id = int(message.command[1])
         added_at = datetime.datetime.now(timezone('Asia/Jakarta'))
-
         added = await add_seller(seller_id, added_at)
         if added:
             await xxnx.edit(f"Penjual Ditambahkan\nSeller ID: {seller_id}\nAdded At: {added_at.strftime('%Y-%m-%d %H:%M:%S')}")
         else:
             await xxnx.edit("Gagal menambahkan penjual.")
-    
-    except ValueError:
-        await xxnx.edit("Seller ID harus berupa angka.")
     except Exception as e:
         print(f"Error adding seller: {e}")
         await xxnx.edit("Terjadi kesalahan saat menambahkan penjual.")
-
+        
 
 @Bot.on_message(filters.command("rmseller") & filters.user(OWNER_ID))
 async def remsellermessag(app: Bot, message: Message):
-    if len(message.command) != 2:
-        return await message.reply("Gunakan Format : /rmseller seller_id")
-
-    try:
-        seller_id = int(message.command[1])
-    except ValueError:
-        return await message.reply("Seller ID harus berupa angka.")
+    if message.reply_to_message:
+        seller_id = message.reply_to_message.from_user.id
+    elif len(message.command) == 2:
+        try:
+            seller_id = int(message.command[1])
+        except ValueError:
+            return await message.reply("Seller ID harus berupa angka.")
+    else:
+        return await message.reply("Gunakan Format : /rmseller seller_id atau reply ke pesan user.")
 
     xxnx = await message.reply("Menghapus penjual...")
     try:
