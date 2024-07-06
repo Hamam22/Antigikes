@@ -107,18 +107,17 @@ async def addgroupmessag(app: Bot, message: Message):
     await message.delete()
     
 
-
 @Bot.on_message(filters.command("rmgc") & filters.user(OWNER_ID))
 async def remgcmessag(app: Bot, message: Message):
-    
-    if not await is_seller(message.from_user.id):
-        return await message.reply("Anda tidak diizinkan untuk menggunakan perintah ini.")
-    
-    chat_id = int(get_arg(message))
+    arg = get_arg(message)
+    if not arg:
+        return await message.reply("Anda harus menyediakan ID grup untuk menghapus izin.")
 
-    if not chat_id:
-        chat_id = message.chat.id
-        
+    try:
+        chat_id = int(arg)
+    except ValueError:
+        return await message.reply("ID grup harus berupa angka yang valid.")
+
     xxnx = await message.reply(f"Menghapus izin dalam grup ini...")
     try:
         await rem_actived_chat(chat_id)
@@ -130,7 +129,6 @@ async def remgcmessag(app: Bot, message: Message):
     await asyncio.sleep(10)
     await xxnx.delete()
     await message.delete()
-
 
 @Bot.on_message(filters.command("groups"))
 async def get_groupsmessag(app: Bot, message: Message):
