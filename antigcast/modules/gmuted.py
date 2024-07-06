@@ -138,3 +138,5 @@ async def delete_muted_messages(app: Bot, message: Message):
             print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
         except MessageDeleteForbidden:
             print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
+
+print("Handler untuk delete_muted_messages sudah diinisialisasi")
