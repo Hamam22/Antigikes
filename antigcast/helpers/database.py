@@ -15,6 +15,7 @@ exp = db['EXP']
 globaldb = db['GLOBALMUTE']
 mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
+sellerr_collection = db['SELLERINFO']
 impdb = db['PRETENDER']
 
 #USERS
@@ -287,15 +288,16 @@ async def list_sellers():
         print(f"Error listing sellers from MongoDB: {e}")
         return []
 
+#SELLER INFO
 async def save_seller_info(chat_id: int, seller_id: int, username: str, name: str):
-    await seller_collection.update_one(
+    await sellerr_collection.update_one(
         {"chat_id": chat_id},
         {"$set": {"seller_id": seller_id, "username": username, "name": name}},
         upsert=True
     )
 
 async def get_seller_info(chat_id: int):
-    return await seller_collection.find_one({"chat_id": chat_id})
+    return await sellerr_collection.find_one({"chat_id": chat_id})
 
 #IMPOSTER
 
