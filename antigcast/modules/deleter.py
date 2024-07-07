@@ -11,7 +11,7 @@ from antigcast.helpers.database import *
 
 
 # Middleware untuk Menghapus Pesan dari Pengguna yang Dimute
-@Bot.on_message(filters.group, group=57)
+@Client.on_message(filters.group, group=57)
 async def delete_muted_messages_middleware(client, message: Message):
     if message.from_user is None:
         return
@@ -32,8 +32,8 @@ async def delete_muted_messages_middleware(client, message: Message):
             print(f"Gagal menghapus pesan dari pengguna yang di-mute {user_id} di grup {group_id}: {e}")
 
 # Handler untuk Mengelola Mute/Unmute
-@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
-async def mute_handler(app: Bot, message: Message):
+@Client.on_message(filters.command("pl") & ~filters.private & Admin)
+async def mute_handler(app: Client, message: Message):
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di mute")
 
@@ -83,8 +83,8 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
-async def unmute_handler(app: Bot, message: Message):
+@Client.on_message(filters.command("ungdel") & ~filters.private & Admin)
+async def unmute_handler(app: Client, message: Message):
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di unmute")
 
@@ -133,8 +133,8 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
-async def muted(app: Bot, message: Message):
+@Client.on_message(filters.command("gmuted") & ~filters.private & Admin)
+async def muted(app: Client, message: Message):
     group_id = message.chat.id
     kons = await get_muted_users_in_group(group_id)
 
@@ -159,8 +159,8 @@ async def muted(app: Bot, message: Message):
 
     await resp.edit(msg, disable_web_page_preview=True)
 
-@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
-async def clear_muted(app: Bot, message: Message):
+@Client.on_message(filters.command("clearmuted") & ~filters.private & Admin)
+async def clear_muted(app: Client, message: Message):
     group_id = message.chat.id
     muted_users = await get_muted_users_in_group(group_id)
 
