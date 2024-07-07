@@ -85,7 +85,7 @@ async def unmute_handler(app: Bot, message: Message):
 @Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
-    kons = await get_muted_users_in_group(group_id, app)
+    kons = await get_muted_users_in_group(group_id)
 
     if not kons:
         return await message.reply("Belum ada pengguna yang di mute.")
