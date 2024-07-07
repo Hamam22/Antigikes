@@ -1,6 +1,6 @@
 import asyncio
 
-from antigcast import Bot
+from antigcast import Bot, Client
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
