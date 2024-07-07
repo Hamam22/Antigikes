@@ -88,21 +88,22 @@ async def muted(app: Bot, message: Message):
     kons = await get_muted_users_in_group(group_id)
 
     if not kons:
-        return await message.reply("Belum ada pengguna yang di mute.")
+        return await message.reply("**Belum ada pengguna yang di mute.**")
 
-    resp = await message.reply("Memuat database...")
+    resp = await message.reply("**Memuat database...**")
 
-    msg = "Daftar pengguna yang di mute\n\n"
+    msg = "**Daftar pengguna yang di mute**\n\n"
     num = 0
 
-    for data in kons:
-        user_id = data['user_id']
-        user_name = data['name']
-        muted_by_name = data['muted_by']['name']
+    for user in kons:
         num += 1
-        msg += f"{num}. {user_name}\n└ User ID: {user_id}\n└ Di-mute oleh: {muted_by_name}\n\n"
+        user_id = user['user_id']
+        user_name = (await app.get_users(user_id)).first_name
+        muted_by_name = user['muted_by']['name']
+        msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
+
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
