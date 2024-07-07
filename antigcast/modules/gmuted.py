@@ -95,14 +95,14 @@ async def muted(app: Bot, message: Message):
     msg = "Daftar pengguna yang di mute\n\n"
     num = 0
 
-    for user_id, data in kons.items():
-        num += 1
+    for data in kons:
+        user_id = data['user_id']
         user_name = data['name']
         muted_by_name = data['muted_by']['name']
+        num += 1
         msg += f"{num}. {user_name}\n└ User ID: {user_id}\n└ Di-mute oleh: {muted_by_name}\n\n"
 
     await resp.edit(msg, disable_web_page_preview=True)
-    
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
