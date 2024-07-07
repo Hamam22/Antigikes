@@ -56,7 +56,7 @@ async def mute_handler(app: Bot, message: Message):
         return
 
     try:
-        user_name = user.first_name + (" " + user.last_name if user.last_name else "")
+        user_name = (user.first_name or "") + (" " + user.last_name if user.last_name else "")
 
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
 
@@ -137,7 +137,7 @@ async def muted(app: Bot, message: Message):
         user_id = user['user_id']
         try:
             user_info = await app.get_users(user_id)
-            user_name = user_info.first_name + (" " + user_info.last_name if user_info.last_name else "")
+            user_name = (user_info.first_name or "") + (" " + user_info.last_name if user_info.last_name else "")
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
         muted_by_name = user['muted_by']['name']
@@ -165,7 +165,7 @@ async def delete_muted_messages(app: Bot, message: Message):
 
     user_id = message.from_user.id
     username = message.from_user.username
-    name = message.from_user.first_name + (
+    name = (message.from_user.first_name or "") + (
         " " + message.from_user.last_name if message.from_user.last_name else ""
     )
     group_id = message.chat.id
