@@ -11,7 +11,7 @@ from antigcast.helpers.database import *
 
 
 # Middleware untuk Menghapus Pesan dari Pengguna yang Dimute
-@Bot.on_message(filters.group)
+@Bot.on_message(filters.group, group=57)
 async def delete_muted_messages_middleware(client, message: Message):
     if message.from_user is None:
         return
