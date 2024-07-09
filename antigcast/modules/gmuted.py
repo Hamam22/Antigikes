@@ -139,8 +139,8 @@ async def muted(app: Bot, message: Message):
         muted_by_name = user['muted_by']['name']
         msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
-    await resp.edit(msg, disable_web_page_preview=True)
-
+    await message.reply(msg, disable_web_page_preview=True)
+    await resp.delete()
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
