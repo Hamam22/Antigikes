@@ -8,7 +8,6 @@ from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-
 # Handler
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
@@ -62,7 +61,6 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-
 @Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) < 2:
@@ -114,7 +112,6 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
-
 @Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     group_id = message.chat.id
@@ -125,19 +122,27 @@ async def muted(app: Bot, message: Message):
 
     resp = await message.reply("**Memuat database...**")
 
-    msg = "**Daftar pengguna yang di mute**\n\n"
+    header_msg = "**Daftar pengguna yang di mute**\n\n"
+    msg = header_msg
     num = 0
+    max_length = 4096  # Maximum message length allowed by Telegram
 
     for user in kons:
         num += 1
         user_id = user['user_id']
         try:
-            user_info = await app.get_users(user_id)
+            user_info = await app.get_users(int(user_id))
             user_name = (user_info.first_name or "") + (" " + user_info.last_name if user_info.last_name else "")
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
         muted_by_name = user['muted_by']['name']
-        msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
+        user_info_msg = f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
+
+        if len(msg) + len(user_info_msg) > max_length:
+            await message.reply(msg, disable_web_page_preview=True)
+            msg = header_msg + user_info_msg
+        else:
+            msg += user_info_msg
 
     await message.reply(msg, disable_web_page_preview=True)
     await resp.delete()
@@ -152,7 +157,6 @@ async def clear_muted(app: Bot, message: Message):
 
     await clear_muted_users_in_group(group_id)
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
-
 
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
