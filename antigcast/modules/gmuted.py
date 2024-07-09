@@ -125,22 +125,36 @@ async def muted(app: Bot, message: Message):
 
     resp = await message.reply("**Memuat database...**")
 
-    msg = "**Daftar pengguna yang di mute**\n\n"
+    header_msg = "**Daftar pengguna yang di mute**\n\n"
+    messages = [header_msg]
+    current_message = header_msg
     num = 0
 
     for user in kons:
         num += 1
         user_id = user['user_id']
         try:
-            user_info = await app.get_users(int(x))
+            user_info = await app.get_users(int(user_id))
             user_name = (user_info.first_name or "") + (" " + user_info.last_name if user_info.last_name else "")
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
         muted_by_name = user['muted_by']['name']
-        msg += f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
+        user_info_msg = f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
 
-    await resp.edit(msg, disable_web_page_preview=True)
+        if len(current_message) + len(user_info_msg) > 4096:
+            messages.append(current_message)
+            current_message = user_info_msg
+        else:
+            current_message += user_info_msg
 
+    messages.append(current_message)
+
+    for i, msg in enumerate(messages):
+        if i == 0:
+            await resp.edit(msg, disable_web_page_preview=True)
+        else:
+            await message.reply(msg, disable_web_page_preview=True)
+            
 
 @Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
