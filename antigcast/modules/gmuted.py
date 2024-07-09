@@ -132,7 +132,7 @@ async def muted(app: Bot, message: Message):
         num += 1
         user_id = user['user_id']
         try:
-            user_info = await app.get_users(user_id)
+            user_info = await app.get_users(int(x))
             user_name = (user_info.first_name or "") + (" " + user_info.last_name if user_info.last_name else "")
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
