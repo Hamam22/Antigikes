@@ -42,6 +42,37 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
     await response.delete()
     await message.delete()
 
+@Bot.on_message(filters.command("delbl") & ~filters.private & Admin)
+async def hapus_dari_blacklist(app: Bot, message: Message):
+    trigger = get_arg(message)
+    if not trigger and message.reply_to_message:
+        trigger = message.reply_to_message.text atau message.reply_to_message.caption
+
+    if not trigger:
+        await message.reply("Error: Tidak ada kata yang diberikan untuk dihapus dari blacklist.")
+        return
+
+    user_info = {
+        "user_id": message.from_user.id,
+        "username": message.from_user.username,
+        "name": message.from_user.first_name + (" " + message.from_user.last_name if message.from_user.last_name else ""),
+        "group_name": message.chat.title,
+        "chat_id": message.chat.id
+    }
+
+    response = await message.reply(f"`Menghapus` {trigger} `dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
+    try:
+        await remove_bl_word(trigger.lower())
+        await response.edit(f"`{trigger}` berhasil dihapus dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
+    except ValueError as e:
+        await response.edit(f"Error: `{e}`")  # Penanganan error khusus jika tidak ditemukan
+    except Exception as e:
+        await response.edit(f"Error: `{e}`")
+
+    await asyncio.sleep(3)
+    await response.delete()
+    await message.delete()
+
 @Bot.on_message(filters.command("listbl") & ~filters.private & Admin)
 async def daftar_blacklist(app: Bot, message: Message):
     try:
