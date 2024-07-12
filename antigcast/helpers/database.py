@@ -138,6 +138,10 @@ async def rem_actived_chat(trigger) -> bool:
 
 
 #BLWORD
+async def init_db():
+    await blackword.create_index([("filter", ASCENDING)], unique=True)
+    await bl_groups.create_index([("chat_id", ASCENDING)], unique=True)
+
 async def get_bl_words() -> list:
     filters = await blackword.find_one({"filter": "filter"})
     if not filters:
@@ -156,7 +160,7 @@ async def add_bl_word(trigger, user_info) -> bool:
     })
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
 
-    
+    # Tambahkan grup ke dalam daftar bl_groups
     await bl_groups.update_one(
         {"chat_id": user_info["chat_id"]},
         {"$set": {"group_name": user_info["group_name"]}},
