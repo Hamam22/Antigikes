@@ -137,7 +137,7 @@ async def rem_actived_chat(trigger) -> bool:
         return False
 
 
-# BLACKLIST_WORD
+#BLWORD
 async def get_bl_words() -> list:
     filters = await blackword.find_one({"filter": "filter"})
     if not filters:
