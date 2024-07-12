@@ -17,6 +17,7 @@ mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
 sellerr_collection = db['SELLERINFO']
 impdb = db['PRETENDER']
+bl_groups = ['BLGROUPS']
 
 #USERS
 def new_user(id):
