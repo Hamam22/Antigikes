@@ -17,7 +17,6 @@ mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
 sellerr_collection = db['SELLERINFO']
 impdb = db['PRETENDER']
-bl_groups = ['BLGROUPS']
 
 #USERS
 def new_user(id):
@@ -138,42 +137,29 @@ async def rem_actived_chat(trigger) -> bool:
         return False
 
 
-#BLACKWORDS
+#BLWORD
 async def get_bl_words() -> list:
     filters = await blackword.find_one({"filter": "filter"})
     if not filters:
         return []
     return filters["filters"]
 
-async def add_bl_word(trigger, user_info) -> bool:
+
+async def add_bl_word(trigger) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
-    filters.append({
-        "word": x,
-        "user_id": user_info["user_id"],
-        "username": user_info["username"],
-        "name": user_info["name"],
-        "group_name": user_info["group_name"]
-    })
+    filters.append(x)
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
-    
-    await bl_groups.update_one(
-        {"chat_id": user_info["chat_id"]},
-        {"$set": {"group_name": user_info["group_name"]}},
-        upsert=True
-    )
     return True
+
 
 async def remove_bl_word(trigger) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
-    filters = [f for f in filters if f["word"] != x]
+    filters.remove(x)
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
     return True
-
-async def get_bl_groups() -> list:
-    groups = await bl_groups.find_one().to_list(length=None)
-    return groups
+    
 
 # OWNER
 async def get_owners() -> list:
