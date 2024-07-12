@@ -1,12 +1,15 @@
 import asyncio
+
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
-from antigcast.helpers.tools import get_arg
+from antigcast.config import *
+from antigcast.helpers.tools import *
 from antigcast.helpers.admins import *
-from antigcast.helpers.database import get_bl_words, add_bl_word, remove_bl_word, get_bl_groups, add_group
+from antigcast.helpers.message import *
+from antigcast.helpers.database import *
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def tambah_ke_blacklist(app: Bot, message: Message):
