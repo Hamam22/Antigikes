@@ -137,7 +137,7 @@ async def rem_actived_chat(trigger) -> bool:
         return False
 
 
-#BLWORD
+#BLACKWORDS
 async def init_db():
     await blackword.create_index([("filter", ASCENDING)], unique=True)
     await bl_groups.create_index([("chat_id", ASCENDING)], unique=True)
