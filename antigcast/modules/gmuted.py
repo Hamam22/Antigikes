@@ -119,4 +119,3 @@ async def deletermessag(app: Bot, message: Message):
         await message.delete()
     except MessageDeleteForbidden:
         pass
-    
