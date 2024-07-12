@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
 from antigcast.helpers.tools import get_arg
-from antigcast.helpers.admins import Admin
+from antigcast.helpers.admins import *
 from antigcast.helpers.database import get_bl_words, add_bl_word, remove_bl_word, get_bl_groups, add_group
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
