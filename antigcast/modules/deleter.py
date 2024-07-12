@@ -13,35 +13,6 @@ from antigcast.helpers.database import get_bl_words, add_bl_word, remove_bl_word
 async def tambah_ke_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
     if not trigger and message.reply_to_message:
-        trigger = message.reply_to_message.text or message.reply_to_message.caption
-
-    if not trigger:
-        await message.reply("Error: Tidak ada kata yang diberikan untuk blacklist.")
-        return
-
-    user_info = {
-        "user_id": message.from_user.id,
-        "username": message.from_user.username,
-        "name": message.from_user.first_name + (" " + message.from_user.last_name if message.from_user.last_name else ""),
-        "group_name": message.chat.title,
-        "chat_id": message.chat.id
-    }
-
-    response = await message.reply(f"`Menambahkan` {trigger} `ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
-    try:
-        await add_bl_word(trigger.lower(), user_info)
-        await response.edit(f"`{trigger}` berhasil ditambahkan ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
-    except Exception as e:
-        await response.edit(f"Error: `{e}`")
-
-    await asyncio.sleep(3)
-    await response.delete()
-    await message.delete()
-
-@Bot.on_message(filters.command("bl") & ~filters.private & Admin)
-async def tambah_ke_blacklist(app: Bot, message: Message):
-    trigger = get_arg(message)
-    if not trigger and message.reply_to_message:
         # Menggunakan pengecekan lebih mendalam untuk mendapatkan teks atau caption
         if message.reply_to_message.text:
             trigger = message.reply_to_message.text
