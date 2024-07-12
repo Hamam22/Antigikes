@@ -31,7 +31,7 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
 
     response = await message.reply(f"`Menambahkan` {trigger} `ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
     try:
-        await add_bl_word(trigger.lower())
+        await add_bl_word(trigger.lower(), user_info)
         await response.edit(f"`{trigger}` berhasil ditambahkan ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
     except Exception as e:
         await response.edit(f"Error: `{e}`")
