@@ -7,7 +7,7 @@ from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipan
 from antigcast.helpers.tools import *
 from antigcast.helpers.admins import *
 from antigcast.helpers.message import *
-from antigcast.helpers.database import *
+from antigcast.helpers.database import get_bl_words, add_bl_word, remove_bl_word
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def tambah_ke_blacklist(app: Bot, message: Message):
@@ -34,7 +34,7 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
 async def hapus_dari_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
     if not trigger and message.reply_to_message:
-        trigger = message.reply_to_message.text atau message.reply_to_message.caption
+        trigger = message.reply_to_message.text or message.reply_to_message.caption
 
     if not trigger:
         await message.reply("Error: Tidak ada kata yang diberikan untuk dihapus dari blacklist.")
@@ -60,7 +60,7 @@ async def daftar_blacklist(app: Bot, message: Message):
         if not bl_words:
             await message.reply("Tidak ada kata-kata yang di-blacklist.")
             return
-        
+
         bl_list = "\n".join([f"{idx + 1}. {word}" for idx, word in enumerate(bl_words)])
         response_text = f"**Daftar kata-kata yang di-blacklist ({len(bl_words)} kata):**\n{bl_list}"
         await message.reply(response_text)
@@ -80,7 +80,7 @@ async def deletermessag(app: Bot, message: Message):
         except UserNotParticipant as e:
             print(e)
         return
-    
+
     # Hapus pesan
     try:
         await message.delete()
