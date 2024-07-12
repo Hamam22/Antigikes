@@ -138,60 +138,34 @@ async def rem_actived_chat(trigger) -> bool:
 
 
 #BLWORD
-async def get_bl_words() -> list:
-    filters = await blackword.find_one({"filter": "filter"})
-    if not filters:
+async def get_bl_words(chat_id) -> list:
+    group = await blackword.find_one({"chat_id": chat_id})
+    if not group or "filters" not in group:
         return []
-    return filters["filters"]
+    return group["filters"]
 
 async def add_bl_word(trigger, user_info) -> bool:
     x = trigger.lower()
-    filters = await get_bl_words()
+    filters = await get_bl_words(user_info["chat_id"])
     filters.append(x)
     
     await blackword.update_one(
-        {"filter": "filter"},
-        {"$set": {"filters": filters}},
-        upsert=True
-    )
-
-    # Store the group information with blacklist word
-    await blackword.update_one(
         {"chat_id": user_info["chat_id"]},
-        {
-            "$set": {"group_name": user_info["group_name"]},
-            "$addToSet": {"filters": x}
-        },
+        {"$set": {"filters": filters, "group_name": user_info["group_name"]}},
         upsert=True
     )
-
     return True
 
-async def remove_bl_word(trigger) -> bool:
+async def remove_bl_word(trigger, chat_id) -> bool:
     x = trigger.lower()
-    filters = await get_bl_words()
+    filters = await get_bl_words(chat_id)
     filters.remove(x)
-    await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
+    await blackword.update_one({"chat_id": chat_id}, {"$set": {"filters": filters}}, upsert=True)
     return True
 
 async def get_bl_groups():
-    groups = await blackword.distinct("chat_id")
-    group_details = []
-    for group_id in groups:
-        group_info = await blackword.find_one({"chat_id": group_id})
-        if group_info:
-            group_details.append({
-                "group_name": group_info["group_name"],
-                "chat_id": group_id
-            })
-    return group_details
-
-async def add_group(chat_id, group_name):
-    await blackword.find_one_and_update(
-        {"chat_id": chat_id},
-        {"$set": {"group_name": group_name}},
-        upsert=True
-    )   
+    groups = await blackword.find().to_list(None)
+    return [{"group_name": group["group_name"], "chat_id": group["chat_id"]} for group in groups if "group_name" in group]
 
 # OWNER
 async def get_owners() -> list:
