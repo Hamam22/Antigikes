@@ -172,7 +172,7 @@ async def remove_bl_word(trigger) -> bool:
     return True
 
 async def get_bl_groups() -> list:
-    groups = await bl_groups.find().to_list(length=None)
+    groups = await bl_groups.find_one().to_list(length=None)
     return groups
 
 # OWNER
