@@ -1,16 +1,13 @@
 import asyncio
-
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
-from antigcast.config import *
 from antigcast.helpers.tools import *
 from antigcast.helpers.admins import *
 from antigcast.helpers.message import *
 from antigcast.helpers.database import *
-
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def tambah_ke_blacklist(app: Bot, message: Message):
@@ -29,7 +26,7 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
     except Exception as e:
         await response.edit(f"Error: `{e}`")
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(3)
     await response.delete()
     await message.delete()
 
@@ -37,7 +34,7 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
 async def hapus_dari_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
     if not trigger and message.reply_to_message:
-        trigger = message.reply_to_message.text or message.reply_to_message.caption
+        trigger = message.reply_to_message.text atau message.reply_to_message.caption
 
     if not trigger:
         await message.reply("Error: Tidak ada kata yang diberikan untuk dihapus dari blacklist.")
@@ -52,14 +49,27 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
     except Exception as e:
         await response.edit(f"Error: `{e}`")
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(3)
     await response.delete()
     await message.delete()
 
+@Bot.on_message(filters.command("listbl") & ~filters.private & Admin)
+async def daftar_blacklist(app: Bot, message: Message):
+    try:
+        bl_words = await get_bl_words()
+        if not bl_words:
+            await message.reply("Tidak ada kata-kata yang di-blacklist.")
+            return
+        
+        bl_list = "\n".join([f"{idx + 1}. {word}" for idx, word in enumerate(bl_words)])
+        response_text = f"**Daftar kata-kata yang di-blacklist ({len(bl_words)} kata):**\n{bl_list}"
+        await message.reply(response_text)
+    except Exception as e:
+        await message.reply(f"Error: `{e}`")
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
-async def deletermessag(app : Bot, message : Message):
-    text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+async def deletermessag(app: Bot, message: Message):
+    text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
     chats = await get_actived_chats()
     if chat not in chats:
@@ -71,7 +81,7 @@ async def deletermessag(app : Bot, message : Message):
             print(e)
         return
     
-    # Delete
+    # Hapus pesan
     try:
         await message.delete()
     except FloodWait as e:
