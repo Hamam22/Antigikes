@@ -144,21 +144,36 @@ async def get_bl_words() -> list:
         return []
     return filters["filters"]
 
-
-async def add_bl_word(trigger) -> bool:
+async def add_bl_word(trigger, user_info) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
-    filters.append(x)
+    filters.append({
+        "word": x,
+        "user_id": user_info["user_id"],
+        "username": user_info["username"],
+        "name": user_info["name"],
+        "group_name": user_info["group_name"]
+    })
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
-    return True
 
+    
+    await bl_groups.update_one(
+        {"chat_id": user_info["chat_id"]},
+        {"$set": {"group_name": user_info["group_name"]}},
+        upsert=True
+    )
+    return True
 
 async def remove_bl_word(trigger) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
-    filters.remove(x)
+    filters = [f for f in filters if f["word"] != x]
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
     return True
+
+async def get_bl_groups() -> list:
+    groups = await bl_groups.find().to_list(length=None)
+    return groups
     
 
 # OWNER
