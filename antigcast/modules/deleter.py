@@ -42,7 +42,7 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
 async def hapus_dari_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
     if not trigger and message.reply_to_message:
-        trigger = message.reply_to_message.text atau message.reply_to_message.caption
+        trigger = message.reply_to_message.text or message.reply_to_message.caption
 
     if not trigger:
         await message.reply("Error: Tidak ada kata yang diberikan untuk dihapus dari blacklist.")
