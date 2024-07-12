@@ -138,6 +138,10 @@ async def rem_actived_chat(trigger) -> bool:
 
 
 #BLACKWORDS
+async def init_db():
+    await blackword.create_index([("filter", ASCENDING)], unique=True)
+    await bl_groups.create_index([("chat_id", ASCENDING)], unique=True)
+
 async def get_bl_words() -> list:
     filters = await blackword.find_one({"filter": "filter"})
     if not filters:
@@ -172,7 +176,7 @@ async def remove_bl_word(trigger) -> bool:
     return True
 
 async def get_bl_groups() -> list:
-    groups = await blackword.find().to_list(length=None)
+    groups = await bl_groups.find().to_list(length=None)
     return groups
     
 
