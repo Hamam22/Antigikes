@@ -144,11 +144,27 @@ async def get_bl_words() -> list:
         return []
     return filters["filters"]
 
-async def add_bl_word(trigger) -> bool:
+async def add_bl_word(trigger, user_info) -> bool:
     x = trigger.lower()
     filters = await get_bl_words()
     filters.append(x)
-    await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
+    
+    await blackword.update_one(
+        {"filter": "filter"},
+        {"$set": {"filters": filters}},
+        upsert=True
+    )
+
+    # Store the group information with blacklist word
+    await blackword.update_one(
+        {"chat_id": user_info["chat_id"]},
+        {
+            "$set": {"group_name": user_info["group_name"]},
+            "$addToSet": {"filters": x}
+        },
+        upsert=True
+    )
+
     return True
 
 async def remove_bl_word(trigger) -> bool:
@@ -163,18 +179,19 @@ async def get_bl_groups():
     group_details = []
     for group_id in groups:
         group_info = await blackword.find_one({"chat_id": group_id})
-        group_details.append({
-            "group_name": group_info["group_name"],
-            "chat_id": group_id
-        })
+        if group_info:
+            group_details.append({
+                "group_name": group_info["group_name"],
+                "chat_id": group_id
+            })
     return group_details
 
 async def add_group(chat_id, group_name):
-    await db.groups.find_one_and_update(
+    await blackword.find_one_and_update(
         {"chat_id": chat_id},
         {"$set": {"group_name": group_name}},
         upsert=True
-    )
+    )   
 
 # OWNER
 async def get_owners() -> list:
