@@ -60,7 +60,7 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 
     response = await message.reply(f"`Menghapus` {trigger} `dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
     try:
-        await remove_bl_word(trigger.lower())
+        await remove_bl_word(trigger.lower(), user_info["chat_id"])
         await response.edit(f"`{trigger}` berhasil dihapus dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
     except ValueError as e:
         await response.edit(f"Error: `{e}`")  # Penanganan error khusus jika tidak ditemukan
@@ -74,13 +74,14 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 @Bot.on_message(filters.command("listbl") & ~filters.private & Admin)
 async def daftar_blacklist(app: Bot, message: Message):
     try:
-        bl_words = await get_bl_words()
+        chat_id = message.chat.id
+        bl_words = await get_bl_words(chat_id)
         if not bl_words:
             await message.reply("Tidak ada kata-kata yang di-blacklist.")
             return
 
         bl_list = "\n".join([f"{idx + 1}. {word}" for idx, word in enumerate(bl_words)])
-        response_text = f"**Daftar kata-kata yang di-blacklist ({len(bl_words)} kata):**\n{bl_list}"
+        response_text = f"**Daftar kata-kata yang di-blacklist di grup ini ({len(bl_words)} kata):**\n{bl_list}"
         await message.reply(response_text)
     except Exception as e:
         await message.reply(f"Error: `{e}`")
