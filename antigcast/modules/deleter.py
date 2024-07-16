@@ -1,9 +1,8 @@
 import asyncio
-
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
-from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
+from pyrogram.errors import FloodWait
 
 from antigcast.config import *
 from antigcast.helpers.tools import *
@@ -110,7 +109,7 @@ async def deletermessag(app: Bot, message: Message):
         await asyncio.sleep(5)
         try:
             await app.leave_chat(chat)
-        except UserNotParticipant as e:
+        except Exception as e:
             print(e)
         return
 
@@ -120,5 +119,5 @@ async def deletermessag(app: Bot, message: Message):
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await message.delete()
-    except MessageDeleteForbidden:
-        pass
+    except Exception as e:
+        print(e)
