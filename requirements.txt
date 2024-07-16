@@ -1,6 +1,6 @@
 motor[srv]
 pytz
-pyrogram
+pyrofork
 TgCrypto
 aiofiles
 python-dateutil
