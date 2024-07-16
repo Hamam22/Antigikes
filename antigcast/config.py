@@ -11,7 +11,7 @@ API_HASH = os.environ.get("API_HASH", "42db0fd56c51ff2b94cf064838eba7c1")
 
 LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", "-1002011558545"))
 
-MONGO_DB_URI = os.environ.get("MONGO_DB_URI", "mongodb+srv://cilikankes:kuliankes@cluster0.xtrebza.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_URL = os.environ.get("MONGO_DB_URI", "mongodb+srv://cilikankes:kuliankes@cluster0.xtrebza.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DB_NAME = os.environ.get("DB_NAME", "isinamamongo")
 BROADCAST_AS_COPY = True
 
