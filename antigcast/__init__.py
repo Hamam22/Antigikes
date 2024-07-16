@@ -1,5 +1,6 @@
 import sys
 from pyromod import listen
+from motor.motor_asyncio import AsyncIOMotorClient
 from pyrogram import Client
 from antigcast.config import API_HASH, APP_ID, BOT_TOKEN,LOG_CHANNEL_ID , LOGGER
 
@@ -10,6 +11,7 @@ class Bot(Client):
     def __init__(self):
         super().__init__(
             "Bot",
+            name="bot_session",
             api_hash=API_HASH,
             api_id=APP_ID,
             plugins={"root": "antigcast/modules"},
