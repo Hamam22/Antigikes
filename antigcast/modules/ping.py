@@ -44,6 +44,11 @@ async def ping_pong(client: Client, message: Message):
         "**PONG!!**🏓 \n"
         f"**• Pinger -** `{delta_ping * 1000:.3f}ms`\n"
         f"**• Uptime -** `{uptime}`\n"
+        f"\n<details><summary>More Info</summary><blockquote>\n"
+        f"**Detailed Information**\n"
+        f"- Ping Time: `{delta_ping * 1000:.3f}ms`\n"
+        f"- Uptime: `{uptime}`\n"
+        "</blockquote></details>"
     )
 
 
@@ -56,5 +61,11 @@ async def get_uptime(client: Client, message: Message):
     await message.reply_text(
         "🤖 **Bot Status:**\n"
         f"• **Uptime:** `{uptime}`\n"
-        f"• **Start Time:** `{START_TIME_WIB_ISO}` (WIB)"
+        f"• **Start Time:** `{START_TIME_WIB_ISO}` (WIB)\n"
+        f"\n<details><summary>More Info</summary><blockquote>\n"
+        f"**Detailed Information**\n"
+        f"- Current UTC Time: `{current_time_utc}`\n"
+        f"- Current WIB Time: `{current_time_wib}`\n"
+        f"- Uptime in Seconds: `{uptime_sec}`\n"
+        "</blockquote></details>"
     )
