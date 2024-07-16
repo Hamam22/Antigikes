@@ -17,7 +17,6 @@ class Bot(Client):
             workers=4,
             bot_token=BOT_TOKEN,
             in_memory=False,
-            workdir="./sessions/",
         )
         self.LOGGER = LOGGER
 
