@@ -1,9 +1,9 @@
 import datetime
 from pytz import timezone
-from antigcast.config import MONGO_URL, DB_NAME
+from antigcast.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
-mongo_client = AsyncIOMotorClient(MONGO_URL)
+mongo_client = AsyncIOMotorClient(MONGO_DB_URI)
 db = mongo_client[DB_NAME]
 
 userdb = db['USERS']
