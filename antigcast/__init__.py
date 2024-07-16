@@ -2,7 +2,7 @@ import sys
 from pyromod import listen
 from motor.motor_asyncio import AsyncIOMotorClient
 from pyrogram import Client
-from antigcast.config import API_HASH, APP_ID, BOT_TOKEN,LOG_CHANNEL_ID , LOGGER
+from antigcast.config import API_HASH, APP_ID, BOT_TOKEN, LOG_CHANNEL_ID, LOGGER
 
 from antigcast.helpers.database import *
 
@@ -10,8 +10,7 @@ from antigcast.helpers.database import *
 class Bot(Client):
     def __init__(self):
         super().__init__(
-            "Bot",
-            name="bot_session",
+            "bot_session",
             api_hash=API_HASH,
             api_id=APP_ID,
             plugins={"root": "antigcast/modules"},
@@ -34,9 +33,7 @@ class Bot(Client):
             )
         except Exception as a:
             self.LOGGER(__name__).warning(a)
-            self.LOGGER(__name__).info(
-                "Bot Berhenti."
-            )
+            self.LOGGER(__name__).info("Bot Berhenti.")
             sys.exit()
 
         try:
@@ -54,9 +51,7 @@ class Bot(Client):
             self.LOGGER(__name__).warning(
                 f"Pastikan @{self.username} adalah admin di Channel DataBase anda, LOG_CHANNEL_ID Saat Ini: {db_channel.title}"
             )
-            self.LOGGER(__name__).info(
-                "Bot Berhenti."
-            )
+            self.LOGGER(__name__).info("Bot Berhenti.")
             sys.exit()
 
 app = Bot()
