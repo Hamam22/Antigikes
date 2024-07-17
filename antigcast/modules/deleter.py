@@ -33,13 +33,11 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
 
     response = await message.reply(
         f"<blockquote>Menambahkan {trigger} ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...</blockquote>",
-        parse_mode="html"
     )
     try:
         await add_bl_word(trigger.lower(), user_info)
         await response.edit(
             f"<blockquote>{trigger} berhasil ditambahkan ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.</blockquote>",
-            parse_mode="html"
         )
     except Exception as e:
         await response.edit(f"Error: `{e}`")
@@ -68,13 +66,11 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 
     response = await message.reply(
         f"<blockquote>Menghapus {trigger} dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...</blockquote>",
-        parse_mode="html"
     )
     try:
         await remove_bl_word(trigger.lower(), user_info["chat_id"])
         await response.edit(
             f"<blockquote>{trigger} berhasil dihapus dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.</blockquote>",
-            parse_mode="html"
         )
     except ValueError as e:
         await response.edit(f"Error: `{e}`")
