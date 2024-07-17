@@ -40,7 +40,7 @@ async def mute_handler(app: Bot, message: Message):
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
 
-    if await isAdmin(app, message.chat.id, user_id):
+    if await isAdmin(filters, app, message):
         return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
