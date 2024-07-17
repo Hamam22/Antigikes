@@ -12,7 +12,7 @@ from antigcast.helpers.database import *
 async def admin(app, group_id, user_id):
     try:
         member = await app.get_chat_member(group_id, user_id)
-        return member.status in ("administrator", "creator")
+        return member.status in ("STATUS.OWNER, STATUS.ADMINISTRATOR")
     except UserNotParticipant:
         return False
     except Exception as e:
