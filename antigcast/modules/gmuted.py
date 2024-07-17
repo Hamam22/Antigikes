@@ -1,8 +1,8 @@
+import asyncio
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, PeerIdInvalid, UserNotParticipant
-import asyncio
 
 from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
@@ -58,7 +58,10 @@ async def mute_handler(app: Bot, message: Message):
 
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
 
-        await xxnx.edit(f"**Pengguna berhasil di mute**\n- Nama: {user_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}")
+        await xxnx.edit(
+            f"<blockquote>**Pengguna berhasil di mute**\n- Nama: {user_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}</blockquote>",
+            parse_mode="html"
+        )
         await asyncio.sleep(10)
         await xxnx.delete()
     except Exception as e:
@@ -109,7 +112,10 @@ async def unmute_handler(app: Bot, message: Message):
     try:
         await unmute_user_in_group(group_id, user_id)
 
-        await xxnx.edit(f"**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{user_id}`")
+        await xxnx.edit(
+            f"<blockquote>**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{user_id}`</blockquote>",
+            parse_mode="html"
+        )
         await asyncio.sleep(10)
         await xxnx.delete()
         await message.delete()
@@ -127,7 +133,7 @@ async def muted(app: Bot, message: Message):
 
     resp = await message.reply("**Memuat database...**")
 
-    header_msg = "**Daftar pengguna yang di mute**\n\n"
+    header_msg = "<blockquote>**Daftar pengguna yang di mute**\n\n</blockquote>"
     msg = header_msg
     num = 0
     max_length = 4096  # Maximum message length allowed by Telegram
@@ -141,7 +147,7 @@ async def muted(app: Bot, message: Message):
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
         muted_by_name = user['muted_by']['name']
-        user_info_msg = f"**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n"
+        user_info_msg = f"<blockquote>**{num}. {user_name}**\n└ User ID: `{user_id}`\n└ Di-mute oleh: {muted_by_name}\n\n</blockquote>"
 
         if len(msg) + len(user_info_msg) > max_length:
             await message.reply(msg, disable_web_page_preview=True)
