@@ -61,7 +61,7 @@ async def mute_handler(app: Bot, message: Message):
 
         await xxnx.edit(
             f"<blockquote>**Pengguna berhasil di mute**\n- Nama: {user_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}</blockquote>",
-            parse_mode="html"
+            parse_mode="HTML"
         )
         await asyncio.sleep(10)
         await xxnx.delete()
