@@ -8,6 +8,7 @@ from youtubesearchpython import SearchVideos
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from pyrogram import Client, filters
+from pyrogram.types import Message
 from pyrogram.types import *
 from antigcast import Bot
 
