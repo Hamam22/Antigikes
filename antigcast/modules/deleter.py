@@ -92,7 +92,7 @@ async def daftar_blacklist(app: Bot, message: Message):
 
         bl_list = "\n".join([f"{idx + 1}. {word}" for idx, word in enumerate(bl_words)])
         response_text = f"<blockquote>**Daftar kata-kata yang di-blacklist di grup ini ({len(bl_words)} kata):**\n{bl_list}</blockquote>"
-        await message.reply(response_text, parse_mode="html")
+        await message.reply(response_text)
     except Exception as e:
         await message.reply(f"Error: `{e}`")
 
@@ -106,7 +106,7 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
 
         group_list = "\n".join([f"{idx + 1}. {group['group_name']} (ID: {group['chat_id']})" for idx, group in enumerate(bl_groups)])
         response_text = f"<blockquote>**Daftar grup yang menggunakan perintah blacklist ({len(bl_groups)} grup):**\n{group_list}</blockquote>"
-        await message.reply(response_text, parse_mode="html")
+        await message.reply(response_text)
     except Exception as e:
         await message.reply(f"Error: `{e}`")
 
@@ -116,7 +116,7 @@ async def deletermessag(app: Bot, message: Message):
     chat = message.chat.id
     chats = await get_actived_chats()
     if chat not in chats:
-        await message.reply(text=text, parse_mode="html")
+        await message.reply(text=text)
         await asyncio.sleep(5)
         try:
             await app.leave_chat(chat)
