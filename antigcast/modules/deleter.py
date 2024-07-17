@@ -10,6 +10,9 @@ from antigcast.helpers.admins import *
 from antigcast.helpers.message import *
 from antigcast.helpers.database import *
 
+def get_full_name(user):
+    return f"{user.first_name or ''} {user.last_name or ''}".strip()
+
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
 async def tambah_ke_blacklist(app: Bot, message: Message):
     trigger = get_arg(message)
@@ -23,15 +26,21 @@ async def tambah_ke_blacklist(app: Bot, message: Message):
     user_info = {
         "user_id": message.from_user.id,
         "username": message.from_user.username,
-        "name": message.from_user.first_name + (" " + message.from_user.last_name if message.from_user.last_name else ""),
+        "name": get_full_name(message.from_user),
         "group_name": message.chat.title,
         "chat_id": message.chat.id
     }
 
-    response = await message.reply(f"`Menambahkan` {trigger} `ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
+    response = await message.reply(
+        f"<blockquote>Menambahkan {trigger} ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...</blockquote>",
+        parse_mode="html"
+    )
     try:
         await add_bl_word(trigger.lower(), user_info)
-        await response.edit(f"`{trigger}` berhasil ditambahkan ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
+        await response.edit(
+            f"<blockquote>{trigger} berhasil ditambahkan ke dalam blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.</blockquote>",
+            parse_mode="html"
+        )
     except Exception as e:
         await response.edit(f"Error: `{e}`")
 
@@ -52,17 +61,23 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
     user_info = {
         "user_id": message.from_user.id,
         "username": message.from_user.username,
-        "name": message.from_user.first_name + (" " + message.from_user.last_name if message.from_user.last_name else ""),
+        "name": get_full_name(message.from_user),
         "group_name": message.chat.title,
         "chat_id": message.chat.id
     }
 
-    response = await message.reply(f"`Menghapus` {trigger} `dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...`")
+    response = await message.reply(
+        f"<blockquote>Menghapus {trigger} dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}...</blockquote>",
+        parse_mode="html"
+    )
     try:
         await remove_bl_word(trigger.lower(), user_info["chat_id"])
-        await response.edit(f"`{trigger}` berhasil dihapus dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.")
+        await response.edit(
+            f"<blockquote>{trigger} berhasil dihapus dari blacklist oleh {user_info['name']} (@{user_info['username']}) di grup {user_info['group_name']}.</blockquote>",
+            parse_mode="html"
+        )
     except ValueError as e:
-        await response.edit(f"Error: `{e}`")  # Penanganan error khusus jika tidak ditemukan
+        await response.edit(f"Error: `{e}`")
     except Exception as e:
         await response.edit(f"Error: `{e}`")
 
@@ -80,8 +95,8 @@ async def daftar_blacklist(app: Bot, message: Message):
             return
 
         bl_list = "\n".join([f"{idx + 1}. {word}" for idx, word in enumerate(bl_words)])
-        response_text = f"**Daftar kata-kata yang di-blacklist di grup ini ({len(bl_words)} kata):**\n{bl_list}"
-        await message.reply(response_text)
+        response_text = f"<blockquote>**Daftar kata-kata yang di-blacklist di grup ini ({len(bl_words)} kata):**\n{bl_list}</blockquote>"
+        await message.reply(response_text, parse_mode="html")
     except Exception as e:
         await message.reply(f"Error: `{e}`")
 
@@ -94,18 +109,18 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
             return
 
         group_list = "\n".join([f"{idx + 1}. {group['group_name']} (ID: {group['chat_id']})" for idx, group in enumerate(bl_groups)])
-        response_text = f"**Daftar grup yang menggunakan perintah blacklist ({len(bl_groups)} grup):**\n{group_list}"
-        await message.reply(response_text)
+        response_text = f"<blockquote>**Daftar grup yang menggunakan perintah blacklist ({len(bl_groups)} grup):**\n{group_list}</blockquote>"
+        await message.reply(response_text, parse_mode="html")
     except Exception as e:
         await message.reply(f"Error: `{e}`")
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
 async def deletermessag(app: Bot, message: Message):
-    text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+    text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**</blockquote>"
     chat = message.chat.id
     chats = await get_actived_chats()
     if chat not in chats:
-        await message.reply(text=text)
+        await message.reply(text=text, parse_mode="html")
         await asyncio.sleep(5)
         try:
             await app.leave_chat(chat)
@@ -113,7 +128,6 @@ async def deletermessag(app: Bot, message: Message):
             print(e)
         return
 
-    # Hapus pesan
     try:
         await message.delete()
     except FloodWait as e:
