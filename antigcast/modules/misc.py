@@ -32,40 +32,42 @@ async def song(client, message):
     user_id = message.from_user.id 
     user_name = message.from_user.first_name 
     rpk = "["+user_name+"](tg://user?id="+str(user_id)+")"
-    query = ''
-    for i in message.command[1:]:
-        query += ' ' + str(i)
-    print(query)
+    query = ' '.join(message.command[1:])
+    
     m = await message.reply(f"**Mencari lagumu...!\n {query}**")
+    
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
+    
     try:
         results = YoutubeSearch(query, max_results=1).to_dict()
         link = f"https://youtube.com{results[0]['url_suffix']}"
         title = results[0]["title"][:40]       
         thumbnail = results[0]["thumbnails"][0]
         thumb_name = f'thumb{title}.jpg'
+        
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, 'wb').write(thumb.content)
+        
         performer = f"[Mᴋɴ Bᴏᴛᴢ™]" 
         duration = results[0]["duration"]
-        url_suffix = results[0]["url_suffix"]
-        views = results[0]["views"]
-    except Exception as e:
-        print(str(e))
-        return await m.edit("**Tidak ditemukan. Silakan periksa ejaan atau coba link lain.**")
-                
-    await m.edit("**Mengunduh lagumu...!**")
-    try:
+        
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
 
+    except Exception as e:
+        print(str(e))
+        return await m.edit("**Tidak ditemukan. Silakan periksa ejaan atau coba link lain.**")
+                
+    try:
         cap = "**BY›› [Mᴋɴ Bᴏᴛᴢ™](https://t.me/mkn_bots_updates)**"
+        
         secmul, dur, dur_arr = 1, 0, duration.split(':')
         for i in range(len(dur_arr)-1, -1, -1):
             dur += (int(dur_arr[i]) * secmul)
             secmul *= 60
+        
         await message.reply_audio(
             audio_file,
             caption=cap,            
@@ -76,15 +78,17 @@ async def song(client, message):
             thumb=thumb_name
         )            
         await m.delete()
+        
     except Exception as e:
         await m.edit("**🚫 Kesalahan 🚫**")
         print(e)
+    
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as e:
         print(e)
-
+        
 def get_text(message: Message) -> [None, str]:
     text_to_return = message.text
     if message.text is None:
