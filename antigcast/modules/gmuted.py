@@ -2,14 +2,27 @@ import asyncio
 from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
-from pyrogram.errors import FloodWait, MessageDeleteForbidden, PeerIdInvalid, UserNotParticipant
+from pyrogram.errors import FloodWait, PeerIdInvalid, UserNotParticipant
+from pyrogram.enums import ChatMemberStatus as STATUS
 
-from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
+async def is_admin_or_owner(client, chat_id, user_id):
+    try:
+        member = await client.get_chat_member(chat_id=chat_id, user_id=user_id)
+        return member.status in [STATUS.OWNER, STATUS.ADMINISTRATOR]
+    except (FloodWait, UserNotParticipant):
+        return False
+    except:
+        return False
+
+@Bot.on_message(filters.command("pl") & ~filters.private)
 async def mute_handler(app: Bot, message: Message):
+    # Check if the command issuer is an admin
+    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
+        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di mute")
 
@@ -30,7 +43,6 @@ async def mute_handler(app: Bot, message: Message):
     group_id = message.chat.id
 
     issuer_id = message.from_user.id
-    issuer_username = message.from_user.username
     issuer_name = message.from_user.first_name + (
         " " + message.from_user.last_name if message.from_user.last_name else ""
     )
@@ -40,7 +52,7 @@ async def mute_handler(app: Bot, message: Message):
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
 
-    if await isAdmin(None, app, message):
+    if await is_admin_or_owner(app, message.chat.id, user_id):
         return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
@@ -65,8 +77,13 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
+
+@Bot.on_message(filters.command("ungdel") & ~filters.private)
 async def unmute_handler(app: Bot, message: Message):
+    # Check if the command issuer is an admin
+    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
+        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di unmute")
 
@@ -87,7 +104,6 @@ async def unmute_handler(app: Bot, message: Message):
     group_id = message.chat.id
 
     issuer_id = message.from_user.id
-    issuer_username = message.from_user.username
     issuer_name = message.from_user.first_name + (
         " " + message.from_user.last_name if message.from_user.last_name else ""
     )
@@ -118,8 +134,13 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
+
+@Bot.on_message(filters.command("gmuted") & ~filters.private)
 async def muted(app: Bot, message: Message):
+    # Check if the command issuer is an admin
+    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
+        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+
     group_id = message.chat.id
     kons = await get_muted_users_in_group(group_id)
 
@@ -153,8 +174,13 @@ async def muted(app: Bot, message: Message):
     await message.reply(msg, disable_web_page_preview=True)
     await resp.delete()
 
-@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
+
+@Bot.on_message(filters.command("clearmuted") & ~filters.private)
 async def clear_muted(app: Bot, message: Message):
+    # Check if the command issuer is an admin
+    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
+        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+
     group_id = message.chat.id
     muted_users = await get_muted_users_in_group(group_id)
 
@@ -164,32 +190,25 @@ async def clear_muted(app: Bot, message: Message):
     await clear_muted_users_in_group(group_id)
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
 
+
 @Bot.on_message(filters.group & ~filters.private, group=54)
 async def delete_muted_messages(app: Bot, message: Message):
     if message.from_user is None:
         return
 
     user_id = message.from_user.id
-    username = message.from_user.username
-    name = (message.from_user.first_name or "") + (
-        " " + message.from_user.last_name if message.from_user.last_name else ""
-    )
     group_id = message.chat.id
     group_name = message.chat.title
 
     muted_users = await get_muted_users_in_group(group_id)
     if any(u['user_id'] == user_id for u in muted_users):
-        print(f"Pesan dari pengguna yang di-mute: {user_id} ({username}) di grup {group_name} ({group_id})")
+        print(f"Pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
         try:
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} ({username}) di grup {group_name} ({group_id}) berhasil dihapus")
+            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus")
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} ({username}) di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
-        except MessageDeleteForbidden:
-            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} ({username}) di grup {group_name} ({group_id}). Pastikan bot memiliki izin untuk menghapus pesan.")
+            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
         except Exception as e:
-            print(f"Gagal menghapus pesan dari pengguna yang di-mute {user_id} ({username}) di grup {group_name} ({group_id}): {e}")
-
-print("Handler untuk delete_muted_messages sudah diinisialisasi")
+            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id}). Error: {e}")
