@@ -1,7 +1,6 @@
 import os
 
 from antigcast import Bot
-from __future__ import unicode_literals
 
 import os, requests, asyncio, math, time, wget
 from pyrogram import filters, Client
