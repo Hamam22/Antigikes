@@ -8,17 +8,6 @@ from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
-from pyrogram.enums import ChatMemberStatus
-
-async def isAdmin(app, group_id, user_id):
-    try:
-        member = await app.get_chat_member(group_id, user_id)
-        return str(member.status) in ("STATUS.OWNER, STATUS.ADMINISTRATOR")
-    except UserNotParticipant:
-        return False
-    except Exception as e:
-        print(f"Gagal memeriksa status admin untuk pengguna {user_id} di grup {group_id}: {e}")
-        return False
 
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
@@ -52,7 +41,7 @@ async def mute_handler(app: Bot, message: Message):
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
 
-    if await isAdmin(app, group_id, user_id):
+    if await isAdmin(filter, client, update):
         return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
