@@ -114,7 +114,7 @@ async def unmute_handler(app: Bot, message: Message):
 
         await xxnx.edit(
             f"<blockquote>**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{user_id}`</blockquote>",
-            parse_mode="html"
+            parse_mode="HTML"
         )
         await asyncio.sleep(10)
         await xxnx.delete()
