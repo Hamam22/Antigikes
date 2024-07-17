@@ -9,12 +9,11 @@ from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.types import *
 from antigcast import Bot
 
 # Fungsi untuk mendownload lagu dari YouTube
 @Bot.on_message(filters.command("audio"))
-async def download_song(_, message):
+async def download_song(client, message):
     query = " ".join(message.command[1:])
     print(query)
     m = await message.reply("**🔄 Sedang mencari...**")
