@@ -2,6 +2,8 @@ import os
 
 from antigcast import Bot
 
+from flask import Flask, request
+import pygame
 import os, requests, asyncio, math, time, wget
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -28,6 +30,16 @@ async def showid(client, message):
 
 
 MUSIC_SERVER_URL = "http://localhost:5000"
+
+app = Flask(__name__)
+
+@Bot.on_message(filters.command("play")
+def play():
+    url = request.form['url']
+    pygame.mixer.init()
+    pygame.mixer.music.load(url)
+    pygame.mixer.music.play()
+    return "Playing", 200
 
 @Bot.on_message(filters.command(['song', 'mp3']) & (filters.private | filters.group))
 async def song(client, message):
