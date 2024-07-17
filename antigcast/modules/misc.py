@@ -1,4 +1,6 @@
 import os
+
+from antigcast import Bot
 from antigcast.helpers.admins import *
 from speedtest import Speedtest, ConfigRetrievalError
 from pyrogram import Client, filters, enums
