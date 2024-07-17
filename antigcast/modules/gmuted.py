@@ -41,8 +41,9 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa mute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
-    elif await isAdmin(None, app, message):
-        return await message.reply_text("Kamu tidak bisa mute admin atau owner")
+    # Remove or modify the check for admins
+    # elif await isAdmin(None, app, message):
+    #     return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
@@ -66,7 +67,6 @@ async def mute_handler(app: Bot, message: Message):
         await xxnx.delete()
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
-
 
 @Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
