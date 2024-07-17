@@ -9,6 +9,7 @@ from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from pyrogram.types import *
 from antigcast import Bot
 
 # Fungsi untuk mendownload lagu dari YouTube
@@ -46,7 +47,7 @@ async def download_song(client, message):
         ydl_opts = {"format": "bestaudio[ext=m4a]"}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
-            audio_file = ydl.prepare_filename(info_dict)  # Inisialisasi audio_file di sini
+            audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
 
         # Hitung durasi dalam detik
@@ -71,12 +72,13 @@ async def download_song(client, message):
     except Exception as e:
         await m.edit("**- Terjadi kesalahan! Mohon coba lagi nanti.**")
         print(f"Error: {str(e)}")
-        if 'audio_file' in locals():
-            try:
-                os.remove(audio_file)
-                os.remove(thumb_name)
-            except Exception as e:
-                print(f"Error: {str(e)}")
+
+    try:
+        os.remove(audio_file)
+        os.remove(thumb_name)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
 # Fungsi untuk mendownload video dari YouTube
 @Bot.on_message(filters.command(["yt", "video"]))
 async def ytmusic(client, message: Message):
