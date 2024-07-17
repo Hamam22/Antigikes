@@ -27,7 +27,7 @@ async def showid(client, message):
         await message.reply_text(f'★ Channel ID: <code>{message.chat.id}</code>')
 
 
-@Bot.on_message(filters.command(['song', 'mp3']) & filters.group)
+@Bot.on_message(filters.command(['song', 'mp3']) & filters.group, group=46)
 async def song(client, message):
     user_id = message.from_user.id 
     user_name = message.from_user.first_name 
@@ -100,7 +100,7 @@ def get_text(message: Message) -> [None, str]:
     except IndexError:
         return None
 
-@Bot.on_message(filters.command(["video", "mp4"]) & filters.group)
+@Bot.on_message(filters.command(["video", "mp4"]) & filters.group, group=65)
 async def vsong(client, message: Message):
     urlissed = get_text(message)
     pablo = await client.send_message(message.chat.id, f"**Mencari video** `{urlissed}`")
