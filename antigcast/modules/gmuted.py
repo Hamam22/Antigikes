@@ -60,14 +60,14 @@ async def mute_handler(app: Bot, message: Message):
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
 
         await xxnx.edit(
-            f"<blockquote>**Pengguna berhasil di mute**\n- Nama: {user_name}\n- User ID: `{user_id}`\n- Di-mute oleh: {issuer_name}</blockquote>",
+            f"<b>Pengguna berhasil di mute</b>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}",
             parse_mode="HTML"
         )
         await asyncio.sleep(10)
         await xxnx.delete()
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
-
+        
 @Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not message.reply_to_message and len(message.command) < 2:
