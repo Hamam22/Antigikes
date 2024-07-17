@@ -2,8 +2,6 @@ import os
 
 from antigcast import Bot
 
-from flask import Flask, request
-import pygame
 import os, requests, asyncio, math, time, wget
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -29,24 +27,14 @@ async def showid(client, message):
         await message.reply_text(f'★ Channel ID: <code>{message.chat.id}</code>')
 
 
-MUSIC_SERVER_URL = "http://localhost:5000"
-
-app = Flask(__name__)
-
-@Bot.on_message(filters.command("play")
-def play():
-    url = request.form['url']
-    pygame.mixer.init()
-    pygame.mixer.music.load(url)
-    pygame.mixer.music.play()
-    return "Playing", 200
-
-@Bot.on_message(filters.command(['song', 'mp3']) & (filters.private | filters.group))
+@Bot.on_message(filters.command(['song', 'mp3']) & filters.group)
 async def song(client, message):
     user_id = message.from_user.id 
     user_name = message.from_user.first_name 
     rpk = "["+user_name+"](tg://user?id="+str(user_id)+")"
-    query = ' '.join(message.command[1:])
+    query = ''
+    for i in message.command[1:]:
+        query += ' ' + str(i)
     print(query)
     m = await message.reply(f"**Mencari lagumu...!\n {query}**")
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
@@ -78,14 +66,6 @@ async def song(client, message):
         for i in range(len(dur_arr)-1, -1, -1):
             dur += (int(dur_arr[i]) * secmul)
             secmul *= 60
-        
-        # Mengirim perintah untuk memutar musik ke server
-        try:
-            requests.post(f"{MUSIC_SERVER_URL}/play", data={'url': audio_file})
-        except Exception as e:
-            await m.edit(f"**🚫 Gagal mengirim perintah ke server musik 🚫**\n{str(e)}")
-            return
-        
         await message.reply_audio(
             audio_file,
             caption=cap,            
@@ -116,7 +96,7 @@ def get_text(message: Message) -> [None, str]:
     except IndexError:
         return None
 
-@Bot.on_message(filters.command(["video", "mp4"]) & (filters.private | filters.group))
+@Bot.on_message(filters.command(["video", "mp4"]) & filters.group)
 async def vsong(client, message: Message):
     urlissed = get_text(message)
     pablo = await client.send_message(message.chat.id, f"**Mencari video** `{urlissed}`")
