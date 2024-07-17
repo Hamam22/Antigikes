@@ -9,12 +9,25 @@ from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
 
+async def admin(app, group_id, user_id):
+    try:
+        member = await app.get_chat_member(group_id, user_id)
+        return member.status in ("administrator", "creator")
+    except UserNotParticipant:
+        return False
+    except Exception as e:
+        print(f"Gagal memeriksa status admin untuk pengguna {user_id} di grup {group_id}: {e}")
+        return False
+        
+
 # Handler
 @Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
+    # Cek input dari pengguna
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di mute")
 
+    # Ambil user berdasarkan balasan atau input command
     if message.reply_to_message:
         user = message.reply_to_message.from_user
     else:
@@ -37,12 +50,14 @@ async def mute_handler(app: Bot, message: Message):
         " " + message.from_user.last_name if message.from_user.last_name else ""
     )
 
+    # Cek apakah pengguna mencoba mute diri sendiri atau bot
     if user_id == issuer_id:
         return await message.reply_text("Kamu tidak bisa mute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
 
-    if await isAdmin(app, group_id, user_id):
+    # Cek apakah pengguna adalah admin atau owner
+    if await admin(app, group_id, user_id):
         return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
