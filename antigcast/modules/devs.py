@@ -23,7 +23,7 @@ async def send_msg(chat_id, message: Message):
         await asyncio.sleep(int(e.value))
         return send_msg(chat_id, message)
 
-@Bot.on_message(filters.command("update") & filters.user(CREATOR))
+@Bot.on_message(filters.command("update") & ~filters.private & filters.user(CREATOR))
 async def handle_update(app: Bot, message: Message):
     try:
         out = subprocess.check_output(["git", "pull"], stderr=subprocess.STDOUT).decode("UTF-8")
