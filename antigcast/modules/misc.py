@@ -2,7 +2,6 @@ import os
 from antigcast.helpers.admins import *
 from speedtest import Speedtest, ConfigRetrievalError
 from pyrogram import Client, filters, enums
-import get_size
 from datetime import datetime
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
 import logging
