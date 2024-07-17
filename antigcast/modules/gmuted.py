@@ -60,7 +60,7 @@ async def mute_handler(app: Bot, message: Message):
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
 
         await xxnx.edit(
-            f"<b>Pengguna berhasil di mute</b>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}",
+            f"<b><blockquote>Pengguna berhasil di mute</b><blockquote>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}",
         )
         await asyncio.sleep(10)
         await xxnx.delete()
@@ -113,7 +113,6 @@ async def unmute_handler(app: Bot, message: Message):
 
         await xxnx.edit(
             f"<blockquote>**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{user_id}`</blockquote>",
-            parse_mode="HTML"
         )
         await asyncio.sleep(10)
         await xxnx.delete()
