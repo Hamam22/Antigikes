@@ -1,5 +1,4 @@
 import time
-from urllib.parse import urlparse
 import os
 import asyncio
 import requests
@@ -8,21 +7,24 @@ import yt_dlp
 from youtubesearchpython import SearchVideos
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
-from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import *
 from antigcast import Bot
 
-# ------------------------------------------------------------------------------- #
-
+# Fungsi untuk mendownload lagu dari YouTube
 @Bot.on_message(filters.command("audio"))
-def download_song(_, message):
-    query = " ".join(message.command[1:])  
+async def download_song(_, message):
+    query = " ".join(message.command[1:])
     print(query)
-    m = message.reply("**🔄 sᴇᴀʀᴄʜɪɴɢ... **")
-    ydl_ops = {"format": "bestaudio[ext=m4a]"}
+    m = await message.reply("**🔄 Sedang mencari...**")
+
     try:
         results = YoutubeSearch(query, max_results=1).to_dict()
+        if not results:
+            await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
+            print("Tidak ada hasil ditemukan")
+            return
+
         link = f"https://youtube.com{results[0]['url_suffix']}"
         title = results[0]["title"][:40]
         thumbnail = results[0]["thumbnails"][0]
@@ -30,79 +32,65 @@ def download_song(_, message):
         thumb = requests.get(thumbnail, allow_redirects=True)
         open(thumb_name, "wb").write(thumb.content)
         duration = results[0]["duration"]
-
-        # Add these lines to define views and channel_name
         views = results[0]["views"]
         channel_name = results[0]["channel"]
 
     except Exception as e:
-        m.edit("**⚠️ ɴᴏ ʀᴇsᴜʟᴛs ᴡᴇʀᴇ ғᴏᴜɴᴅ. ᴍᴀᴋᴇ sᴜʀᴇ ʏᴏᴜ ᴛʏᴘᴇᴅ ᴛʜᴇ ᴄᴏʀʀᴇᴄᴛ sᴏɴɢ ɴᴀᴍᴇ**")
-        print(str(e))
+        await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
+        print(f"Error: {str(e)}")
         return
-    m.edit("**📥 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...**")
+
+    await m.edit("**📥 Sedang mendownload...**")
+
     try:
-        with yt_dlp.YoutubeDL(ydl_ops) as ydl:
+        ydl_opts = {"format": "bestaudio[ext=m4a]"}
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
+
+        # Hitung durasi dalam detik
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
             dur += int(float(dur_arr[i])) * secmul
             secmul *= 60
-        m.edit("**📤 ᴜᴘʟᴏᴀᴅɪɴɢ...**")
 
-        message.reply_audio(
+        await m.edit("**📤 Sedang mengunggah...**")
+
+        # Kirim file audio
+        await message.reply_audio(
             audio_file,
             thumb=thumb_name,
             title=title,
-            caption=f"{title}\nRᴇǫᴜᴇsᴛᴇᴅ ʙʏ ➪{message.from_user.mention}\nVɪᴇᴡs➪ {views}\nCʜᴀɴɴᴇʟ➪ {channel_name}",
+            caption=f"{title}\nDipesan oleh: {message.from_user.mention}\nViews: {views}\nChannel: {channel_name}",
             duration=dur
         )
-        m.delete()
+
+        await m.delete()
+
     except Exception as e:
-        m.edit(" - An error !!")
-        print(e)
+        await m.edit("**- Terjadi kesalahan! Mohon coba lagi nanti.**")
+        print(f"Error: {str(e)}")
 
     try:
         os.remove(audio_file)
         os.remove(thumb_name)
     except Exception as e:
-        print(e)
-        
+        print(f"Error: {str(e)}")
 
-def get_file_extension_from_url(url):
-    url_path = urlparse(url).path
-    basename = os.path.basename(url_path)
-    return basename.split(".")[-1]
-
-
-def get_text(message: Message) -> [None, str]:
-    """Extract Text From Commands"""
-    text_to_return = message.text
-    if message.text is None:
-        return None
-    if " " in text_to_return:
-        try:
-            return message.text.split(None, 1)[1]
-        except IndexError:
-            return None
-    else:
-        return None
-
-# ------------------------------------------------------------------------------- #
-
+# Fungsi untuk mendownload video dari YouTube
 @Bot.on_message(filters.command(["yt", "video"]))
 async def ytmusic(client, message: Message):
-    urlissed = get_text(message)
+    urlissed = " ".join(message.command[1:])
     await message.delete()
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     chutiya = "[" + user_name + "](tg://user?id=" + str(user_id) + ")"
 
-    pablo = await client.send_message(message.chat.id, f"sᴇᴀʀᴄʜɪɴɢ, ᴩʟᴇᴀsᴇ ᴡᴀɪᴛ...")
+    pablo = await client.send_message(message.chat.id, f"**Sedang mencari, mohon tunggu...**")
     if not urlissed:
         await pablo.edit(
-            "😴 sᴏɴɢ ɴᴏᴛ ғᴏᴜɴᴅ ᴏɴ ʏᴏᴜᴛᴜʙᴇ.\n\n» ᴍᴀʏʙᴇ ᴛᴜɴᴇ ɢᴀʟᴛɪ ʟɪᴋʜᴀ ʜᴏ, ᴩᴀᴅʜᴀɪ - ʟɪᴋʜᴀɪ ᴛᴏʜ ᴋᴀʀᴛᴀ ɴᴀʜɪ ᴛᴜ !"
+            "**😴 Lagu tidak ditemukan di YouTube.**\n\n» Mungkin Anda salah mengetik, periksa kembali tulisan Anda."
         )
         return
 
@@ -136,11 +124,12 @@ async def ytmusic(client, message: Message):
             ytdl_data = ytdl.extract_info(url, download=True)
 
     except Exception as e:
-        await pablo.edit(f"**ғᴀɪʟᴇᴅ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ.** \n**ᴇʀʀᴏʀ :** `{str(e)}`")
+        await pablo.edit(f"**Gagal mengunduh.** \n**Error:** `{str(e)}`")
         return
+
     c_time = time.time()
     file_stark = f"{ytdl_data['id']}.mp4"
-    capy = f"❄ **ᴛɪᴛʟᴇ :** [{thum}]({mo})\n💫 **ᴄʜᴀɴɴᴇʟ :** {thums}\n✨ **sᴇᴀʀᴄʜᴇᴅ :** {urlissed}\n🥀 **ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :** {chutiya}"
+    capy = f"❄ **Judul:** [{thum}]({mo})\n💫 **Channel:** {thums}\n✨ **Pencarian:** {urlissed}\n🥀 **Diminta oleh:** {chutiya}"
     await client.send_video(
         message.chat.id,
         video=open(file_stark, "rb"),
@@ -152,7 +141,7 @@ async def ytmusic(client, message: Message):
         progress_args=(
             pablo,
             c_time,
-            f"» ᴩʟᴇᴀsᴇ ᴡᴀɪᴛ...\n\nᴜᴩʟᴏᴀᴅɪɴɢ `{urlissed}` ғʀᴏᴍ ʏᴏᴜᴛᴜʙᴇ sᴇʀᴠᴇʀs...💫",
+            f"**» Mohon tunggu...**\n\n**Mengunggah `{urlissed}` dari server YouTube...💫**",
             file_stark,
         ),
     )
@@ -160,4 +149,3 @@ async def ytmusic(client, message: Message):
     for files in (sedlyf, file_stark):
         if files and os.path.exists(files):
             os.remove(files)
-
