@@ -41,9 +41,9 @@ async def mute_handler(app: Bot, message: Message):
         return await message.reply_text("Kamu tidak bisa mute diri sendiri")
     elif user_id == app.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot")
-    # Remove or modify the check for admins
-    # elif await isAdmin(None, app, message):
-    #     return await message.reply_text("Kamu tidak bisa mute admin atau owner")
+
+    if await isAdmin(app, group_id, user_id):
+        return await message.reply_text("Kamu tidak bisa mute admin atau owner")
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
@@ -60,7 +60,7 @@ async def mute_handler(app: Bot, message: Message):
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
 
         await xxnx.edit(
-            f"<b><blockquote>Pengguna berhasil di mute</b></blockquote>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}",
+            f"<b><blockquote>Pengguna berhasil di mute</blockquote>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}",
         )
         await asyncio.sleep(10)
         await xxnx.delete()
