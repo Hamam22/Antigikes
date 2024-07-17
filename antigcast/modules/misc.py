@@ -1,6 +1,7 @@
 import os
 
 from antigcast import Bot
+from pyrogram import enums
 
 import os, requests, asyncio, math, time, wget
 from pyrogram import filters, Client
