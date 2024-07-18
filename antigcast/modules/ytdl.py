@@ -3,9 +3,9 @@ import time
 import asyncio
 import requests
 import wget
-import yt_dlp
 from youtubesearchpython import SearchVideos
 from youtube_search import YoutubeSearch
+from yt_dlp import YoutubeDL
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from antigcast import Bot
@@ -63,7 +63,7 @@ async def download_song(client, message):
 
     try:
         ydl_opts = {"format": "bestaudio[ext=m4a]"}
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
@@ -131,7 +131,7 @@ async def ytmusic(client, message: Message):
             "prefer_ffmpeg": True,
             "geo_bypass": True,
             "nocheckcertificate": True,
-            "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}],
+            "postprocessors": [{"key": "FFmpegVideoConvertor", "preferredformat": "mp4"}],
             "outtmpl": "%(id)s.mp4",
             "logtostderr": False,
             "quiet": True,
