@@ -46,7 +46,7 @@ async def download_song(client, message):
             await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
             return
 
-        link = f"https://youtu.be{result['url_suffix']}"
+        link = f"https://youtube.com{result['url_suffix']}"
         title = result["title"][:40]
         thumbnail = result["thumbnails"][0]
         thumb_name = download_thumbnail(thumbnail, title)
@@ -56,7 +56,7 @@ async def download_song(client, message):
 
     except Exception as e:
         await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
-        print(f"Error: {str(e)}")
+        print(f"Error during search: {str(e)}")
         return
 
     await m.edit("**📥 Sedang mendownload...**")
@@ -66,7 +66,7 @@ async def download_song(client, message):
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
-            ydl.process_info(info_dict)
+            ydl.download([link])
 
         dur = calculate_duration(duration)
 
@@ -85,13 +85,13 @@ async def download_song(client, message):
 
     except Exception as e:
         await m.edit("**- Terjadi kesalahan! Mohon coba lagi nanti.**")
-        print(f"Error: {str(e)}")
+        print(f"Error during download/upload: {str(e)}")
         return
 
     finally:
-        if 'audio_file' in locals():
+        if 'audio_file' in locals() and os.path.exists(audio_file):
             os.remove(audio_file)
-        if 'thumb_name' in locals():
+        if 'thumb_name' in locals() and os.path.exists(thumb_name):
             os.remove(thumb_name)
 
 # Function to download video from YouTube
@@ -131,7 +131,7 @@ async def ytmusic(client, message: Message):
             "prefer_ffmpeg": True,
             "geo_bypass": True,
             "nocheckcertificate": True,
-            "postprocessors": [{"key": "FFmpegVideoConvertor", "preferredformat": "mp4"}],
+            "postprocessors": [{"key": "FFmpegVideoConvertor", "preferredcodec": "mp4"}],
             "outtmpl": "%(id)s.mp4",
             "logtostderr": False,
             "quiet": True,
@@ -161,6 +161,7 @@ async def ytmusic(client, message: Message):
 
     except Exception as e:
         await m.edit(f"**Gagal mengunduh.** \n**Error:** `{str(e)}`")
+        print(f"Error during video download/upload: {str(e)}")
         return
 
     finally:
