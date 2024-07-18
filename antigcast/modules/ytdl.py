@@ -46,7 +46,7 @@ async def download_song(client, message):
             await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
             return
 
-        link = f"https://youtube.com{result['url_suffix']}"
+        link = f"https://youtu.be{result['url_suffix']}"
         title = result["title"][:40]
         thumbnail = result["thumbnails"][0]
         thumb_name = download_thumbnail(thumbnail, title)
