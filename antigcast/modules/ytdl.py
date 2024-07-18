@@ -56,7 +56,7 @@ async def download_song(client, message):
 
     except Exception as e:
         await m.edit("**⚠️ Tidak ada hasil ditemukan. Pastikan nama lagu yang Anda ketik benar.**")
-        print(f"Error during search: {str(e)}")
+        print(f"Error: {str(e)}")
         return
 
     await m.edit("**📥 Sedang mendownload...**")
@@ -66,7 +66,7 @@ async def download_song(client, message):
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
             audio_file = ydl.prepare_filename(info_dict)
-            ydl.download([link])
+            ydl.process_info(info_dict)
 
         dur = calculate_duration(duration)
 
@@ -85,13 +85,13 @@ async def download_song(client, message):
 
     except Exception as e:
         await m.edit("**- Terjadi kesalahan! Mohon coba lagi nanti.**")
-        print(f"Error during download/upload: {str(e)}")
+        print(f"Error: {str(e)}")
         return
 
     finally:
-        if 'audio_file' in locals() and os.path.exists(audio_file):
+        if 'audio_file' in locals():
             os.remove(audio_file)
-        if 'thumb_name' in locals() and os.path.exists(thumb_name):
+        if 'thumb_name' in locals():
             os.remove(thumb_name)
 
 # Function to download video from YouTube
@@ -161,7 +161,6 @@ async def ytmusic(client, message: Message):
 
     except Exception as e:
         await m.edit(f"**Gagal mengunduh.** \n**Error:** `{str(e)}`")
-        print(f"Error during video download/upload: {str(e)}")
         return
 
     finally:
