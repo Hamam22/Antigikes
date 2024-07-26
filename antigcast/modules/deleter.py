@@ -131,3 +131,27 @@ async def deletermessag(app: Bot, message: Message):
         await message.delete()
     except Exception as e:
         print(e)
+
+#DELETE BL
+@Bot.on_message(filters.text & ~filters.private)
+async def cek_blacklist(app: Bot, message: Message):
+    chat_id = message.chat.id
+    text = message.text.lower() if message.text else ""
+    
+    # Dapatkan daftar kata yang di-blacklist untuk grup ini
+    bl_words = await get_bl_words(chat_id)
+    if not bl_words:
+        return
+    
+    # Periksa apakah pesan mengandung kata yang di-blacklist
+    for word in bl_words:
+        if word in text:
+            try:
+                await message.delete()
+                return
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.delete()
+            except Exception as e:
+                print(e)
+                return
