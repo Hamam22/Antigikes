@@ -8,7 +8,8 @@ from pyrogram import __version__ as pyrover
 from pyrogram import idle
 from antigcast.helpers.tools import checkExpired
 
-loop = asyncio.get_event_loop_policy().get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 msg = """
 **🇲🇨Berhasil Di Aktifkan🇲🇨**
@@ -24,7 +25,7 @@ async def send_reminder():
 
     while datetime.now() < reminder_time:
         await asyncio.sleep(60)  # Tunggu selama 1 menit
-    
+
     # Kirim pesan pengingat
     reminder_message = f"🗓️ Tanggal: {reminder_time.strftime('%d-%m-%Y')}\n🕕 Jam: {reminder_time.strftime('%H:%M:%S')}"
     print(reminder_message)
