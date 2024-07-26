@@ -1,13 +1,9 @@
 import os
-
-from antigcast import Bot
-from pyrogram import enums
-
-import os, requests, asyncio, math, time, wget
-from pyrogram import filters, Client
-from pyrogram.types import Message
+import asyncio
 from datetime import datetime
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from antigcast import Bot
+from pyrogram import enums, filters, Client
+from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import UserNotParticipant
 
 # Fungsi untuk mendapatkan informasi file dari pesan
@@ -27,8 +23,12 @@ def get_file_id(message):
 
 # Fungsi untuk mengekstrak ID pengguna dan username dari pesan
 def extract_user(message):
-    from_user_id = message.from_user.id
-    username = message.from_user.username  # Opsional, tergantung kebutuhan Anda
+    if message.reply_to_message:
+        from_user_id = message.reply_to_message.from_user.id
+        username = message.reply_to_message.from_user.username
+    else:
+        from_user_id = message.from_user.id
+        username = message.from_user.username
     return from_user_id, username
 
 # Perintah untuk menampilkan informasi ID pengguna atau obrolan
@@ -44,8 +44,7 @@ async def show_id(client, message):
         await message.reply_text(f"➲ Nama Depan: {first}\n➲ Nama Belakang: {last}\n➲ Username: {username}\n➲ ID Telegram: {user_id}\n➲ ID DC: {dc_id}", quote=True)
 
     elif chat_type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
-        _id = ""
-        _id += f"➲ ID Obrolan: {message.chat.id}\n"
+        _id = f"➲ ID Obrolan: {message.chat.id}\n"
         
         if message.reply_to_message:
             from_user_id, _ = extract_user(message)
@@ -57,48 +56,46 @@ async def show_id(client, message):
             file_info = get_file_id(message.reply_to_message)
         else:
             from_user_id, _ = extract_user(message)
-            _id += (
-                f"➲ ID Pengguna: {from_user_id}\n"
-            )
+            _id += f"➲ ID Pengguna: {from_user_id}\n"
             file_info = get_file_id(message)
         if file_info:
-            _id += (
-                f"{file_info['message_type']}: {file_info['file_id']}\n"
-            )
+            _id += f"{file_info['message_type']}: {file_info['file_id']}\n"
         await message.reply_text(_id, quote=True)
 
 # Perintah untuk menampilkan informasi pengguna
 @Bot.on_message(filters.command(["info"]))
 async def user_info(client, message):
     status_message = await message.reply_text("`Mohon tunggu....`")
-    from_user = None
     from_user_id, _ = extract_user(message)
     try:
         from_user = await client.get_users(from_user_id)
     except Exception as error:
         return await status_message.edit(str(error))
+    
     if from_user is None:
         return await status_message.edit("ID pengguna tidak valid atau pesan tidak spesifik")
-    message_out_str = ""
-    message_out_str += f"➲ Nama Depan: {from_user.first_name}\n"
+    
+    message_out_str = f"➲ Nama Depan: {from_user.first_name}\n"
     last_name = from_user.last_name or "Tidak ada"
     message_out_str += f"➲ Nama Belakang: {last_name}\n"
     message_out_str += f"➲ ID Telegram: {from_user.id}\n"
     username = from_user.username or "Tidak ada"
+    message_out_str += f"➲ Username: @{username}\n"
     dc_id = from_user.dc_id or "[Pengguna tidak memiliki DP yang valid]"
     message_out_str += f"➲ ID DC: {dc_id}\n"
-    message_out_str += f"➲ Username: @{username}\n"
     message_out_str += f"➲ Tautan Pengguna: [Klik di sini](tg://user?id={from_user.id})\n"
-    if message.chat.type in ((enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL)):
+    
+    if message.chat.type in (enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL):
         try:
             chat_member_p = await message.chat.get_member(from_user.id)
             joined_date = (chat_member_p.joined_date or datetime.now()).strftime("%Y.%m.%d %H:%M:%S")
             message_out_str += f"➲ Bergabung dalam obrolan ini pada: {joined_date}\n"
         except UserNotParticipant:
             pass
+    
     chat_photo = from_user.photo
     if chat_photo:
-        local_user_photo = await client.download_media(message=chat_photo.big_file_id)
+        local_user_photo = await client.download_media(chat_photo.big_file_id)
         buttons = [[InlineKeyboardButton('Tutup ✘', callback_data='close_data')]]
         await message.reply_photo(
             photo=local_user_photo,
@@ -116,4 +113,4 @@ async def user_info(client, message):
             quote=True,
             disable_notification=True
         )
-    await status_message.delete()    
+    await status_message.delete()
