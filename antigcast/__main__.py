@@ -28,10 +28,12 @@ async def send_reminder():
 
     # Kirim pesan pengingat
     reminder_message = f"🗓️ Tanggal: {reminder_time.strftime('%d-%m-%Y')}\n🕕 Jam: {reminder_time.strftime('%H:%M:%S')}"
-    print(reminder_message)
-    # Jika Anda ingin mengirim ke saluran, gunakan:
-    # await app.send_message(LOG_CHANNEL_ID, reminder_message)
-    
+    LOGGER("INFO").info(f"Sending reminder: {reminder_message}")
+    try:
+        await app.send_message(LOG_CHANNEL_ID, reminder_message)
+    except Exception as e:
+        LOGGER("ERROR").error(f"Failed to send reminder: {e}")
+
 async def auto_restart():
     # Jalankan pengingat sebagai task latar belakang
     asyncio.create_task(send_reminder())
