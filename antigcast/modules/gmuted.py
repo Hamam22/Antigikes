@@ -4,6 +4,8 @@ from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, PeerIdInvalid, UserNotParticipant
 from pyrogram.enums import ChatMemberStatus as STATUS
+
+from antigcast.helpers.admins import *
 from antigcast.helpers.tools import extract
 from antigcast.helpers.database import *
 
@@ -16,7 +18,7 @@ async def is_admin_or_owner(client, chat_id, user_id):
     except:
         return False
 
-@Bot.on_message(filters.command("pl") & ~filters.private)
+@Bot.on_message(filters.command("pl") & ~filters.private & Admin)
 async def mute_handler(app: Bot, message: Message):
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
         return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
@@ -69,7 +71,7 @@ async def mute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private)
+@Bot.on_message(filters.command("ungdel") & ~filters.private & Admin)
 async def unmute_handler(app: Bot, message: Message):
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
         return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
@@ -119,7 +121,7 @@ async def unmute_handler(app: Bot, message: Message):
     except Exception as e:
         await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("gmuted") & ~filters.private)
+@Bot.on_message(filters.command("gmuted") & ~filters.private & Admin)
 async def muted(app: Bot, message: Message):
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
         return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
@@ -157,7 +159,7 @@ async def muted(app: Bot, message: Message):
     await message.reply(msg, disable_web_page_preview=True)
     await resp.delete()
 
-@Bot.on_message(filters.command("clearmuted") & ~filters.private)
+@Bot.on_message(filters.command("clearmuted") & ~filters.private & Admin)
 async def clear_muted(app: Bot, message: Message):
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
         return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
