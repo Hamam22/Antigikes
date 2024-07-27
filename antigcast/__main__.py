@@ -1,13 +1,15 @@
 import asyncio
+import os
+import sys
+from datetime import datetime, timedelta
 from antigcast import Bot, app
-from sys import version as pyver
-
 from antigcast.config import LOGGER, LOG_CHANNEL_ID
-from pyrogram import _version_ as pyrover
+from pyrogram import __version__ as pyrover
 from pyrogram import idle
 from antigcast.helpers.tools import checkExpired
 
-loop = asyncio.get_event_loop_policy().get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 msg = """
 **🇲🇨Berhasil Di Aktifkan🇲🇨**
