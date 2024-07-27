@@ -3,7 +3,7 @@ from antigcast import Bot, app
 from sys import version as pyver
 
 from antigcast.config import LOGGER, LOG_CHANNEL_ID
-from pyrogram import version as pyrover
+from pyrogram import _version_ as pyrover
 from pyrogram import idle
 from antigcast.helpers.tools import checkExpired
 
