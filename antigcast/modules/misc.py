@@ -32,7 +32,7 @@ def extract_user(message):
     return from_user_id, username
 
 # Perintah untuk menampilkan informasi ID pengguna atau obrolan
-@Bot.on_message(filters.command('id'))
+@Bot.on_message(filters.command(id)
 async def show_id(client, message):
     chat_type = message.chat.type
     if chat_type == enums.ChatType.PRIVATE:
@@ -63,7 +63,7 @@ async def show_id(client, message):
         await message.reply_text(_id, quote=True)
 
 # Perintah untuk menampilkan informasi pengguna
-@Bot.on_message(filters.command(["info"]))
+@Bot.on_message(filters.command(info)
 async def user_info(client, message):
     status_message = await message.reply_text("`Mohon tunggu....`")
     from_user_id, _ = extract_user(message)
