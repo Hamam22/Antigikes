@@ -33,39 +33,58 @@ def new_user(id):
 
 
 async def add_user(id):
-    try:
-        if not isinstance(id, int):
-            raise ValueError("ID harus berupa integer.")
-        user = new_user(id)
-        await userdb.insert_one(user)
-    except Exception as e:
-        print(f"Error adding user: {e}")
+    user = new_user(id)
+    await userdb.insert_one(user)
+
 
 async def is_user_exist(id):
-    try:
-        if not isinstance(id, int):
-            raise ValueError("ID harus berupa integer.")
-        user = await userdb.find_one({"id": int(id)})
-        return bool(user)
-    except Exception as e:
-        print(f"Error checking user existence: {e}")
-        return False
+    user = await userdb.find_one({"id": int(id)})
+    return bool(user)
+
+
+async def total_users_count():
+    count = await userdb.count_documents({})
+    return count
+
+
+async def get_all_users():
+    return userdb.find({})
+
+
+async def delete_user(user_id):
+    await userdb.delete_many({"id": int(user_id)})
+
+
+async def remove_ban(id):
+    ban_status = dict(
+        is_banned=False,
+        ban_duration=0,
+        banned_on=datetime.date.max.isoformat(),
+        ban_reason="",
+    )
+    await userdb.update_one({"id": id}, {"$set": {"ban_status": ban_status}})
+
+
+async def ban_user(user_id, ban_duration, ban_reason):
+    ban_status = dict(
+        is_banned=True,
+        ban_duration=ban_duration,
+        banned_on=datetime.date.today().isoformat(),
+        ban_reason=ban_reason,
+    )
+    await userdb.update_one({"id": user_id}, {"$set": {"ban_status": ban_status}})
+
 
 async def get_ban_status(id):
-    try:
-        if not isinstance(id, int):
-            raise ValueError("ID harus berupa integer.")
-        default = dict(
-            is_banned=False,
-            ban_duration=0,
-            banned_on=datetime.date.max.isoformat(),
-            ban_reason="",
-        )
-        user = await userdb.find_one({"id": int(id)})
-        return user.get("ban_status", default)
-    except Exception as e:
-        print(f"Error getting ban status: {e}")
-        return default
+    default = dict(
+        is_banned=False,
+        ban_duration=0,
+        banned_on=datetime.date.max.isoformat(),
+        ban_reason="",
+    )
+    user = await userdb.find_one({"id": int(id)})
+    return user.get("ban_status", default)
+
 
 async def get_all_banned_users():
     return userdb.find({"ban_status.is_banned": True})
