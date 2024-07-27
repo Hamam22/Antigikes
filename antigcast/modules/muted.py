@@ -19,23 +19,26 @@ async def is_admin_or_owner(client, chat_id, user_id):
 
 @Bot.on_message(filters.command("pl") & ~filters.private)
 async def mute_handler(app: Bot, message: Message):
+    print("Perintah pl diterima")  # Debugging statement
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
+        print("Bukan admin")  # Debugging statement
         return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
 
+    print("Admin terdeteksi")  # Debugging statement
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di mute.")
 
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user
-    else:
-        user_input = message.command[1]
-        try:
-            if user_input.isdigit():
-                user = await app.get_users(int(user_input))
-            else:
-                user = await app.get_users(user_input)
-        except PeerIdInvalid:
-            return await message.reply_text("Tidak dapat menemukan pengguna dengan nama tersebut.")
+    try:
+        if message.reply_to_message:
+            user = message.reply_to_message.from_user
+        else:
+            user_input = message.command[1]
+            user = await app.get_users(int(user_input)) if user_input.isdigit() else await app.get_users(user_input)
+    except PeerIdInvalid:
+        return await message.reply_text("Tidak dapat menemukan pengguna dengan nama tersebut.")
+    except Exception as e:
+        print(f"Error getting user: {e}")  # Debugging statement
+        return await message.reply_text("Terjadi kesalahan saat mencari pengguna.")
 
     user_id = user.id
     group_id = message.chat.id
@@ -52,14 +55,14 @@ async def mute_handler(app: Bot, message: Message):
 
     xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
-    muted = await get_muted_users_in_group(group_id)
-    if any(u['user_id'] == user_id for u in muted):
-        await xxnx.edit("**Pengguna ini sudah ada di daftar mute.**")
-        await asyncio.sleep(10)
-        await xxnx.delete()
-        return
-
     try:
+        muted = await get_muted_users_in_group(group_id)
+        if any(u['user_id'] == user_id for u in muted):
+            await xxnx.edit("**Pengguna ini sudah ada di daftar mute.**")
+            await asyncio.sleep(10)
+            await xxnx.delete()
+            return
+
         user_name = f"{user.first_name or ''} {user.last_name or ''}"
         await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
         await xxnx.edit(
@@ -68,8 +71,9 @@ async def mute_handler(app: Bot, message: Message):
         await asyncio.sleep(10)
         await xxnx.delete()
     except Exception as e:
+        print(f"Error muting user: {e}")  # Debugging statement
         await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
-
+        
 @Bot.on_message(filters.command("ungdel") & ~filters.private)
 async def unmute_handler(app: Bot, message: Message):
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
