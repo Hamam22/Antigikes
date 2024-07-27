@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from pyrogram.errors import FloodWait, PeerIdInvalid, UserNotParticipant
 from pyrogram.enums import ChatMemberStatus as STATUS
 
-from antigcast.helpers.tools import extract
+from antigcast.helpers.tools import *
 from antigcast.helpers.database import *
 
 async def is_admin_or_owner(client, chat_id, user_id):
