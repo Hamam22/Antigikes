@@ -17,7 +17,7 @@ async def is_admin_or_owner(client, chat_id, user_id):
     except:
         return False
 
-@Bot.on_message(filters.command("pl") & ~filters.private)
+@Bot.on_message(filters.command("pll") & ~filters.private)
 async def mute_handler(app: Bot, message: Message):
     # Check if the command issuer is an admin
     if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
