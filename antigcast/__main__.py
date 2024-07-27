@@ -1,13 +1,15 @@
 import asyncio
+import os
+import sys
+from datetime import datetime, timedelta
 from antigcast import Bot, app
-from sys import version as pyver
-
 from antigcast.config import LOGGER, LOG_CHANNEL_ID
-from pyrogram import _version_ as pyrover
+from pyrogram import __version__ as pyrover
 from pyrogram import idle
 from antigcast.helpers.tools import checkExpired
 
-loop = asyncio.get_event_loop_policy().get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 msg = """
 **🇲🇨Berhasil Di Aktifkan🇲🇨**
@@ -26,12 +28,10 @@ async def send_reminder():
 
     # Kirim pesan pengingat
     reminder_message = f"🗓️ Tanggal: {reminder_time.strftime('%d-%m-%Y')}\n🕕 Jam: {reminder_time.strftime('%H:%M:%S')}"
-    LOGGER("INFO").info(f"Sending reminder: {reminder_message}")
-    try:
-        await app.send_message(LOG_CHANNEL_ID, reminder_message)
-    except Exception as e:
-        LOGGER("ERROR").error(f"Failed to send reminder: {e}")
-
+    print(reminder_message)
+    # Jika Anda ingin mengirim ke saluran, gunakan:
+    # await app.send_message(LOG_CHANNEL_ID, reminder_message)
+    
 async def auto_restart():
     # Jalankan pengingat sebagai task latar belakang
     asyncio.create_task(send_reminder())
