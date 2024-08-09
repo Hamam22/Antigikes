@@ -77,7 +77,7 @@ async def handle_mute_unmute(app, message, action):
     except Exception as e:
         await action_message.edit(f"**Gagal {action} pengguna:** `{e}`")
 
-@Bot.on_message(filters.command("pl") & ~filters.private)
+@Bot.on_message(filters.command("pl"))
 async def mute_handler(app: Bot, message: Message):
     await handle_mute_unmute(app, message, "mute")
 
