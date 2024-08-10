@@ -3,7 +3,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "6048377445:AAHPf995y8TcIOw77bXEz7deYfaZhc8Dmw0")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "6048377445:AAEw5_rEmTLGw4K9xy5NLsEZKTOdc0oYvQE")
 BOT_WORKERS = int(os.environ.get("BOT_WORKERS", "4"))
 
 APP_ID = int(os.environ.get("APP_ID", "25639252"))
@@ -18,7 +18,7 @@ BROADCAST_AS_COPY = True
 PLUG = dict(root="BocilAnti/plugins")
 
 OWNER_ID = [int(x) for x in (os.environ.get("OWNER_ID", "843830036").split())]
-OWNER_NAME = os.environ.get("OWNER_NAME", "843830036")
+OWNER_NAME = os.environ.get("OWNER_NAME", "babah")
 
 
 LOG_FILE_NAME = "BocilAnti_logs.txt"
@@ -31,7 +31,7 @@ logging.basicConfig(
         logging.StreamHandler(),
     ],
 )
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
+logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
 def LOGGER(name: str) -> logging.Logger:
     return logging.getLogger(name)
