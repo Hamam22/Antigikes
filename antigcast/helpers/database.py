@@ -113,28 +113,35 @@ async def rem_served_chat(trigger) -> bool:
     
 
 # ACTIVED_CHATS
-async def get_actived_chats() -> list:
-    acctivedchats = await actchat.find_one({"acctivedchat": "acctivedchat"})
-    if not acctivedchats:
+async def get_active_chats() -> list:
+    active_chats = await actchat.find_one({"acctivedchat": "acctivedchat"})
+    if not active_chats:
         return []
-    return acctivedchats["acctivedchats"]
+    return active_chats.get("acctivedchats", [])
 
-
-async def add_actived_chat(trigger) -> bool:
-    acctivedchats = await get_actived_chats()
-    acctivedchats.append(trigger)
-    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
-    return True
-
-
-async def rem_actived_chat(trigger) -> bool:
-    acctivedchats = await get_actived_chats()
-    if trigger in acctivedchats:
-        acctivedchats.remove(trigger)
-        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+async def add_active_chat(chat_id) -> bool:
+    active_chats = await get_active_chats()
+    if chat_id not in active_chats:
+        active_chats.append(chat_id)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": active_chats}},
+            upsert=True
+        )
         return True
-    else:
-        return False
+    return False
+
+async def remove_active_chat(chat_id) -> bool:
+    active_chats = await get_active_chats()
+    if chat_id in active_chats:
+        active_chats.remove(chat_id)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": active_chats}},
+            upsert=True
+        )
+        return True
+    return False
         
 
 
