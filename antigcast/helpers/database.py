@@ -114,26 +114,27 @@ async def rem_served_chat(trigger) -> bool:
 
 # ACTIVED_CHATS
 async def get_actived_chats() -> list:
-    # Mengambil semua chat aktif dari koleksi dengan status "active"
-    acctivedchats = await actchat.find({"status": "active"}).to_list(length=None)
-    return [chat["trigger"] for chat in acctivedchats]
+    acctivedchats = await actchat.find_one({"acctivedchat": "acctivedchat"})
+    if not acctivedchats:
+        return []
+    return acctivedchats["acctivedchats"]
+
 
 async def add_actived_chat(trigger) -> bool:
-    # Menambahkan chat aktif dengan status "active"
-    result = await actchat.update_one(
-        {"trigger": trigger},
-        {"$set": {"status": "active"}},
-        upsert=True
-    )
-    return result.modified_count > 0 or result.upserted_id is not None
+    acctivedchats = await get_actived_chats()
+    acctivedchats.append(trigger)
+    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+    return True
+
 
 async def rem_actived_chat(trigger) -> bool:
-    # Menandai chat sebagai tidak aktif
-    result = await actchat.update_one(
-        {"trigger": trigger, "status": "active"},
-        {"$set": {"status": "inactive"}}
-    )
-    return result.modified_count > 0
+    acctivedchats = await get_actived_chats()
+    if trigger in acctivedchats:
+        acctivedchats.remove(trigger)
+        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+        return True
+    else:
+        return False
         
 
 
