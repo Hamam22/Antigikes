@@ -104,6 +104,7 @@ async def deletermessag(app: Bot, message: Message):
     text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
     chats = await get_actived_chats()
+
     if chat not in chats:
         await message.reply(text=text)
         await asyncio.sleep(5)
@@ -113,7 +114,7 @@ async def deletermessag(app: Bot, message: Message):
             print(e)
         return
 
-    # Hapus pesan
+    # Hapus pesan hanya jika grup tidak terdaftar
     try:
         await message.delete()
     except FloodWait as e:
