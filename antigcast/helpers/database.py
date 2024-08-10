@@ -135,6 +135,7 @@ async def rem_actived_chat(trigger) -> bool:
         return True
     else:
         return False
+        
 
 
 #BLWORD
