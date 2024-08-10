@@ -5,14 +5,12 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from antigcast import Bot
 
-from antigcast.config import *
-
-
+# Konfigurasi waktu
 START_TIME_UTC = datetime.utcnow()
 START_TIME_WIB = START_TIME_UTC + timedelta(hours=7)
 START_TIME_WIB_ISO = START_TIME_WIB.replace(microsecond=0).isoformat()
 
-
+# Konstanta durasi waktu
 TIME_DURATION_UNITS = (
     ("week", 60 * 60 * 24 * 7),
     ("day", 60**2 * 24),
@@ -21,8 +19,8 @@ TIME_DURATION_UNITS = (
     ("sec", 1),
 )
 
-
 async def _human_time_duration(seconds):
+    """Mengonversi detik ke format durasi waktu yang lebih manusiawi."""
     if seconds == 0:
         return "inf"
     parts = []
@@ -34,6 +32,7 @@ async def _human_time_duration(seconds):
 
 @Bot.on_message(filters.command("pung") & filters.group, group=28)
 async def ping_pong(client: Client, message: Message):
+    """Menangani perintah /pung untuk ping dan uptime."""
     start = time()
     current_time = datetime.utcnow()
     uptime_sec = (current_time - START_TIME_UTC).total_seconds()
@@ -41,19 +40,14 @@ async def ping_pong(client: Client, message: Message):
     m_reply = await message.reply("Pinging...")
     delta_ping = time() - start
     await m_reply.edit(
-        "**PONG!!**🏓 \n"
+        "**PONG!!**🏓\n"
         f"**• Pinger -** `{delta_ping * 1000:.3f}ms`\n"
-        f"**• Uptime -** `{uptime}`\n"
-        f"\n<details><summary>More Info</summary><blockquote>\n"
-        f"**Detailed Information**\n"
-        f"- Ping Time: `{delta_ping * 1000:.3f}ms`\n"
-        f"- Uptime: `{uptime}`\n"
-        "</blockquote></details>"
+        f"**• Uptime -** `{uptime}`"
     )
-
 
 @Bot.on_message(filters.command("time") & filters.group, group=27)
 async def get_uptime(client: Client, message: Message):
+    """Menangani perintah /time untuk menampilkan uptime dan waktu mulai bot."""
     current_time_utc = datetime.utcnow()
     current_time_wib = current_time_utc + timedelta(hours=7)
     uptime_sec = (current_time_utc - START_TIME_UTC).total_seconds()
@@ -62,10 +56,7 @@ async def get_uptime(client: Client, message: Message):
         "🤖 **Bot Status:**\n"
         f"• **Uptime:** `{uptime}`\n"
         f"• **Start Time:** `{START_TIME_WIB_ISO}` (WIB)\n"
-        f"\n<details><summary>More Info</summary><blockquote>\n"
-        f"**Detailed Information**\n"
-        f"- Current UTC Time: `{current_time_utc}`\n"
-        f"- Current WIB Time: `{current_time_wib}`\n"
-        f"- Uptime in Seconds: `{uptime_sec}`\n"
-        "</blockquote></details>"
+        f"• **Current UTC Time:** `{current_time_utc}`\n"
+        f"• **Current WIB Time:** `{current_time_wib}`\n"
+        f"• **Uptime in Seconds:** `{uptime_sec}`"
     )
