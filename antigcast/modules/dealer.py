@@ -103,7 +103,7 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
 async def deletermessag(app: Bot, message: Message):
     text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
-    chats = await get_actived_chats()
+    chats = await get_active_chats()
 
     if chat not in chats:
         await message.reply(text=text)
