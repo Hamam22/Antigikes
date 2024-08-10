@@ -110,7 +110,7 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
     except Exception as e:
         await message.reply(f"Error: {e}")
 
-@Bot.on_message(filters.text & ~filters.private & Gcast)
+@Bot.on_message(filters.text & ~filters.private)
 async def deletermessag(app: Bot, message: Message):
     text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\nBot akan meninggalkan group!</blockquote>"
     chat = message.chat.id
