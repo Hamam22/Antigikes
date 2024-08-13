@@ -2,20 +2,24 @@ from pyrogram import filters
 from antigcast.helpers.database import *
 
 async def isGcast(filter, client, update):
-    message_text = update.text.lower()  # Ambil teks pesan dan ubah ke huruf kecil
-
-    # Ambil daftar kata-kata blacklist
-    blacklist_words = await get_bl_words()
+    # Ambil teks pesan
+    message_text = update.text.lower()
+    
+    # Ambil daftar kata-kata blacklist dari database
+    db_blacklist_words = await get_bl_words()
 
     # Baca daftar kata dari file 'bl.txt'
-    with open('bl.txt', 'r') as file:
-        blacklist_file_words = [w.lower().strip() for w in file.readlines()]
+    try:
+        with open('bl.txt', 'r') as file:
+            file_blacklist_words = [w.lower().strip() for w in file.readlines()]
+    except FileNotFoundError:
+        file_blacklist_words = []
 
     # Gabungkan daftar blacklist
-    blacklist_words.extend(blacklist_file_words)
+    all_blacklist_words = set(db_blacklist_words + file_blacklist_words)
 
-    # Cek apakah pesan mengandung kata dari blacklist
-    if any(word in message_text for word in blacklist_words):
+    # Cek apakah pesan mengandung kata-kata dari blacklist
+    if any(word in message_text for word in all_blacklist_words):
         return True
 
     # Cek apakah pengguna sedang dibisukan
