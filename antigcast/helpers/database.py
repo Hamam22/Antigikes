@@ -13,8 +13,9 @@ blackword = db['BLACKWORDS']
 owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
-mute_collection = db['GROUPMUTE']
+mutedb = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
+sellerr_collection = db['SELLERINFO']
 
 #USERS
 def new_user(id):
