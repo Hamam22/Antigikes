@@ -114,8 +114,9 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
 async def deletermessag(app: Bot, message: Message):
     text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\nBot akan meninggalkan group!</blockquote>"
     chat = message.chat.id
-    chats = await get_actived_chats()
-    if chat not in chats:
+
+    # Menyederhanakan logika: jika grup ini bukan grup yang ingin diproses, hapus pesan
+    if not chat in list_of_grups_to_process:  # Misalkan list_of_grups_to_process adalah daftar grup yang sah
         await message.reply(text=text)
         await asyncio.sleep(5)
         try:
