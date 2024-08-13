@@ -1,16 +1,16 @@
 
 import asyncio
 
-from BocilAnti import Bot
+from antigikes import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
-from BocilAnti.config import *
-from BocilAnti.helpers.tools import *
-from BocilAnti.helpers.admins import *
-from BocilAnti.helpers.message import *
-from BocilAnti.helpers.database import *
+from antigikes.config import *
+from antigikes.helpers.tools import *
+from antigikes.helpers.admins import *
+from antigikes.helpers.message import *
+from antigikes.helpers.database import *
 
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
