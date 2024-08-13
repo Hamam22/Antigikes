@@ -1,5 +1,5 @@
 from pyrogram import filters
-from BocilAnti.helpers.database import *
+from antigcast.helpers.database import *
 
 
 async def isGcast(filter, client, update):
