@@ -5,7 +5,6 @@ from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
-from antigcast.config import *
 from antigcast.helpers.tools import *
 from antigcast.helpers.admins import *
 from antigcast.helpers.message import *
@@ -57,7 +56,7 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.group, group=1 & Gcast)
+@Bot.on_message(@Bot.on_message(filters.text & ~filters.private & Member & Gcast))
 async def deletermessag(app : Bot, message : Message):
     text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
