@@ -77,6 +77,8 @@ async def deletermessag(app: Bot, message: Message):
         except Exception as e:
             print(f"Error while leaving chat {chat}: {e}")  # Debugging: Menangani kesalahan saat meninggalkan chat
         return
+    else:
+        print(f"Chat {chat} is in active chats. Processing message deletion...")  # Debugging: Chat terdaftar
 
     try:
         await message.delete()
