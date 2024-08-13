@@ -7,10 +7,10 @@ async def isGcast(filter, client, update):
     
     # Debug: Print pesan yang diterima
     print(f"Pesan yang diterima: {message_text}")
-    
+
     # Ambil daftar kata-kata blacklist dari database
     db_blacklist_words = await get_bl_words()
-    
+
     # Debug: Print kata-kata blacklist dari database
     print(f"Kata-kata blacklist dari database: {db_blacklist_words}")
 
@@ -48,3 +48,21 @@ async def isGcast(filter, client, update):
     return False
 
 Gcast = filters.create(isGcast)
+
+@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
+async def handle_message(app, Bot message):
+    message_text = message.text.lower()
+    if await isGcast(None, app, message):
+        await message.delete()
+    else:
+        text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
+        chat = message.chat.id
+        chats = await get_actived_chats()
+        if chat not in chats:
+            await message.reply(text=text)
+            await asyncio.sleep(5)
+            try:
+                await app.leave_chat(chat)
+            except UserNotParticipant as e:
+                print(e)
+            return
