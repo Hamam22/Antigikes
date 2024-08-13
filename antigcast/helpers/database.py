@@ -1,6 +1,6 @@
 import datetime
 from pytz import timezone
-from antigcast.config import MONGO_DB_URI, DB_NAME
+from BocilAnti.config import MONGO_DB_URI, DB_NAME
 from motor.motor_asyncio import AsyncIOMotorClient
 
 mongo_client = AsyncIOMotorClient(MONGO_DB_URI)
@@ -13,10 +13,8 @@ blackword = db['BLACKWORDS']
 owner = db['OWNERS']
 exp = db['EXP']
 globaldb = db['GLOBALMUTE']
-mutedb = db['GROUPMUTE']
+mute_collection = db['GROUPMUTE']
 sellers_collection = db['ADDSELLER']
-sellerr_collection = db['SELLERINFO']
-impdb = db['PRETENDER']
 
 #USERS
 def new_user(id):
@@ -135,10 +133,9 @@ async def rem_actived_chat(trigger) -> bool:
         return True
     else:
         return False
-        
 
 
-#BLWORD
+# BLACKLIST_WORD
 async def get_bl_words() -> list:
     filters = await blackword.find_one({"filter": "filter"})
     if not filters:
@@ -161,6 +158,7 @@ async def remove_bl_word(trigger) -> bool:
     await blackword.update_one({"filter": "filter"}, {"$set": {"filters": filters}}, upsert=True)
     return True
     
+
 # OWNER
 async def get_owners() -> list:
     owners = await owner.find_one({"owner": "owner"})
