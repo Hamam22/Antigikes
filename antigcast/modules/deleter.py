@@ -110,15 +110,17 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
     except Exception as e:
         await message.reply(f"Error: {e}")
 
-from pyrogram import Client, filters
-from pyrogram.errors import FloodWait
-import asyncio
 
-@Bot.on_message(filters.text & ~filters.private & Gcast & filters.group, group=78)
+# Fungsi untuk memeriksa apakah teks mengandung kata dari daftar hitam
+async def is_blacklisted(text, bl_words):
+    """ Check if the text contains any blacklisted words """
+    return any(word in text for word in bl_words)
+
+@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
 async def deletermessag(app: Bot, message: Message):
     chat_id = message.chat.id
     active_chats = await get_actived_chats()
-    
+
     # Periksa apakah chat_id ada dalam daftar chat aktif
     if chat_id not in active_chats:
         text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\nBot akan meninggalkan group!</blockquote>"
@@ -126,23 +128,35 @@ async def deletermessag(app: Bot, message: Message):
         await asyncio.sleep(5)  # Tunggu beberapa detik sebelum meninggalkan grup
         try:
             await app.leave_chat(chat_id)
+            print(f"Bot left chat: {chat_id}")
         except Exception as e:
             print(f"Error leaving chat: {e}")
         return
 
     # Mendapatkan teks pesan
     message_text = message.text.lower()
+    print(f"Received message: '{message_text}'")
 
     # Membaca daftar kata dari file bl.txt
-    with open('bl.txt', 'r') as file:
-        bl_words = [word.lower().strip() for word in file.readlines()]
+    try:
+        with open('bl.txt', 'r') as file:
+            bl_words = [word.lower().strip() for word in file.readlines()]
+    except Exception as e:
+        print(f"Error reading bl.txt: {e}")
+        return
+
+    print(f"Blacklisted words: {bl_words}")
 
     # Memeriksa apakah pesan mengandung kata-kata dari daftar bl.txt
-    if any(word in message_text for word in bl_words):
+    if await is_blacklisted(message_text, bl_words):
+        print(f"Message contains blacklisted words. Deleting message.")
         try:
             await message.delete()
         except FloodWait as e:
+            print(f"FloodWait exception: {e.value}. Sleeping for {e.value} seconds.")
             await asyncio.sleep(e.value)
             await message.delete()
         except Exception as e:
             print(f"Error deleting message: {e}")
+    else:
+        print(f"Message does not contain blacklisted words.")
