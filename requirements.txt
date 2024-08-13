@@ -1,6 +1,6 @@
 motor[srv]
 pytz
-pyrogram
+pyrofork==2.3.28
 tgcrypto
 aiofiles
 python-dateutil
