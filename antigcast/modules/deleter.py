@@ -64,7 +64,7 @@ async def handle_message(app: Bot, message: Message):
     message_text = message.text.lower()
 
     # Ambil daftar kata-kata blacklist
-    blacklist = await get_blacklist_words()
+    blacklist = await get_bl_words()
 
     # Cek apakah pesan mengandung kata-kata dari blacklist
     if any(word in message_text for word in blacklist):
