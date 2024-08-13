@@ -60,21 +60,13 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
 async def handle_message(app: Bot, message: Message):
-    # Ambil teks pesan
     message_text = message.text.lower()
-
-    # Ambil daftar kata-kata blacklist
-    blacklist = await get_bl_words()
-
-    # Cek apakah pesan mengandung kata-kata dari blacklist
-    if any(word in message_text for word in blacklist):
+    if await isGcast(None, app, message):
         await message.delete()
     else:
-        # Jika pesan tidak mengandung kata-kata blacklist, lakukan pengecekan grup
         text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
         chat = message.chat.id
         chats = await get_actived_chats()
-
         if chat not in chats:
             await message.reply(text=text)
             await asyncio.sleep(5)
@@ -82,3 +74,4 @@ async def handle_message(app: Bot, message: Message):
                 await app.leave_chat(chat)
             except UserNotParticipant as e:
                 print(e)
+            return
