@@ -1,4 +1,3 @@
-
 import asyncio
 
 from antigcast import Bot
@@ -62,7 +61,6 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 async def deletermessag(app: Bot, message: Message):
     text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**</blockquote>"
     chat = message.chat.id
-    chats = await get_actived_chats()
     if chat not in chats:
         await message.reply(text=text)
         await asyncio.sleep(5)
