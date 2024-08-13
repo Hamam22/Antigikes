@@ -114,7 +114,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 import asyncio
 
-@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
+@Bot.on_message(filters.text & ~filters.private & Gcast & filters.group, group=78)
 async def deletermessag(app: Bot, message: Message):
     chat_id = message.chat.id
     active_chats = await get_actived_chats()
