@@ -59,19 +59,23 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
-async def handle_message(app: Bot, message: Message):
-    message_text = message.text.lower()
-    if await isGcast(None, app, message):
+async def deletermessag(app: Bot, message: Message):
+    text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**</blockquote>"
+    chat = message.chat.id
+    chats = await get_actived_chats()
+    if chat not in chats:
+        await message.reply(text=text)
+        await asyncio.sleep(5)
+        try:
+            await app.leave_chat(chat)
+        except Exception as e:
+            print(e)
+        return
+
+    try:
         await message.delete()
-    else:
-        text = "Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
-        chat = message.chat.id
-        chats = await get_actived_chats()
-        if chat not in chats:
-            await message.reply(text=text)
-            await asyncio.sleep(5)
-            try:
-                await app.leave_chat(chat)
-            except UserNotParticipant as e:
-                print(e)
-            return
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        await message.delete()
+    except Exception as e:
+        print(e)
