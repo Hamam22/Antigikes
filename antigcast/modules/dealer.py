@@ -56,7 +56,7 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
     await message.delete()
 
 
-@Bot.on_message(filters.text & ~filters.private & Member & Gcast))
+@Bot.on_message(filters.text & ~filters.private & Gcast)
 async def deletermessag(app : Bot, message : Message):
     text = f"Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**"
     chat = message.chat.id
