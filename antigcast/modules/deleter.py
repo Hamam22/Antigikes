@@ -110,12 +110,29 @@ async def daftar_grup_blacklist(app: Bot, message: Message):
     except Exception as e:
         await message.reply(f"Error: {e}")
 
-@Bot.on_message(filters.text & ~filters.private)
+@Bot.on_message(filters.text & ~filters.private & Member & Gcast)
 async def deletermessag(app: Bot, message: Message):
+    text = (
+        "Maaf, grup ini tidak terdaftar dalam list. "
+        "Silahkan hubungi @Zenithnewbie untuk mendaftarkan grup Anda.\n\n"
+        "**Bot akan meninggalkan grup!**"
+    )
+    chat = message.chat.id
+    chats = await get_actived_chats()
+    if chat not in chats:
+        await message.reply(text=text)
+        await asyncio.sleep(5)
+        try:
+            await app.leave_chat(chat)
+        except UserNotParticipant as e:
+            print(f"Error leaving chat: {e}")
+        return
+
+    # Delete the message
     try:
         await message.delete()
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await message.delete()
-    except Exception as e:
-        print(e)
+    except MessageDeleteForbidden:
+        pass
