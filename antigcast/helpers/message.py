@@ -1,4 +1,5 @@
 from pyrogram import filters
+from antigcast import Bot
 from antigcast.helpers.database import *
 
 
