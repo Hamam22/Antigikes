@@ -4,13 +4,13 @@ import datetime
 from pytz import timezone
 from dateutil.relativedelta import relativedelta
 
-from BocilAnti import Bot
+from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 
-from BocilAnti.config import OWNER_ID
-from BocilAnti.helpers.tools import *
-from BocilAnti.helpers.database import *
+from antigcast.config import OWNER_ID
+from antigcast.helpers.tools import *
+from antigcast.helpers.database import *
 
 
 #SUPPORT BY PYROGRAM !!!!!!
