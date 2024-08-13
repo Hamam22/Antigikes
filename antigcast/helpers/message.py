@@ -50,7 +50,7 @@ async def isGcast(filter, client, update):
 Gcast = filters.create(isGcast)
 
 @Bot.on_message(filters.text & ~filters.private & Member & Gcast)
-async def handle_message(app, Bot message):
+async def handle_message(app: Bot, message: Message):
     message_text = message.text.lower()
     if await isGcast(None, app, message):
         await message.delete()
