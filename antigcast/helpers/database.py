@@ -116,25 +116,32 @@ async def get_actived_chats() -> list:
     acctivedchats = await actchat.find_one({"acctivedchat": "acctivedchat"})
     if not acctivedchats:
         return []
+    print(f"Data diambil: {acctivedchats}")
     return acctivedchats["acctivedchats"]
-
 
 async def add_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
-    acctivedchats.append(trigger)
-    await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
-    return True
-
+    if trigger not in acctivedchats:
+        acctivedchats.append(trigger)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": acctivedchats}},
+            upsert=True
+        )
+        return True
+    return False
 
 async def rem_actived_chat(trigger) -> bool:
     acctivedchats = await get_actived_chats()
     if trigger in acctivedchats:
         acctivedchats.remove(trigger)
-        await actchat.update_one({"acctivedchat": "acctivedchat"}, {"$set": {"acctivedchats": acctivedchats}}, upsert=True)
+        await actchat.update_one(
+            {"acctivedchat": "acctivedchat"},
+            {"$set": {"acctivedchats": acctivedchats}},
+            upsert=True
+        )
         return True
-    else:
-        return False
-
+    return False
 
 # BLACKLIST_WORD
 async def get_bl_words() -> list:
