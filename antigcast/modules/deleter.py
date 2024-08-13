@@ -1,16 +1,16 @@
 
 import asyncio
 
-from antigikes import Bot
+from antigcast import Bot
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait, MessageDeleteForbidden, UserNotParticipant
 
-from antigikes.config import *
-from antigikes.helpers.tools import *
-from antigikes.helpers.admins import *
-from antigikes.helpers.message import *
-from antigikes.helpers.database import *
+from antigcast.config import *
+from antigcast.helpers.tools import *
+from antigcast.helpers.admins import *
+from antigcast.helpers.message import *
+from antigcast.helpers.database import *
 
 
 @Bot.on_message(filters.command("bl") & ~filters.private & Admin)
