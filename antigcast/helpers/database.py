@@ -113,7 +113,6 @@ async def rem_served_chat(trigger) -> bool:
 
 # ACTIVED_CHATS
 async def get_actived_chats() -> list:
-async def get_actived_chats() -> list:
     acctivedchats = await actchat.find_one({"acctivedchat": "acctivedchat"})
     if not acctivedchats:
         return []
