@@ -61,19 +61,29 @@ async def hapus_dari_blacklist(app: Bot, message: Message):
 async def deletermessag(app: Bot, message: Message):
     text = "<blockquote>Maaf, Grup ini tidak terdaftar di dalam list. Silahkan hubungi @Zenithnewbie Untuk mendaftarkan Group Anda.\n\n**Bot akan meninggalkan group!**</blockquote>"
     chat = message.chat.id
+    print(f"Received message in chat: {chat}")  # Debugging: Print chat ID
+
+    # Mendapatkan daftar chat aktif
+    chats = await get_actived_chats()
+    print(f"Active chats: {chats}")  # Debugging: Print daftar chat aktif
+
     if chat not in chats:
+        print(f"Chat {chat} not in active chats. Replying and leaving...")  # Debugging: Chat tidak terdaftar
         await message.reply(text=text)
         await asyncio.sleep(5)
         try:
             await app.leave_chat(chat)
+            print(f"Bot has left chat {chat}")  # Debugging: Berhasil meninggalkan chat
         except Exception as e:
-            print(e)
+            print(f"Error while leaving chat {chat}: {e}")  # Debugging: Menangani kesalahan saat meninggalkan chat
         return
 
     try:
         await message.delete()
+        print(f"Message in chat {chat} deleted")  # Debugging: Pesan berhasil dihapus
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await message.delete()
+        print(f"Message in chat {chat} deleted after flood wait")  # Debugging: Pesan dihapus setelah menunggu flood
     except Exception as e:
-        print(e)
+        print(f"Error while deleting message in chat {chat}: {e}")  # Debugging: Menangani kesalahan saat menghapus pesan
