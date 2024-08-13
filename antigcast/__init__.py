@@ -1,9 +1,9 @@
 import sys
 from pyromod import listen
 from pyrogram import Client
-from BocilAnti.config import API_HASH, APP_ID, BOT_TOKEN,LOG_CHANNEL_ID , LOGGER
+from antigcast.config import API_HASH, APP_ID, BOT_TOKEN,LOG_CHANNEL_ID , LOGGER
 
-from BocilAnti.helpers.database import *
+from antigcast.helpers.database import *
 
 
 class Bot(Client):
