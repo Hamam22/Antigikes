@@ -1,13 +1,17 @@
 import asyncio
-from antigcast import Bot
-from pyrogram import filters
-from pyrogram.types import Message
+import logging
+from AnonXMusic import app
+from AnonXMusic.utils.database import *
+from pyrogram import Client, filters
 from pyrogram.errors import FloodWait, PeerIdInvalid, UserNotParticipant
 from pyrogram.enums import ChatMemberStatus as STATUS
+from pyrogram.types import Message
+from config import BANNED_USERS
 
-from antigcast.helpers.tools import *
-from antigcast.helpers.database import *
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+# Function to check if the user is an admin or owner
 async def is_admin_or_owner(app, chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id=chat_id, user_id=user_id)
@@ -15,15 +19,17 @@ async def is_admin_or_owner(app, chat_id, user_id):
     except (FloodWait, UserNotParticipant):
         return False
     except Exception as e:
-        print(f"Error in is_admin_or_owner: {e}")
+        logger.error(f"Error in is_admin_or_owner: {e}")
         return False
 
-@Bot.on_message(filters.command("pl") & ~filters.private)
-async def mute_handler(app: Bot, message: Message):
-    print(f"Received /pl command from {message.from_user.id}")
+# Command handler for muting a user
+@app.on_message(filters.command("pl") & filters.group & ~(BANNED_USERS))
+async def mute_handler(client, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
-        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+    if not await is_admin_or_owner(client, chat_id, user_id):
+        return await message.reply("Hanya admin atau pemilik grup yang bisa menggunakan perintah ini.")
 
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di mute.")
@@ -33,55 +39,37 @@ async def mute_handler(app: Bot, message: Message):
     else:
         user_input = message.command[1]
         try:
-            if user_input.isdigit():
-                user = await app.get_users(int(user_input))
-            else:
-                user = await app.get_users(user_input)
+            user = await client.get_users(int(user_input)) if user_input.isdigit() else await client.get_users(user_input)
         except PeerIdInvalid:
             return await message.reply_text("Tidak dapat menemukan pengguna dengan nama tersebut.")
-        except Exception as e:
-            print(f"Error in retrieving user: {e}")
-            return await message.reply_text("Terjadi kesalahan saat mencari pengguna.")
 
-    user_id = user.id
-    group_id = message.chat.id
-    issuer_id = message.from_user.id
+    target_user_id = user.id
     issuer_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}"
 
-    if user_id == issuer_id:
+    if target_user_id == user_id:
         return await message.reply_text("Kamu tidak bisa mute diri sendiri.")
-    elif user_id == app.me.id:
+    elif target_user_id == client.me.id:
         return await message.reply_text("Kamu tidak bisa mute bot.")
 
-    if await is_admin_or_owner(app, message.chat.id, user_id):
-        return await message.reply_text("Kamu tidak bisa mute admin atau owner.")
+    response = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
 
-    xxnx = await message.reply("`Menambahkan pengguna ke dalam daftar mute...`")
+    await mute_user_in_group(chat_id, target_user_id, user_id, issuer_name)
 
-    muted = await get_muted_users_in_group(group_id)
-    if any(u['user_id'] == user_id for u in muted):
-        await xxnx.edit("**Pengguna ini sudah ada di daftar mute.**")
-        await asyncio.sleep(10)
-        await xxnx.delete()
-        return
+    await response.edit(
+        f"<b><blockquote>Pengguna berhasil di mute</blockquote>\n- Nama: {user.first_name}\n"
+        f"- User ID: <code>{target_user_id}</code>\n- Di-mute oleh: {issuer_name}</b>"
+    )
+    await asyncio.sleep(10)
+    await response.delete()
 
-    try:
-        user_name = f"{user.first_name or ''} {user.last_name or ''}"
-        await mute_user_in_group(group_id, user_id, issuer_id, issuer_name)
-        await xxnx.edit(
-            f"<b><blockquote>Pengguna berhasil di mute</blockquote>\n- Nama: {user_name}\n- User ID: <code>{user_id}</code>\n- Di-mute oleh: {issuer_name}</b>"
-        )
-        await asyncio.sleep(10)
-        await xxnx.delete()
-    except Exception as e:
-        await xxnx.edit(f"**Gagal mute pengguna:** `{e}`")
+# Command handler for unmuting a user
+@app.on_message(filters.command("unpl") & filters.group & ~(BANNED_USERS))
+async def unmute_handler(client, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-@Bot.on_message(filters.command("ungdel") & ~filters.private)
-async def unmute_handler(app: Bot, message: Message):
-    print(f"Received /ungdel command from {message.from_user.id}")
-
-    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
-        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+    if not await is_admin_or_owner(client, chat_id, user_id):
+        return await message.reply("Hanya admin atau pemilik grup yang bisa menggunakan perintah ini.")
 
     if not message.reply_to_message and len(message.command) < 2:
         return await message.reply_text("Berikan saya ID atau nama pengguna yang ingin di unmute.")
@@ -91,71 +79,53 @@ async def unmute_handler(app: Bot, message: Message):
     else:
         user_input = message.command[1]
         try:
-            if user_input.isdigit():
-                user = await app.get_users(int(user_input))
-            else:
-                user = await app.get_users(user_input)
+            user = await client.get_users(int(user_input)) if user_input.isdigit() else await client.get_users(user_input)
         except PeerIdInvalid:
             return await message.reply_text("Tidak dapat menemukan pengguna dengan nama tersebut.")
-        except Exception as e:
-            print(f"Error in retrieving user: {e}")
-            return await message.reply_text("Terjadi kesalahan saat mencari pengguna.")
 
-    user_id = user.id
-    group_id = message.chat.id
-    issuer_id = message.from_user.id
+    target_user_id = user.id
     issuer_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}"
 
-    if user_id == issuer_id:
+    if target_user_id == user_id:
         return await message.reply_text("Kamu tidak bisa unmute diri sendiri.")
-    elif user_id == app.me.id:
+    elif target_user_id == client.me.id:
         return await message.reply_text("Kamu tidak bisa unmute bot.")
 
-    xxnx = await message.reply("`Menghapus pengguna dari daftar mute...`")
+    response = await message.reply("`Menghapus pengguna dari daftar mute...`")
 
-    muted = await get_muted_users_in_group(group_id)
-    if not any(u['user_id'] == user_id for u in muted):
-        await xxnx.edit("**Pengguna ini tidak ada di daftar mute.**")
-        await asyncio.sleep(10)
-        await xxnx.delete()
-        return
+    await unmute_user_in_group(chat_id, target_user_id)
 
-    try:
-        await unmute_user_in_group(group_id, user_id)
-        await xxnx.edit(
-            f"<blockquote>**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{user_id}`</blockquote>"
-        )
-        await asyncio.sleep(10)
-        await xxnx.delete()
-        await message.delete()
-    except Exception as e:
-        await xxnx.edit(f"**Gagal unmute pengguna:** `{e}`")
+    await response.edit(f"<blockquote>**Pengguna berhasil di unmute**\n- Nama: {user.first_name}\n- User ID: `{target_user_id}`</blockquote>")
+    await asyncio.sleep(10)
+    await response.delete()
+    await message.delete()
 
-@Bot.on_message(filters.command("gmuted") & ~filters.private)
-async def muted(app: Bot, message: Message):
-    print(f"Received /gmuted command from {message.from_user.id}")
+# Command handler to list all muted users
+@app.on_message(filters.command("listpl") & filters.group & ~(BANNED_USERS))
+async def muted(client, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
-        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+    if not await is_admin_or_owner(client, chat_id, user_id):
+        return await message.reply("Hanya admin atau pemilik grup yang bisa menggunakan perintah ini.")
 
-    group_id = message.chat.id
-    kons = await get_muted_users_in_group(group_id)
+    muted_users = await get_muted_users_in_group(chat_id)
 
-    if not kons:
+    if not muted_users:
         return await message.reply("**Belum ada pengguna yang di mute.**")
 
-    resp = await message.reply("**Memuat database...**")
+    response = await message.reply("**Memuat database...**")
 
     header_msg = "<blockquote>**Daftar pengguna yang di mute**\n\n</blockquote>"
     msg = header_msg
     num = 0
-    max_length = 4096  # Maximum message length allowed by Telegram
+    max_length = 4096  # Panjang pesan maksimum yang diizinkan oleh Telegram
 
-    for user in kons:
+    for user in muted_users:
         num += 1
         user_id = user['user_id']
         try:
-            user_info = await app.get_users(int(user_id))
+            user_info = await client.get_users(int(user_id))
             user_name = f"{user_info.first_name or ''} {user_info.last_name or ''}"
         except PeerIdInvalid:
             user_name = "Tidak dikenal"
@@ -169,42 +139,45 @@ async def muted(app: Bot, message: Message):
             msg += user_info_msg
 
     await message.reply(msg, disable_web_page_preview=True)
-    await resp.delete()
+    await response.delete()
 
-@Bot.on_message(filters.command("clearmuted") & ~filters.private)
-async def clear_muted(app: Bot, message: Message):
-    print(f"Received /clearmuted command from {message.from_user.id}")
+# Command handler to clear all muted users in a group
+@app.on_message(filters.command("clearpl") & filters.group & ~(BANNED_USERS))
+async def clear_muted(client, message: Message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
 
-    if not await is_admin_or_owner(app, message.chat.id, message.from_user.id):
-        return await message.reply_text("Kamu harus menjadi admin untuk menggunakan perintah ini.")
+    if not await is_admin_or_owner(client, chat_id, user_id):
+        return await message.reply("Hanya admin atau pemilik grup yang bisa menggunakan perintah ini.")
 
-    group_id = message.chat.id
-    muted_users = await get_muted_users_in_group(group_id)
+    muted_users = await get_muted_users_in_group(chat_id)
 
     if not muted_users:
         return await message.reply("**Tidak ada pengguna yang di mute untuk dihapus.**")
 
-    await clear_muted_users_in_group(group_id)
+    await clear_muted_users_in_group(chat_id)
+
     await message.reply("**Semua pengguna yang di mute telah dihapus untuk grup ini.**")
 
-@Bot.on_message(filters.group & ~filters.private)
-async def delete_muted_messages(app: Bot, message: Message):
+# Message handler to delete messages from muted users
+@app.on_message(filters.group & ~filters.private)
+async def delete_muted_messages(client, message: Message):
     if message.from_user is None:
         return
 
     user_id = message.from_user.id
-    group_id = message.chat.id
+    chat_id = message.chat.id
     group_name = message.chat.title
 
-    muted_users = await get_muted_users_in_group(group_id)
+    muted_users = await get_muted_users_in_group(chat_id)
     if any(u['user_id'] == user_id for u in muted_users):
-        print(f"Pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id})")
+        logger.info(f"Pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({chat_id})")
         try:
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus")
+            logger.info(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({chat_id}) berhasil dihapus")
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.delete()
-            print(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({group_id}) berhasil dihapus setelah menunggu {e.value} detik")
+            logger.info(f"Pesan dari pengguna yang di-mute {user_id} di grup {group_name} ({chat_id}) berhasil dihapus setelah menunggu {e.value} detik")
         except Exception as e:
-            print(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({group_id}). Error: {e}")
+            logger.error(f"Tidak dapat menghapus pesan dari pengguna yang di-mute: {user_id} di grup {group_name} ({chat_id}). Error: {e}")
