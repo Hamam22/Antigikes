@@ -46,6 +46,10 @@ async def mute_handler(client, message: Message):
     target_user_id = user.id
     issuer_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}"
 
+    # Check if the target user is an admin or owner
+    if await is_admin_or_owner(client, chat_id, target_user_id):
+        return await message.reply_text("Maaf, tidak bisa memasukkan admin ke dalam pl.")
+
     if target_user_id == user_id:
         return await message.reply_text("Kamu tidak bisa mute diri sendiri.")
     elif target_user_id == client.me.id:
